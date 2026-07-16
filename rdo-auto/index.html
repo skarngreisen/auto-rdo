@@ -272,9 +272,9 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 <div class="container">
 
   <!-- ============================================================
-       VIEW: PROJECT SELECTION
+       VIEW: HOME (project selector + RDO list)
        ============================================================ -->
-  <div class="view" id="projectsView">
+  <div class="view" id="homeView">
     <div class="card" style="margin-top:.75rem;">
       <div class="card-header">Projeto</div>
       <label for="projectSelect">Selecionar projeto</label>
@@ -285,14 +285,8 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
         <button class="btn btn-secondary" id="btnNewProject" style="flex:1">+ Novo</button>
       </div>
     </div>
-  </div>
-
-  <!-- ============================================================
-       VIEW: RDO LIST
-       ============================================================ -->
-  <div class="view" id="rdosView">
-    <div id="rdosList"></div>
-    <button class="btn btn-primary btn-full" id="btnNewRDO">
+    <div id="rdosList" style="display:none;"></div>
+    <button class="btn btn-primary btn-full" id="btnNewRDO" style="display:none;">
       + Novo RDO
     </button>
   </div>
@@ -587,7 +581,7 @@ function showView(viewId) {
 
   // Back button visibility
   const btnBack = $("#btnBack");
-  if (viewId === "projectsView") {
+  if (viewId === "homeView") {
     btnBack.style.visibility = "hidden";
   } else {
     btnBack.style.visibility = "visible";
@@ -598,13 +592,13 @@ function showView(viewId) {
 // SPLASH
 // ============================================================
 $("#splashView").addEventListener("click", () => {
-  showView("projectsView");
+  showView("homeView");
   loadProjects();
 });
 // Auto-dismiss after 2.5s
 setTimeout(() => {
   if ($("#splashView").classList.contains("active")) {
-    showView("projectsView");
+    showView("homeView");
     loadProjects();
   }
 }, 2500);
@@ -616,15 +610,13 @@ $("#btnBack").addEventListener("click", () => {
   const formActive = $("#formView").classList.contains("active");
   const roActive = $("#readonlyView").classList.contains("active");
   if (formActive || roActive) {
-    showView("rdosView");
+    showView("homeView");
     loadRDOs();
-  } else if ($("#rdosView").classList.contains("active")) {
-    showView("projectsView");
   }
 });
 
 $("#btnBackFromRO").addEventListener("click", () => {
-  showView("rdosView");
+  showView("homeView");
   loadRDOs();
 });
 
@@ -655,6 +647,7 @@ async function loadProjects() {
   const savedId = localStorage.getItem("rdo_selected_project");
   if (savedId && data.find(p => p.id === savedId)) {
     sel.value = savedId;
+    sel.dispatchEvent(new Event("change"));
   }
 }
 
@@ -665,7 +658,8 @@ $("#projectSelect").addEventListener("change", () => {
   currentProjectName = $("#projectSelect").selectedOptions[0]?.text || "";
   localStorage.setItem("rdo_selected_project", id);
   $("#headerProjectName").textContent = currentProjectName;
-  showView("rdosView");
+  $("#rdosList").style.display = "block";
+  $("#btnNewRDO").style.display = "block";
   loadRDOs();
 });
 
@@ -703,7 +697,9 @@ $("#btnModalSave").addEventListener("click", async () => {
   currentProjectName = `${data.cliente} — ${data.localidade} (${data.sonda})`;
   localStorage.setItem("rdo_selected_project", data.id);
   $("#headerProjectName").textContent = currentProjectName;
-  showView("rdosView");
+  showView("homeView");
+  $("#rdosList").style.display = "block";
+  $("#btnNewRDO").style.display = "block";
   loadRDOs();
 });
 
@@ -712,6 +708,8 @@ $("#btnModalSave").addEventListener("click", async () => {
 // ============================================================
 async function loadRDOs() {
   const container = $("#rdosList");
+  container.style.display = "block";
+  $("#btnNewRDO").style.display = "block";
   container.innerHTML = '<div style="text-align:center;padding:1rem;color:#9ca3af;">Carregando...</div>';
 
   const { data, error } = await sb.from("rdos")
@@ -1311,7 +1309,9 @@ $("#btnSubmit").addEventListener("click", async () => {
     if (result.error) { showToast("Erro: "+result.error.message,"error"); return; }
     showToast("RDO enviado com sucesso!","success");
     resetForm();
-    showView("rdosView");
+    showView("homeView");
+    $("#rdosList").style.display = "block";
+    $("#btnNewRDO").style.display = "block";
     loadRDOs();
   } catch(e) { showToast("Erro: "+e.message,"error"); }
   finally {
