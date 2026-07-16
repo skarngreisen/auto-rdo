@@ -42,6 +42,28 @@ Foco: reduzir o atrito de preencher RDOs diarios.
 - Confirma via modal simples: "Tem certeza? Os dados nao salvos serao perdidos."
 - Reseta o form para o estado inicial (com time de hoje, equipe padrao).
 
+### 1.4 Template de RDO por tipo de projeto
+
+- Ao criar um projeto, o usuario seleciona o tipo:
+  - **Perfuracao de poco** — template completo atual (brocas, coluna, fluido, quimicos, parametros, etc.).
+  - **Manutencao** — template reduzido (sem brocas, coluna, fluido, parametros; foco em operacoes, equipe, HSE, materiais).
+- O tipo fica salvo na tabela `projetos` (coluna `tipo`).
+- Ao abrir um RDO novo, as secoes exibidas dependem do `tipo` do projeto.
+- Manutencao tipicamente envolve: troca de bomba, reparo de equipamento, limpeza de poco, teste de vazao.
+- Campos especificos de manutencao (futuro): equipamento intervencionado, pecas trocadas, motivo da intervencao.
+
+### 1.5 Operacoes: classificacao + timeline visual
+
+- Remover campo "Codigo" da tabela de operacoes (nao agrega valor no fluxo atual).
+- Adicionar campo "Tipo" com 3 opcoes:
+  - **Normal** (verde) — atividade produtiva (perfuracao, cimentacao, etc.)
+  - **Nao produtiva** (amarelo) — atividade-meio necessaria (DDS, manutencao preventiva, deslocamento)
+  - **Parada** (vermelho) — tempo ocioso por falha, clima, aguardando terceiros
+- Conforme os intervalos sao preenchidos, renderizar abaixo da tabela uma **linha do tempo** horizontal:
+  - Barra de 24h (00:00 a 24:00) com cada intervalo representado como um segmento colorido.
+  - Visual estilo `O------------O` onde os `O` sao os marcadores de inicio/fim e o traco tem a cor do tipo.
+  - Permite ao supervisor visualizar rapidamente a proporcao de horas produtivas vs paradas no dia.
+
 ---
 
 ## Fase 2: Workflow de Aprovacao
@@ -153,12 +175,12 @@ Foco: funcionar sem internet na sonda.
 ## Resumo visual
 
 ```
-Fase 1 (MVP+)         Fase 2 (Workflow)      Fase 3 (Notif)      Fase 4 (Admin)       Fase 5 (Offline)
-[pre-fill ontem]  →   [em_revisao]       →   [badge]         →   [dashboard]      →   [service worker]
-[pre-fill seção]      [revisado]             [push]              [CSV/PDF]             [sync offline]
-[limpar form]         [reaberto]            [email]             [gráficos]            [PWA install]
-                      [permissões]
-                      [log revisão]
+Fase 1 (MVP+)               Fase 2 (Workflow)      Fase 3 (Notif)      Fase 4 (Admin)       Fase 5 (Offline)
+[pre-fill ontem]        →   [em_revisao]       →   [badge]         →   [dashboard]      →   [service worker]
+[pre-fill secao]            [revisado]             [push]              [CSV/PDF]             [sync offline]
+[limpar form]               [reaberto]            [email]             [graficos]            [PWA install]
+[template perf/manut]       [permissoes]
+[timeline ops colorida]     [log revisao]
 ```
 
 ---
