@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   class="svglite"
+   width="648.00pt"
+   height="432.00pt"
+   viewBox="0 0 648.00 432.00"
+   version="1.1"
+   id="svg43"
+   sodipodi:docname="curva_s_pda_e_se.svg"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview43"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="pt"
+     inkscape:zoom="1.4194871"
+     inkscape:cx="430.7894"
+     inkscape:cy="287.07552"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg43" />
+  <defs
+     id="defs1">
+    <style
+       type="text/css"
+       id="style1"><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath44">
+      <g
+         id="g45">
+        <rect
+           x="0"
+           y="0"
+           width="648"
+           height="432"
+           id="rect44" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath46">
+      <g
+         id="g47">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect46" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath47">
+      <g
+         id="g48">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect47" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath48">
+      <g
+         id="g49">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect48" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath49">
+      <g
+         id="g50">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect49" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath50">
+      <g
+         id="g51">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect50" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath51">
+      <g
+         id="g52">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect51" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath52">
+      <g
+         id="g53">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect52" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath53">
+      <g
+         id="g54">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect53" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath54">
+      <g
+         id="g55">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect54" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath55">
+      <g
+         id="g56">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect55" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath56">
+      <g
+         id="g57">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect56" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath57">
+      <g
+         id="g58">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect57" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath58">
+      <g
+         id="g59">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect58" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath59">
+      <g
+         id="g60">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect59" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath60">
+      <g
+         id="g61">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect60" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath61">
+      <g
+         id="g62">
+        <rect
+           x="55.419998"
+           y="64.739998"
+           width="567.67999"
+           height="280.64999"
+           id="rect61" />
+      </g>
+    </clipPath>
+  </defs>
+  <rect
+     width="100%"
+     height="100%"
+     style="stroke: none; fill: #FFFFFF;"
+     id="rect1" />
+  <defs
+     id="defs2">
+    <clipPath
+       id="cpMC4wMHw2NDguMDB8MC4wMHw0MzIuMDA=">
+      <rect
+         x="0.00"
+         y="0.00"
+         width="648.00"
+         height="432.00"
+         id="rect2" />
+    </clipPath>
+  </defs>
+  <rect
+     x="-6.4e-14"
+     y="0"
+     width="648"
+     height="432"
+     style="fill:#ffffff;stroke:none;stroke-width:1.16"
+     id="rect3"
+     clip-path="url(#clipPath44)" />
+  <defs
+     id="defs4" />
+  <polyline
+     points="55.42,345.39 623.09,345.39 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline4"
+     clip-path="url(#clipPath61)" />
+  <polyline
+     points="55.42,298.61 623.09,298.61 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline5"
+     clip-path="url(#clipPath60)" />
+  <polyline
+     points="55.42,251.84 623.09,251.84 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline6"
+     clip-path="url(#clipPath59)" />
+  <polyline
+     points="55.42,205.06 623.09,205.06 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline7"
+     clip-path="url(#clipPath58)" />
+  <polyline
+     points="55.42,158.29 623.09,158.29 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline8"
+     clip-path="url(#clipPath57)" />
+  <polyline
+     points="55.42,111.51 623.09,111.51 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline9"
+     clip-path="url(#clipPath56)" />
+  <polyline
+     points="55.42,64.74 623.09,64.74 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline10"
+     clip-path="url(#clipPath55)" />
+  <polyline
+     points="55.42,345.39 55.42,64.74 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline11"
+     clip-path="url(#clipPath54)" />
+  <polyline
+     points="150.03,345.39 150.03,64.74 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline12"
+     clip-path="url(#clipPath53)" />
+  <polyline
+     points="244.64,345.39 244.64,64.74 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline13"
+     clip-path="url(#clipPath52)" />
+  <polyline
+     points="339.25,345.39 339.25,64.74 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline14"
+     clip-path="url(#clipPath51)" />
+  <polyline
+     points="433.87,345.39 433.87,64.74 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline15"
+     clip-path="url(#clipPath50)" />
+  <polyline
+     points="528.48,345.39 528.48,64.74 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline16"
+     clip-path="url(#clipPath49)" />
+  <polyline
+     points="623.09,345.39 623.09,64.74 "
+     style="stroke:#eeeeee;stroke-width:0.64;stroke-linecap:butt"
+     id="polyline17"
+     clip-path="url(#clipPath48)" />
+  <polyline
+     points="74.34,339.21 93.26,337.67 112.18,333.46 131.11,331.22 150.03,325.61 168.95,323.95 187.87,315.78 206.80,313.44 225.72,308.30 244.64,305.96 263.56,293.80 282.49,278.83 301.41,258.38 320.33,231.12 339.25,214.75 358.18,202.54 377.10,202.12 396.02,192.76 414.95,185.49 433.87,182.27 452.79,171.51 471.71,168.87 490.64,138.30 509.56,122.27 528.48,121.48 547.40,110.97 566.33,97.48 "
+     style="stroke:#2c3e50;stroke-width:2.35;stroke-linecap:butt"
+     id="polyline18"
+     clip-path="url(#clipPath47)" />
+  <polyline
+     points="74.34,342.58 93.26,336.97 112.18,332.76 131.11,332.76 150.03,332.76 168.95,304.22 187.87,287.48 206.80,253.99 225.72,220.50 244.64,187.01 263.56,179.33 282.49,168.04 301.41,145.45 320.33,122.85 339.25,100.26 358.18,97.48 "
+     style="stroke:#e74c3c;stroke-width:1.28;stroke-linecap:butt;stroke-dasharray:6.83, 6.83;stroke-opacity:0.8"
+     id="polyline19"
+     clip-path="url(#clipPath46)" />
+  <g
+     id="g63"
+     transform="translate(-37.465327,-40.50711)">
+    <text
+       x="377.10001"
+       y="117.56"
+       style="font-size:9.96px;font-family:Arial;fill:#e74c3c"
+       textLength="35.950001"
+       lengthAdjust="spacingAndGlyphs"
+       id="text19">Previsto</text>
+    <text
+       x="377.10001"
+       y="131.3"
+       style="font-size:9.96px;font-family:Arial;fill:#e74c3c"
+       textLength="38.720001"
+       lengthAdjust="spacingAndGlyphs"
+       id="text20"
+       transform="translate(-1.307249)">(16 dias)</text>
+  </g>
+  <text
+     x="547.40002"
+     y="85.099998"
+     text-anchor="end"
+     style="font-size:9.1px;font-family:Arial;fill:#2c3e50"
+     textLength="98.050003"
+     lengthAdjust="spacingAndGlyphs"
+     id="text21"
+     transform="translate(65.74281,-5.1312217)">Executado sem paradas</text>
+  <text
+     x="581.89331"
+     y="92.528786"
+     text-anchor="end"
+     style="font-size:9.1px;font-family:Arial;fill:#2c3e50"
+     lengthAdjust="spacingAndGlyphs"
+     id="text22">(27 dias)</text>
+  <g
+     clip-path="url(#cpMC4wMHw2NDguMDB8MC4wMHw0MzIuMDA=)"
+     id="g43">
+    <text
+       x="50.04"
+       y="348.82"
+       text-anchor="end"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="5.34px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text23">0</text>
+    <text
+       x="50.04"
+       y="302.05"
+       text-anchor="end"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="16.01px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text24">100</text>
+    <text
+       x="50.04"
+       y="255.27"
+       text-anchor="end"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="16.01px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text25">200</text>
+    <text
+       x="50.04"
+       y="208.50"
+       text-anchor="end"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="16.01px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text26">300</text>
+    <text
+       x="50.04"
+       y="161.72"
+       text-anchor="end"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="16.01px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text27">400</text>
+    <text
+       x="50.04"
+       y="114.95"
+       text-anchor="end"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="16.01px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text28">500</text>
+    <text
+       x="50.04"
+       y="68.17"
+       text-anchor="end"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="16.01px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text29">600</text>
+    <text
+       x="55.42"
+       y="357.64"
+       text-anchor="middle"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="5.34px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text30">0</text>
+    <text
+       x="150.03"
+       y="357.64"
+       text-anchor="middle"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="5.34px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text31">5</text>
+    <text
+       x="244.64"
+       y="357.64"
+       text-anchor="middle"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="10.67px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text32">10</text>
+    <text
+       x="339.25"
+       y="357.64"
+       text-anchor="middle"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="10.67px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text33">15</text>
+    <text
+       x="433.87"
+       y="357.64"
+       text-anchor="middle"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="10.67px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text34">20</text>
+    <text
+       x="528.48"
+       y="357.64"
+       text-anchor="middle"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="10.67px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text35">25</text>
+    <text
+       x="623.09"
+       y="357.64"
+       text-anchor="middle"
+       style="font-size: 9.60px;fill: #4D4D4D; font-family: &quot;Arial&quot;;"
+       textLength="10.67px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text36">30</text>
+    <text
+       x="339.25"
+       y="371.24"
+       text-anchor="middle"
+       style="font-size: 12.00px; font-family: &quot;Arial&quot;;"
+       textLength="298.54px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text37">Dia útil de perfuração (apenas dias com avanço &gt; 0,5m)</text>
+    <text
+       transform="translate(28.52,205.06) rotate(-90)"
+       text-anchor="middle"
+       style="font-size: 12.00px; font-family: &quot;Arial&quot;;"
+       textLength="166.09px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text38">Metros perfurados (cumulativo)</text>
+    <text
+       x="339.25"
+       y="50.46"
+       text-anchor="middle"
+       style="font-size: 11.00px;fill: #555555; font-family: &quot;Arial&quot;;"
+       textLength="397.74px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text39">Se não houvesse nenhuma parada  |  Performance pura de perfuração × Previsto</text>
+    <text
+       x="339.25"
+       y="32.81"
+       text-anchor="middle"
+       style="font-size: 18.00px; font-weight: bold; font-family: &quot;Arial&quot;;"
+       textLength="290.49px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text40">Parc das Artes — Cenário &quot;E se?&quot;</text>
+    <text
+       x="339.25"
+       y="387.10"
+       text-anchor="middle"
+       style="font-size: 7.50px;fill: #999999; font-family: &quot;Arial&quot;;"
+       textLength="230.78px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text41">Foram removidos 29 dias sem avanço significativo dos 56 dias totais.</text>
+    <text
+       x="339.25"
+       y="398.80"
+       text-anchor="middle"
+       style="font-size: 7.50px;fill: #999999; font-family: &quot;Arial&quot;;"
+       textLength="198.67px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text42">A curva mostra apenas dias em que houve penetração real.</text>
+    <text
+       x="339.25"
+       y="410.50"
+       text-anchor="middle"
+       style="font-size: 7.50px;fill: #999999; font-family: &quot;Arial&quot;;"
+       textLength="101.69px"
+       lengthAdjust="spacingAndGlyphs"
+       id="text43">Fonte: RDOs  |  Fev–Mai 2026</text>
+  </g>
+</svg>

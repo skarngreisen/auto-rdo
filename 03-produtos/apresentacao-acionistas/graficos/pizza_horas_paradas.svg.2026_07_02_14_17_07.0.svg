@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   class="svglite"
+   width="577.42151pt"
+   height="391.85876pt"
+   viewBox="0 0 577.42151 391.85876"
+   version="1.1"
+   id="svg22"
+   sodipodi:docname="pizza_horas_paradas.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview22"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="pt"
+     showguides="true" />
+  <defs
+     id="defs1">
+    <style
+       type="text/css"
+       id="style1"><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath23">
+      <g
+         id="g24">
+        <rect
+           x="133.85001"
+           y="86.400002"
+           width="380.29999"
+           height="380.29999"
+           id="rect23" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath24">
+      <g
+         id="g25">
+        <rect
+           x="133.85001"
+           y="86.400002"
+           width="380.29999"
+           height="380.29999"
+           id="rect24" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath25">
+      <g
+         id="g26">
+        <rect
+           x="133.85001"
+           y="86.400002"
+           width="380.29999"
+           height="380.29999"
+           id="rect25" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath26">
+      <g
+         id="g27">
+        <rect
+           x="133.85001"
+           y="86.400002"
+           width="380.29999"
+           height="380.29999"
+           id="rect26" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath27">
+      <g
+         id="g28">
+        <rect
+           x="133.85001"
+           y="86.400002"
+           width="380.29999"
+           height="380.29999"
+           id="rect27" />
+      </g>
+    </clipPath>
+  </defs>
+  <defs
+     id="defs2">
+    <clipPath
+       id="cpMC4wMHw2NDguMDB8MC4wMHw1MDQuMDA=">
+      <rect
+         x="0"
+         y="0"
+         width="648"
+         height="504"
+         id="rect2" />
+    </clipPath>
+  </defs>
+  <g
+     clip-path="url(#cpMC4wMHw2NDguMDB8MC4wMHw1MDQuMDA=)"
+     id="g2"
+     transform="translate(-42.503197,-69.456444)" />
+  <defs
+     id="defs3">
+    <clipPath
+       id="cpMTAzLjk2fDU0NC4wNHwwLjAwfDUwNC4wMA==">
+      <rect
+         x="103.96"
+         y="0"
+         width="440.07001"
+         height="504"
+         id="rect3" />
+    </clipPath>
+  </defs>
+  <g
+     clip-path="url(#cpMC4wMHw2NDguMDB8MC4wMHw1MDQuMDA=)"
+     id="g5"
+     transform="translate(-42.503197,-69.456444)" />
+  <defs
+     id="defs5" />
+  <g
+     id="g29"
+     transform="rotate(123.51082,321.40434,230.38103)">
+    <polygon
+       points="324,188.91 324,182.65 324,176.39 324,170.13 324,163.87 319.19,163.97 314.38,164.28 309.6,164.79 304.84,165.51 300.11,166.43 295.43,167.55 290.8,168.87 286.23,170.38 281.74,172.09 277.31,173.99 272.98,176.08 268.73,178.35 264.59,180.8 260.55,183.43 256.63,186.22 252.84,189.18 249.17,192.3 245.64,195.57 242.25,198.99 239.02,202.55 235.93,206.25 233.01,210.08 230.26,214.02 227.67,218.08 225.26,222.25 223.03,226.52 220.99,230.88 219.13,235.32 217.47,239.83 216,244.42 214.72,249.06 213.65,253.75 212.78,258.48 212.11,263.25 211.64,268.04 211.38,272.85 211.32,277.66 211.48,282.47 211.83,287.27 212.39,292.05 213.16,296.81 214.12,301.52 215.29,306.19 216.65,310.81 218.21,315.36 219.97,319.84 221.91,324.25 224.04,328.56 226.36,332.78 228.85,336.9 231.51,340.91 236.65,337.34 241.79,333.76 246.93,330.18 252.06,326.61 257.2,323.03 262.34,319.46 267.48,315.88 272.62,312.31 277.76,308.73 275.54,305.29 273.58,301.7 271.89,297.97 270.48,294.13 269.34,290.2 268.49,286.2 267.94,282.15 267.68,278.07 267.72,273.98 268.05,269.9 268.68,265.86 269.6,261.87 270.81,257.96 272.3,254.15 274.06,250.46 276.09,246.91 278.36,243.51 280.88,240.28 283.63,237.25 286.59,234.42 289.74,231.82 293.08,229.45 296.58,227.33 300.22,225.47 303.99,223.88 307.86,222.57 311.82,221.54 315.85,220.8 319.91,220.36 324,220.21 324,213.95 324,207.69 324,201.43 324,195.17 "
+       style="fill:#e74c3c;stroke:#ffffff;stroke-width:2.56;stroke-linecap:butt;stroke-linejoin:miter"
+       id="polygon5"
+       clip-path="url(#clipPath27)" />
+    <polygon
+       points="252.06,326.61 246.93,330.18 241.79,333.76 236.65,337.34 231.51,340.91 234.34,344.8 237.33,348.55 240.48,352.18 243.78,355.67 247.22,359.02 250.81,362.22 254.52,365.26 258.37,368.14 262.33,370.86 266.41,373.4 270.59,375.77 274.87,377.95 279.23,379.95 283.68,381.77 288.2,383.39 292.79,384.82 297.43,386.05 302.12,387.08 306.85,387.92 311.62,388.55 316.4,388.97 321.2,389.19 326,389.21 330.8,389.02 335.59,388.63 340.36,388.03 345.1,387.24 349.79,386.24 354.45,385.04 359.04,383.64 363.58,382.05 368.04,380.27 372.42,378.3 376.71,376.14 380.91,373.8 385,371.29 388.98,368.6 392.85,365.75 396.59,362.73 400.19,359.56 403.66,356.24 406.99,352.77 410.16,349.16 413.18,345.43 416.03,341.56 418.72,337.58 421.24,333.49 423.57,329.29 425.73,325 427.7,320.62 421.94,318.17 416.18,315.72 410.42,313.27 404.66,310.83 398.9,308.38 393.14,305.93 387.37,303.48 381.61,301.03 375.85,298.58 374.09,302.33 372.06,305.94 369.78,309.39 367.24,312.67 364.47,315.74 361.48,318.61 358.29,321.25 354.92,323.65 351.37,325.79 347.68,327.67 343.87,329.27 339.94,330.59 335.93,331.61 331.85,332.34 327.73,332.76 323.59,332.89 319.46,332.7 315.35,332.22 311.28,331.43 307.28,330.35 303.38,328.98 299.58,327.32 295.92,325.39 292.41,323.2 289.07,320.75 285.92,318.07 282.97,315.16 280.24,312.04 277.76,308.73 272.62,312.31 267.48,315.88 262.34,319.46 257.2,323.03 "
+       style="fill:#e67e22;stroke:#ffffff;stroke-width:2.56;stroke-linecap:butt;stroke-linejoin:miter"
+       id="polygon6"
+       clip-path="url(#clipPath26)" />
+    <polygon
+       points="404.66,310.83 410.42,313.27 416.18,315.72 421.94,318.17 427.7,320.62 429.55,315.99 431.19,311.29 432.62,306.52 433.84,301.69 434.84,296.81 435.63,291.89 436.2,286.94 436.55,281.97 436.68,276.99 436.59,272.01 436.28,267.03 435.75,262.08 435,257.15 434.03,252.27 432.85,247.43 431.46,242.64 429.86,237.93 428.05,233.29 426.03,228.73 423.82,224.27 421.41,219.91 418.81,215.65 413.54,219.04 408.28,222.42 403.01,225.8 397.74,229.19 392.47,232.57 387.21,235.95 381.94,239.34 376.67,242.72 371.41,246.1 373.55,249.73 375.41,253.51 376.99,257.42 378.28,261.43 379.25,265.53 379.92,269.69 380.28,273.89 380.32,278.11 380.04,282.31 379.46,286.49 378.56,290.61 377.35,294.65 375.85,298.58 381.61,301.03 387.37,303.48 393.14,305.93 398.9,308.38 "
+       style="fill:#3498db;stroke:#ffffff;stroke-width:2.56;stroke-linecap:butt;stroke-linejoin:miter"
+       id="polygon7"
+       clip-path="url(#clipPath25)" />
+    <polygon
+       points="397.74,229.19 403.01,225.8 408.28,222.42 413.54,219.04 418.81,215.65 416.11,211.65 413.25,207.76 410.22,204 407.03,200.38 403.7,196.89 400.21,193.55 396.58,190.36 392.83,187.33 388.94,184.46 384.94,181.76 380.82,179.24 376.6,176.9 372.28,174.73 367.88,172.76 363.39,170.98 358.83,169.38 354.21,167.99 349.53,166.8 344.8,165.8 340.04,165.01 339.15,171.21 338.26,177.41 337.37,183.6 336.48,189.8 335.58,196 334.69,202.19 333.8,208.39 332.91,214.58 332.02,220.78 335.98,221.5 339.88,222.49 343.69,223.76 347.41,225.3 351.01,227.1 354.47,229.16 357.77,231.45 360.9,233.98 363.85,236.72 366.59,239.66 369.11,242.8 371.41,246.1 376.67,242.72 381.94,239.34 387.21,235.95 392.47,232.57 "
+       style="fill:#9b59b6;stroke:#ffffff;stroke-width:2.56;stroke-linecap:butt;stroke-linejoin:miter"
+       id="polygon8"
+       clip-path="url(#clipPath24)" />
+    <polygon
+       points="336.48,189.8 337.37,183.6 338.26,177.41 339.15,171.21 340.04,165.01 334.71,164.38 329.36,163.99 324,163.87 324,170.13 324,176.39 324,182.65 324,188.91 324,195.17 324,201.43 324,207.69 324,213.95 324,220.21 328.02,220.35 332.02,220.78 332.91,214.58 333.8,208.39 334.69,202.19 335.58,196 "
+       style="fill:#95a5a6;stroke:#ffffff;stroke-width:2.56;stroke-linecap:butt;stroke-linejoin:miter"
+       id="polygon9"
+       clip-path="url(#clipPath23)" />
+  </g>
+  <g
+     id="g33"
+     transform="translate(261.73395,-62.070217)">
+    <text
+       x="249.09"
+       y="232.22"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       textLength="92.099998"
+       lengthAdjust="spacingAndGlyphs"
+       id="text9"
+       transform="translate(-73.303167,-34.452489)">Mão de obra</text>
+    <text
+       x="249.09"
+       y="253.81"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       textLength="44.34"
+       lengthAdjust="spacingAndGlyphs"
+       id="text10"
+       transform="translate(-72.940478,-33.719457)">34.7%</text>
+  </g>
+  <g
+     id="g32"
+     transform="translate(-194.63977,-287.10074)">
+    <text
+       x="332.69"
+       y="355.41"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       textLength="99.050003"
+       lengthAdjust="spacingAndGlyphs"
+       id="text11"
+       transform="translate(-5.7016483,58.053147)">Equipamento</text>
+    <text
+       x="332.69"
+       y="377.01001"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       textLength="44.34"
+       lengthAdjust="spacingAndGlyphs"
+       id="text12"
+       transform="translate(-5.7016483,58.053147)">33.9%</text>
+  </g>
+  <g
+     id="g30"
+     transform="translate(-330.73864,56.189906)">
+    <text
+       x="408.20999"
+       y="264.20999"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       textLength="101.68"
+       lengthAdjust="spacingAndGlyphs"
+       id="text13"
+       transform="translate(85.537438)">Planejamento</text>
+    <text
+       x="408.20999"
+       y="285.81"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       textLength="44.34"
+       lengthAdjust="spacingAndGlyphs"
+       id="text14"
+       transform="translate(85.537438)">15.5%</text>
+  </g>
+  <g
+     id="g31"
+     transform="translate(-75.165157,167.2675)">
+    <text
+       x="369.70001"
+       y="200.25999"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       lengthAdjust="spacingAndGlyphs"
+       id="text15"
+       transform="translate(71.836092,-38.850679)">Cliente</text>
+    <text
+       x="369.70001"
+       y="221.86"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       textLength="44.34"
+       lengthAdjust="spacingAndGlyphs"
+       id="text16"
+       transform="translate(71.836092,-38.850679)">13.6%</text>
+  </g>
+  <g
+     id="g34"
+     transform="translate(-24.299484,-82.240779)">
+    <text
+       x="444.69717"
+       y="364.68878"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       lengthAdjust="spacingAndGlyphs"
+       id="text17">Outros</text>
+    <text
+       x="330.03"
+       y="208.64999"
+       text-anchor="middle"
+       style="font-weight:bold;font-size:15.65px;font-family:Arial;fill:#000000"
+       textLength="35.639999"
+       lengthAdjust="spacingAndGlyphs"
+       id="text18"
+       transform="translate(114.80075,177.63878)">2.3%</text>
+  </g>
+  <text
+     x="324"
+     y="52.310001"
+     text-anchor="middle"
+     style="font-size:11px;font-family:Arial;fill:#555555"
+     lengthAdjust="spacingAndGlyphs"
+     id="text19"
+     transform="translate(-42.503197,4.5797552)">347h com equipe presente e parada no projeto</text>
+  <text
+     x="324"
+     y="34.25"
+     text-anchor="middle"
+     style="font-weight:bold;font-size:20px;font-family:Arial"
+     lengthAdjust="spacingAndGlyphs"
+     id="text21"
+     transform="translate(-42.503197,4.5797552)">Parc das Artes: Horas paradas por causa raiz</text>
+  <text
+     x="454.49228"
+     y="377.74805"
+     text-anchor="middle"
+     style="font-size:8px;font-family:Arial;fill:#999999"
+     lengthAdjust="spacingAndGlyphs"
+     id="text22">Fonte: RDOs analisados com a operação |   Julho 2026</text>
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.2;stroke-linejoin:round;stroke-opacity:1"
+     d="m 370.81607,275.67742 13.03208,10.02229 h 71.11747"
+     id="path39" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.2;stroke-linejoin:round;stroke-opacity:1"
+     d="m 328.2984,309.53021 10.44978,22.72977 h 59.7588"
+     id="path40" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.2;stroke-linejoin:round;stroke-opacity:1"
+     d="m 224.3801,307.09426 -10.17367,17.82911 H 108.59048"
+     id="path41" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.2;stroke-linejoin:round;stroke-opacity:1"
+     d="m 192.20541,138.31744 -9.53816,-7.33529 H 82.478703"
+     id="path42" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.2;stroke-linejoin:round;stroke-opacity:1"
+     d="m 376.16533,145.99119 10.90772,-7.06459 h 98.73331"
+     id="path43" />
+  <rect
+     style="fill:none;stroke:none;stroke-width:1.2;stroke-linejoin:round;stroke-opacity:1"
+     id="rect43"
+     width="577.42151"
+     height="391.85876"
+     x="0"
+     y="0"
+     ry="1.8000001" />
+</svg>

@@ -1,0 +1,317 @@
+\documentclass[12pt,a4paper]{scrartcl}
+
+% --- Fonts: Helvetica ---
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% --- Layout ---
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% --- Header / Footer ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[L]{IEM Consultoria}
+\fancyhead[R]{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Tables ---
+\usepackage{array}
+\usepackage{tabularx}
+
+% --- Graphics ---
+\usepackage{graphicx}
+
+% --- Hyperlinks ---
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=black}
+
+\begin{document}
+
+% ============================================================
+% TITLE
+% ============================================================
+\title{\textbf{Proposta de Consultoria: DH Projetos, Perfuração e Serviços}}
+\author{Igor Mascarenhas}
+\date{16 de junho de 2026}
+\maketitle
+
+\vspace{-0.5cm}
+
+\begin{center}
+\textbf{Período:} 3 meses \hspace{1cm} \textbf{Dedicação:} 20h semanais \hspace{1cm} \textbf{Foco:} Operacional
+\end{center}
+
+% ============================================================
+% RESUMO EXECUTIVO
+% ============================================================
+\section*{Resumo Executivo}
+
+\textbf{Em 90 dias, com 20h semanais, a DH passa a decidir com dados, não no escuro.}
+
+\begin{itemize}
+  \item \textbf{O problema:} Obras acumulam dias de horas paradas. RDOs atrasam. Cada obra começa sem plano escrito. Lições aprendidas evaporam. A equipe está sobrecarregada e o crescimento para 4 sondas simultâneas escancarou o limite dos processos atuais.
+  \item \textbf{O custo:} Perdas documentadas ultrapassam R\$100k em insumos desperdiçados. O risco de pleitos por atraso chega a R\$500k. E o custo maior é a incapacidade de escalar para contratos de longo prazo, exatamente o movimento estratégico que a DH quer fazer.
+  \item \textbf{A solução:} Três produtos integrados + um protocolo de metas que juntos eliminam as causas-raiz da ineficiência operacional.
+  \item \textbf{O retorno:} R\$45.000 de investimento contra riscos documentados de R\$500k+. Se a consultoria evitar uma única perda relevante, já se pagou múltiplas vezes.
+\end{itemize}
+
+% ============================================================
+% 1. O PROBLEMA
+% ============================================================
+\section{O Problema}
+
+\subsection{Os Sintomas}
+
+Os dados da operação revelam um padrão claro de ineficiência que se repete obra após obra:
+
+\begin{itemize}
+  \item \textbf{22,5 dias de horas paradas no último projeto} (Parc das Artes: 32 dias previstos $\to$ 104 dias reais, 69\% de atraso)
+\end{itemize}
+
+Distribuição das horas paradas por causa raiz:
+
+\begin{itemize}
+  \item \textbf{43\%: Aguardando Terceiros} (tubos fornecidos pelo cliente via faturamento direto + decisões externas)
+  \item \textbf{18\%: Falta de Equipe} (absenteísmo, DTS entre projetos, dimensionamento insuficiente)
+  \item \textbf{18\%: Manutenção Corretiva} (quebras de bomba, fole, underreamer, swivel sem preventiva)
+  \item \textbf{9\%: Atividades-Meio / Logística} (deslocamentos, processos administrativos obrigatórios)
+  \item \textbf{9\%: Materiais / Insumos internos} (concreto, consumíveis de solda, peças de reposição)
+  \item \textbf{3\%: Condições Climáticas} (chuva)
+\end{itemize}
+
+\begin{itemize}
+  \item \textbf{R\$112k perdidos} em produto químico por água não testada (problema evitável)
+  \item \textbf{R\$400-500k em risco} de pleito por RDO enviado com atraso
+  \item \textbf{RDOs acumulados com semanas de atraso}: geólogos afogados em trabalho administrativo essencial
+  \item \textbf{Não se sabe se a mão de obra crítica está disponível} quando precisa, e a obra para por falta de planejamento
+\end{itemize}
+
+\subsection{A Empresa Hoje}
+
+A DH atua em sete frentes: Avaliação Hidrogeológica, Licenciamento e Outorga, Perfuração de Poço Tubular Profundo, Manutenção Preventiva e Corretiva, Recuperação de Poço, Operação de sistema e BOT (Build Operate and Transfer). É um escopo amplo para uma equipe enxuta, e o crescimento recente de 2 para 4 sondas simultâneas evidenciou o limite dos processos atuais.
+
+Hoje a DH opera majoritariamente com contratos avulsos. O objetivo é migrar para contratos de longo prazo com grandes consumidoras. Contratos que garantam fluxo de caixa contínuo, carteira previsível de obras e margem para acelerar ou desacelerar projetos conforme a necessidade, em vez de buscar o próximo contrato para não perder a equipe. Mas para acessar esse mercado, a DH precisa de algo que ainda não tem: previsibilidade. Os gerentes dominam suas áreas, mas quando uma obra depende de várias áreas ao mesmo tempo (materiais que precisam estar no canteiro na data certa, gente disponível com a especialidade certa), a informação se perde. Os mesmos erros se repetem de uma obra para a outra porque a empresa ainda não transforma aprendizados em procedimentos. Não existe um sistema que diga, em tempo real, quanto do cronograma já foi consumido, quantas horas foram produtivas ou se os materiais e a mão de obra vão estar disponíveis na semana que vem. A empresa decide no escuro, e o preço diário de uma sonda parada torna esse custo invisível muito concreto.
+
+\subsection{A Causa Raiz}
+
+\begin{quote}
+\textbf{``Matéria Escura do trabalho'':} da mesma forma que a maior parte da massa do universo é matéria escura não observável, até 55\% do trabalho numa organização não é capturado, rastreado ou medido. Ocorre em mensagens, ligações, fluxos não documentados, retrabalho invisível.
+\end{quote}
+
+Na DH, essa ``Matéria Escura'' se manifesta como:
+
+\begin{itemize}
+  \item \textbf{Decisões acordadas por telefone que não são formalizadas.} O que foi combinado com cliente ou fornecedor em conversa informal permanece apenas na memória de quem participou. Quando a informação é necessária, ela não está acessível.
+  \item \textbf{Informação crítica que não alcança quem decide.} Um atraso de material é comunicado em um grupo de mensagens; o responsável pela alocação de equipe não está naquele grupo. A sonda para com a informação existindo.
+  \item \textbf{Conhecimento operacional retido em pessoas, não na empresa.} O status de cada obra e seu histórico de decisões residem na memória e nos registros pessoais de cada profissional. Quando ele se ausenta, a informação some junto.
+  \item \textbf{Lições aprendidas que evaporam ao fim do projeto.} O que um geólogo aprendeu em uma obra não está disponível para o geólogo da obra seguinte. Os mesmos erros se repetem.
+  \item \textbf{Inexistência de visão consolidada da operação.} Para responder ``quantas obras estão no prazo?'', é preciso consultar três pessoas, cada uma com uma fração da resposta espalhada em planilhas, mensagens e anotações pessoais.
+  \item \textbf{Divergência entre o procedimento documentado e a prática real de campo.} O conhecimento que efetivamente resolve os problemas do dia a dia circula apenas oralmente. O que está escrito não reflete o que é feito; o que é feito não está escrito.
+\end{itemize}
+
+Com excesso de atividades improdutivas, falta esforço direcionado para aumentar a previsibilidade dos projetos, gerenciar riscos e entregar valor.
+
+% ============================================================
+% 2. O CUSTO DE NÃO RESOLVER
+% ============================================================
+\section{O Custo de Não Resolver}
+
+O problema não é teórico: ele já está cobrando um preço mensurável. E o que foi possível medir até agora é apenas a ponta visível:
+
+\vspace{0.3cm}
+\begin{tabular}{p{5cm} p{9cm}}
+\textbf{Categoria} & \textbf{Impacto documentado} \\
+\hline
+\textbf{Perda direta} & R\$112k em produto químico desperdiçado por falha de processo (água não testada) \\
+\textbf{Risco de pleito} & R\$400-500k em risco por atraso na entrega de RDO \\
+\textbf{Horas paradas} & 22,5 dias em uma única obra (43\% por dependência de terceiros não gerenciada) \\
+\textbf{Retrabalho administrativo} & Geólogos e supervisores consumidos por transcrição de RDO, em vez de gestão de obra \\
+\textbf{Custo de oportunidade} & Incapacidade de escalar para contratos de longo prazo sem que o caos se amplifique \\
+\end{tabular}
+\vspace{0.3cm}
+
+Some-se a isso o custo humano: profissionais tecnicamente competentes desgastados por tarefas que não deveriam ser deles, lições aprendidas que se perdem a cada rotação de equipe, e uma operação que reage em vez de antecipar.
+
+O custo de \textbf{não} resolver é continuar com essas perdas se repetindo a cada novo projeto e, principalmente, permanecer travado no modelo de contratos avulsos enquanto o mercado exige previsibilidade para conceder contratos longos.
+
+% ============================================================
+% 3. A SOLUÇÃO
+% ============================================================
+\section{A Solução}
+
+Em 90 dias, com 20 horas semanais, implantamos três produtos que eliminam as causas-raiz identificadas e um protocolo de metas que garante que a empresa toda (não só o operacional) reme na mesma direção.
+
+Os produtos foram desenhados a partir das conversas com a equipe operacional. Cada produto ataca um gargalo relatado por quem está no dia a dia das obras: o RDO que atrasa e põe receita em risco, a falta de visibilidade em tempo real, a ausência de planejamento mínimo antes de cada projeto. A lógica é simples: primeiro enxerga-se o problema (dados), depois organiza-se a resposta (planejamento). Os produtos estão organizados na ordem em que faz sentido implementá-los.
+
+As 20 horas semanais de consultoria são o veículo de entrega desses produtos e da implementação dos ritos de acompanhamento. Não são um produto à parte: são o tempo dedicado a fazer os três produtos funcionarem na prática e a atacar a Matéria Escura do Trabalho que se acumula nas interseções entre os departamentos.
+
+\subsection{Automação de RDO (Mês 1)}
+
+\textbf{O problema:} Hoje o RDO nasce em papel, é escaneado, transcrito manualmente pelo geólogo, e os dados só entram numa planilha dias depois, quando entram. O geólogo perde tempo em excesso nisso, RDOs atrasam, e um atraso de uma semana já colocou R\$400-500k em risco de pleito. O ciclo é: papel, escanear, digitar, planilha, trabalhar com os dados. Muito esforço para chegar no passo que realmente interessa: usar os dados.
+
+\textbf{A solução:} Um sistema de coleta digital que corta o ciclo pela metade. O supervisor registra as informações do RDO diretamente numa interface simples: um bot no WhatsApp que faz perguntas e aceita áudio, um formulário no celular, ou um mini-app. O importante é que os dados já nascem estruturados, evitando o papel, o escaneamento e a transcrição. Sem digitar duas vezes.
+
+Haverá uma versão básica rodando ao final do Mês 1. Uma vez que os dados estejam chegando automaticamente na planilha, quem hoje faz a consolidação manual deixa de ser coletor e passa a ser analista: usa os dados para gerar insights, não para preencher campos.
+
+\textbf{Benefícios esperados:}
+\begin{itemize}
+  \item Geólogo ganha de volta o tempo consumido por transcrição manual
+  \item RDOs deixam de atrasar, e a receita não fica exposta a risco de pleito por falta de envio
+  \item Dados de campo disponíveis em tempo real, alimentando o Radar (Produto 2)
+  \item Supervisor gasta 5 a 10 minutos por dia, não meia hora
+\end{itemize}
+
+\subsection{Radar Operacional (Mês 2--3)}
+
+\textbf{O problema:} Hoje ninguém enxerga o andamento das obras em tempo real. Isso gera dificuldades para a execução dos projetos dentro do prazo e do budget. Citando alguns exemplos, o atraso fica evidente quando já é tarde, os dados de uma obra não retroalimentam o orçamento da obra seguinte e o consumo de insumos ultrapassa o previsto e só se percebe depois que o insumo esgotou.
+
+\textbf{A solução:} Um painel web alimentado pelos RDOs digitalizados e outras fontes de dados da operação:
+
+\begin{itemize}
+  \item Visão por obra: progresso físico, horas trabalhadas versus paradas, horas não-produtivas (NPT), horas paradas
+  \item Comparação entre real e previsto (linha de base), Curva S
+  \item Alertas de desvio: ``esta obra já ultrapassou o número de manobras previstas''
+\end{itemize}
+
+\textbf{Benefícios esperados:}
+\begin{itemize}
+  \item Decisão baseada em dado, não em intuição
+  \item Antecipação de problemas antes que a obra pare
+  \item Transparência para o cliente final
+  \item Dados históricos que alimentam o planejamento de obras futuras
+\end{itemize}
+
+\subsection{Linha de Base por Obra (Mês 3)}
+
+\textbf{O problema:} Hoje cada obra começa sem um plano escrito. Não se sabe quantas manobras serão necessárias, quando os materiais precisam estar no canteiro ou se a mão de obra crítica estará disponível nas datas certas. O resultado é o que os dados do Parc das Artes mostraram: 22,5 dias de horas paradas em uma única obra, 43\% das quais por dependência do cliente.
+
+\textbf{A solução:} Uma ferramenta personalizada de planejamento pré-obra que permite ao operacional definir:
+
+\begin{itemize}
+  \item A EAP da obra (estrutura analítica do projeto): instalar canteiro, montar, perfurar, revestir, desenvolver, desmobilizar
+  \item As datas em que cada material precisa estar na obra (tubos, concreto, consumíveis de solda, produtos químicos)
+  \item As datas em que a mão de obra crítica precisa estar alocada (soldador, torrista, eletricista)
+  \item O número esperado de manobras, deslocamentos e outras tarefas que, se excedidas, viram NPT (linha de base contra a qual o Radar vai comparar o real)
+  \item As dependências externas (ex: materiais faturados pelo cliente, fiscalização, emissão de permissão de trabalho, liberação da área)
+\end{itemize}
+
+Esta ferramenta é deliberadamente simples e temporária. O objetivo não é implantar um sistema definitivo de gestão de projetos, mas criar o músculo de planejamento que a DH não tem hoje. Quando a empresa estiver pronta para adotar uma ferramenta mais robusta (Monday, Asana, ClickUp) ou estruturar um PMO com MS Project, a transição será natural: os conceitos e o hábito de planejar já estarão estabelecidos.
+
+\textbf{Benefícios esperados:}
+\begin{itemize}
+  \item Cada obra começa com um plano escrito e comparável
+  \item O gerente de operações sabe, antes de a obra começar, quais são os riscos relacionados a material ou mão de obra
+  \item A linha de base alimenta o Radar, que passa a mostrar desvios em tempo real
+  \item A DH acumula dados históricos para orçar obras futuras com mais precisão
+\end{itemize}
+
+\subsection{Protocolo de Metas}
+
+Os três produtos resolvem a coleta de dados, a visibilidade das obras e o planejamento pré-obra. Mas nenhum produto, sozinho, faz a empresa decidir melhor. Para arrematar tudo e garantir que a empresa toda reme na mesma direção, implantamos um protocolo de definição e acompanhamento de metas.
+
+\textbf{Resultado esperado.} Ao final dos 3 meses, uma empresa que hoje não mede quase nada passa a medir o essencial. Cada funcionário sabe qual é o objetivo central do trimestre e como seu trabalho contribui para ele. O diretor para de apagar incêndios diários e retoma o controle da estratégia de longo prazo. Os gerentes param de disputar prioridades e passam a coordenar esforços.
+
+\textbf{O que é.} A cada trimestre, a diretoria define 2 a 3 objetivos claros para a empresa, cada um com métricas que permitem saber, toda semana, se a empresa está no rumo certo. Cada gerente conecta as metas do seu departamento a esses objetivos. Ritos semanais de acompanhamento (conversas estruturadas, feedback e reconhecimento) mantêm o ritmo e corrigem a rota antes que o desvio vire crise. O protocolo é simples: responde a ``o que é mais importante agora?'' e ``como sabemos se chegamos lá?''.
+
+\textbf{Por que o Operacional não vira a chave sozinho.} As causas-raiz identificadas passam por todos os departamentos. Materiais faturados pelo cliente que não chegam ao canteiro (interface Comercial $\leftrightarrow$ Operacional). Sondas paradas esperando manutenção (Operacional $\leftrightarrow$ Administrativo). Um protocolo de metas compartilhado garante que cada área enxergue sua responsabilidade no resultado final e que as prioridades do trimestre não sejam engolidas pelas urgências do dia.
+
+% ============================================================
+% 4. CRONOGRAMA
+% ============================================================
+\section{Cronograma}
+
+As entregas estão organizadas em ciclos de 30 dias, com marcos de pagamento ao final de cada ciclo.
+
+\vspace{0.3cm}
+\begin{tabular}{p{6cm} p{9cm}}
+\textbf{Etapa} & \textbf{Período} \\
+\hline
+Protocolo de Metas: definição do 1º ciclo & Semana 1 \\
+Revisão mensal de metas & Final de cada mês \\
+Fechamento + retrospectiva & Final do 3º mês \\
+\hline
+Automação de RDO: desenvolvimento & Mês 1 \\
+\hline
+Radar Operacional: desenvolvimento & Mês 2 \\
+\hline
+Linha de Base por Obra: desenvolvimento + 1ª obra planejada & Mês 3 \\
+\hline
+Consultoria: ritos, treinamentos, modelos, RECS & 90 dias (contínuo) \\
+\end{tabular}
+\vspace{0.3cm}
+
+% ============================================================
+% 5. INVESTIMENTO E RETORNO ESPERADO
+% ============================================================
+\section{Investimento e Retorno Esperado}
+
+\subsection{Investimento}
+
+\textbf{Valor global: R\$ 45.000,00} assim distribuídos:
+
+\vspace{0.3cm}
+\begin{tabular}{p{6cm} r p{4cm}}
+\textbf{Componente} & \textbf{Valor} & \textbf{Pagamento} \\
+\hline
+Produto 1: Automação de RDO & R\$ 10.000 & 30 dias \\
+Produto 2: Radar Operacional & R\$ 10.000 & 60 dias \\
+Produto 3: Linha de Base por Obra & R\$ 10.000 & 90 dias \\
+Consultoria (20h/semana, 90 dias) & R\$ 15.000 & 4 parcelas (dias 15, 45, 75, 90) \\
+\end{tabular}
+\vspace{0.3cm}
+
+\subsubsection{O que está incluso}
+
+\begin{tabular}{p{5cm} p{10cm}}
+\textbf{Item} & \textbf{Descrição} \\
+\hline
+Produto 1: Automação de RDO & Sistema de coleta digital (WhatsApp/AppSheet/app), MVP rodando ao final do Mês 1 \\
+Produto 2: Radar Operacional & Painel web de operações com alertas de desvio, no ar ao final do Mês 2 \\
+Produto 3: Linha de Base por Obra & Ferramenta personalizada de planejamento pré-obra, 1ª obra planejada no Mês 3 \\
+20h/semana de consultoria & Ritos de acompanhamento de metas, reuniões de alinhamento, treinamentos, modelos, documentação, RECS \\
+Fechamento do ciclo de metas & Retrospectiva documentada ao final do 3º mês \\
+\end{tabular}
+
+\subsection{Retorno Esperado}
+
+O investimento total é de R\$45.000 em 3 meses. Posto contra os riscos que a DH já enfrenta:
+
+\begin{itemize}
+  \item \textbf{R\$112.000} perdidos em produto químico por água não testada: uma falha de processo que o Radar + Linha de Base eliminam.
+  \item \textbf{R\$400.000 a R\$500.000} em risco de pleito por atraso na entrega de RDO, que a automação resolve na raiz.
+  \item Horas do supervisor e dos geólogos consumidas em transcrição, que a automação do RDO devolve à gestão.
+  \item 22,5 dias de horas paradas por obra, que a visibilidade em tempo real e o planejamento pré-obra reduzem drasticamente.
+\end{itemize}
+
+\textbf{Se esta consultoria evitar UMA perda como a do produto químico, ela se pagou 2,5$\times$. Se evitar UM pleito como o que quase ocorreu, ela se pagou $\sim$10$\times$.} E isso sem contabilizar o ganho estratégico: a DH preparada para contratos de longo prazo, com previsibilidade para crescer sem que o caos cresça junto.
+
+% ============================================================
+% 6. O QUE ESTA CONSULTORIA NÃO É
+% ============================================================
+\section{O que esta consultoria NÃO é}
+
+\begin{itemize}
+  \item Não é consultoria de PMBOK, nem implanta PMO ou cronograma de recursos no MS Project
+  \item Não cria POPs (já há consultor externo contratado para isso)
+  \item Não é uma intervenção nas áreas comerciais ou administrativas. O foco é operacional, mas a natureza da Matéria Escura do Trabalho exige que as interfaces entre departamentos sejam endereçadas quando afetam a operação (ex.: fluxo de faturamento direto de materiais com o cliente, que impacta a disponibilidade de tubos no canteiro)
+\end{itemize}
+
+O que entregamos é \textbf{planejamento leve}: a ponte entre o planejamento zero de hoje e um planejamento estruturado. Sair do zero já é um salto enorme. Um PMO robusto exigiria dedicação integral que não cabe numa consultoria de 3 meses, mas as bases que criaremos deixam o caminho pronto para quando a DH decidir por esse investimento.
+
+% ============================================================
+% 7. PRÓXIMOS PASSOS
+% ============================================================
+\section{Próximos Passos}
+
+Na primeira semana, realiza-se uma reunião para definir a linha de base real de cada indicador e estabelecer o primeiro ciclo de metas da diretoria. A partir desse marco, cada mês possui uma entrega concreta, cada semana possui um rito de acompanhamento. Em 90 dias, a DH passa a decidir com dados, não mais no escuro.
+
+\subsection{Condição de sucesso}
+
+Os produtos descritos nesta proposta dependem de acesso direto e frequente a quem vive a operação. O sucesso da consultoria está diretamente atrelado à disponibilidade das lideranças e dos colaboradores para se colocarem periodicamente à disposição: compartilhar informações, explicar processos, oferecer perspectivas. Sem essa troca, o consultor trabalha no escuro, e decisões tomadas no escuro (por melhor intencionadas) produzem mais ruído do que resultado. Com ela, as ferramentas são construídas sobre a realidade de quem as usará.
+
+\end{document}

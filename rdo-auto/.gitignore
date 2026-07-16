@@ -1,0 +1,5 @@
+# Supabase local secrets — never commit
+.env.local
+
+# Dependencies (future)
+node_modules/

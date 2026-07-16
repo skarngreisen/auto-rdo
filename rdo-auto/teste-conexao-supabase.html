@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teste de Conexao Supabase — RDO Auto</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --green: #10b981;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --radius: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    max-width: 560px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: .25rem; }
+  h2 { font-size: 1rem; color: var(--muted); font-weight: 400; margin-bottom: 1.5rem; }
+
+  label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
+  input {
+    width: 100%;
+    padding: .6rem .75rem;
+    border: 1px solid #d1d5db;
+    border-radius: var(--radius);
+    font-size: .9rem;
+    margin-bottom: 1rem;
+    font-family: monospace;
+  }
+  input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 2px rgba(59,130,246,.25); }
+
+  .btn {
+    width: 100%;
+    padding: .75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .2s, opacity .2s;
+  }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { opacity: .9; }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+  .status {
+    margin-top: 1rem;
+    padding: .75rem 1rem;
+    border-radius: var(--radius);
+    font-size: .9rem;
+    display: none;
+  }
+  .status.success { background: #d1fae5; color: #065f46; display: block; }
+  .status.error   { background: #fee2e2; color: #991b1b; display: block; }
+
+  .result-list {
+    margin-top: 1rem;
+    list-style: none;
+  }
+  .result-list li {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--radius);
+    padding: .6rem .75rem;
+    margin-bottom: .4rem;
+    font-size: .85rem;
+    font-family: monospace;
+  }
+
+  .instructions {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    max-width: 560px;
+    width: 100%;
+    font-size: .85rem;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .instructions code {
+    background: #e5e7eb;
+    padding: .15rem .35rem;
+    border-radius: 3px;
+    font-size: .82rem;
+    color: #1a1a2e;
+  }
+  .instructions pre {
+    background: #1a1a2e;
+    color: #e5e7eb;
+    padding: 1rem;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    margin: .75rem 0;
+    font-size: .8rem;
+    line-height: 1.5;
+  }
+  .instructions h3 { margin: 1.2rem 0 .4rem; color: var(--text); }
+  .instructions p { margin-bottom: .5rem; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Teste de Conexao Supabase</h1>
+  <h2>RDO Auto — validacao de credenciais</h2>
+
+  <label for="supabaseUrl">Supabase URL</label>
+  <input type="text" id="supabaseUrl"
+         value="https://fecskilrtsaeavoznwgi.supabase.co"
+         placeholder="https://xyzcompany.supabase.co">
+
+  <label for="supabaseKey">Publishable Key</label>
+  <input type="text" id="supabaseKey"
+         value="sb_publishable_VjwnlFeGz7zJkZx_KPxukA_GCTRxcgi"
+         placeholder="sb_publishable_...">
+
+  <button class="btn btn-primary" id="btnTest" onclick="runTest()">
+    Testar Conexao
+  </button>
+
+  <div id="status" class="status"></div>
+  <ul id="results" class="result-list"></ul>
+</div>
+
+<div class="instructions">
+  <h3>Instrucoes</h3>
+
+  <p><strong>1. Substitua a URL acima</strong> pela URL do seu projeto Supabase
+  (ex.: <code>https://abc123.supabase.co</code>).</p>
+
+  <p><strong>2. Crie a tabela <code>rdo_teste</code></strong> no SQL Editor do Supabase:</p>
+  <pre>-- Execute este comando no SQL Editor do Supabase
+CREATE TABLE IF NOT EXISTS rdo_teste (
+  id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  data        DATE NOT NULL DEFAULT CURRENT_DATE,
+  profundidade NUMERIC(6,2),
+  descricao   TEXT,
+  supervisor  TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);</pre>
+
+  <p><strong>3. Desabilite RLS (apenas para este teste):</strong></p>
+  <pre>-- No SQL Editor, execute:
+ALTER TABLE rdo_teste DISABLE ROW LEVEL SECURITY;</pre>
+
+  <p>Ou, se preferir manter RLS ativo, crie uma politica temporaria:</p>
+  <pre>-- Politica que permite INSERT e SELECT para qualquer um
+-- (apenas para teste; remova depois)
+CREATE POLICY "teste_rdo_public"
+ON rdo_teste
+FOR ALL
+USING (true)
+WITH CHECK (true);</pre>
+
+  <p><strong>4.</strong> Clique em <strong>"Testar Conexao"</strong>.
+  O teste insere um registro e depois consulta os ultimos 5 registros da tabela.</p>
+
+  <p><strong>5.</strong> Se tudo funcionar, voce vera uma lista com os registros.
+  Caso contrario, a mensagem de erro mostrara o codigo HTTP e detalhes
+  para diagnostico.</p>
+</div>
+
+<!-- Supabase JS SDK v2 via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/**
+ * Teste de Conexao Supabase — RDO Auto
+ *
+ * Fluxo:
+ *   1. Inicializa o cliente Supabase com url + publishable key
+ *   2. Insere um registro de teste na tabela rdo_teste
+ *   3. Consulta os ultimos 5 registros e exibe na tela
+ *
+ * Requisitos previos:
+ *   - Tabela rdo_teste criada (veja CREATE TABLE nos comentarios acima)
+ *   - RLS desabilitada OU politica publica temporaria ativa
+ *
+ * Nota: A publishable key (sb_publishable_...) e segura para uso no frontend.
+ *       A secret key (service_role) nunca deve ser exposta no cliente.
+ */
+
+const statusEl = document.getElementById('status');
+const resultsEl = document.getElementById('results');
+const btnEl = document.getElementById('btnTest');
+
+function setStatus(type, message) {
+  statusEl.className = 'status ' + type;
+  statusEl.textContent = message;
+}
+
+function clearStatus() {
+  statusEl.className = 'status';
+  statusEl.textContent = '';
+  resultsEl.innerHTML = '';
+}
+
+async function runTest() {
+  clearStatus();
+  btnEl.disabled = true;
+  btnEl.textContent = 'Conectando...';
+
+  const url = document.getElementById('supabaseUrl').value.trim();
+  const key = document.getElementById('supabaseKey').value.trim();
+
+  // --- validate inputs ---
+  if (!url || url === 'https://seu-projeto.supabase.co') {
+    setStatus('error', 'Substitua a URL pela URL real do seu projeto Supabase.');
+    btnEl.disabled = false;
+    btnEl.textContent = 'Testar Conexao';
+    return;
+  }
+  if (!key) {
+    setStatus('error', 'Informe a publishable key.');
+    btnEl.disabled = false;
+    btnEl.textContent = 'Testar Conexao';
+    return;
+  }
+
+  // --- initialize Supabase client ---
+  const supabase = window.supabase.createClient(url, key);
+
+  // --- step 1: insert test record ---
+  const testRecord = {
+    data:         new Date().toISOString().split('T')[0], // YYYY-MM-DD
+    profundidade: 1.5,
+    descricao:    'Teste de conexao via CodeWhale',
+    supervisor:   'Teste'
+  };
+
+  const { data: inserted, error: insertErr } = await supabase
+    .from('rdo_teste')
+    .insert(testRecord)
+    .select();
+
+  if (insertErr) {
+    setStatus('error',
+      'Erro no INSERT: [' + (insertErr.code || '?') + '] ' + insertErr.message +
+      (insertErr.hint ? ' | Dica: ' + insertErr.hint : '') +
+      (insertErr.details ? ' | Detalhes: ' + insertErr.details : '')
+    );
+    btnEl.disabled = false;
+    btnEl.textContent = 'Testar Conexao';
+    return;
+  }
+
+  console.log('Insert OK:', inserted);
+
+  // --- step 2: query last 5 records ---
+  const { data: rows, error: selectErr } = await supabase
+    .from('rdo_teste')
+    .select('*')
+    .order('data', { ascending: false })
+    .limit(5);
+
+  if (selectErr) {
+    setStatus('error',
+      'INSERT ok, mas erro no SELECT: [' + (selectErr.code || '?') + '] ' +
+      selectErr.message +
+      (selectErr.hint ? ' | Dica: ' + selectErr.hint : '')
+    );
+    btnEl.disabled = false;
+    btnEl.textContent = 'Testar Conexao';
+    return;
+  }
+
+  // --- success ---
+  setStatus('success',
+    'Conexao OK! Registro inserido (id=' + (inserted?.[0]?.id ?? '?') +
+    '). ' + rows.length + ' registro(s) retornado(s).'
+  );
+
+  resultsEl.innerHTML = rows.map(r =>
+    '<li>' +
+      'id=' + r.id +
+      ' | data=' + r.data +
+      ' | prof=' + r.profundidade +
+      ' | desc="' + (r.descricao || '') + '"' +
+      ' | supervisor=' + r.supervisor +
+    '</li>'
+  ).join('');
+
+  btnEl.disabled = false;
+  btnEl.textContent = 'Testar Conexao';
+}
+</script>
+
+</body>
+</html>

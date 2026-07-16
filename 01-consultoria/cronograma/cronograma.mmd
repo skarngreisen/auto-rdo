@@ -1,0 +1,23 @@
+gantt
+    title Cronograma de Entregas — 3 Meses
+    dateFormat  YYYY-MM-DD
+    axisFormat  Semana %W
+
+    section OKRs + CFRs
+    Treinamento OKR (diretor+gerentes)    :milestone, okr1, 2026-07-07, 0d
+    1º OKR definido                       :milestone, after okr1, 7d
+    Revisão mensal                        :milestone, after okr1, 30d
+    Revisão mensal                        :milestone, after okr1, 60d
+    Fechamento OKRs                       :milestone, after okr1, 90d
+
+    section Automação de RDO
+    Desenvolvimento RDO digital           :rdo1, 2026-07-7, 30d
+    
+    section Radar Operacional
+    Desenvolvimento Painel web           :radar, after rdo1, 30d
+
+    section Linha de Base por Obra
+    Planner + 1ª obra planejada        :lb, after radar, 30d
+
+    section Consultoria
+    Ritos · Treinamentos · Modelos · RECS :cons, 2026-07-07, 90d
