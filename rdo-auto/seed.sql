@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS rdos (
     parametros      JSONB,    -- { med1: { peso, rpm, torque, rop, bba_ident, spm, pressao, vazao }, med2, med3 }
     coluna          JSONB,    -- [ { item, qty, id_pol, od_pol, length_m, total_m } ]
     operacoes       JSONB,    -- [ { inicio, termino, codigo, descritivo } ]
+    equipe          JSONB,    -- [ { funcao, nome } ]
     insumos         JSONB,    -- { agua, limpa_fossa, limpeza_banheiro, pta, munck, guindaste, remocao_cacamba }
     quimicos        JSONB,    -- { bentonita: {consumo,estoque}, cmc: {...}, soda_caustica: {...}, ... }
     combustivel     JSONB,    -- { diesel: {consumo, estoque} }

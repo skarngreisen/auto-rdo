@@ -90,7 +90,7 @@ input:focus, select:focus, textarea:focus {
 }
 textarea { resize: vertical; min-height: 60px; }
 select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .6rem center; padding-right: 2rem; }
-input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6; }
+input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6; -webkit-appearance: checkbox !important; appearance: auto; }
 .row { display: flex; gap: .5rem; }
 .row > * { flex: 1; }
 
@@ -231,7 +231,7 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 
 <header>
   <h1>RDO Auto</h1>
-  <div class="sub">Relatorio Diario de Obras</div>
+  <div class="sub">Relatório Diário de Obras</div>
 </header>
 
 <div class="container">
@@ -257,13 +257,13 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 
     <!-- Date + Type -->
     <div class="card">
-      <div class="card-header">Identificacao</div>
+      <div class="card-header">Identificação</div>
       <div class="row">
         <div><label for="rdoData">Data do RDO</label><input type="date" id="rdoData"></div>
         <div>
           <label for="rdoTipoDia">Tipo de dia</label>
           <select id="rdoTipoDia">
-            <option value="perfuracao">Perfuracao</option>
+            <option value="perfuracao">Perfuração</option>
             <option value="montagem">Montagem</option>
             <option value="teste">Teste</option>
             <option value="parado">Parado</option>
@@ -274,10 +274,10 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
     </div>
 
     <!-- ============================================================
-         TOGGLE: Perfuracao
+         TOGGLE: Perfuração
          ============================================================ -->
     <div class="card">
-      <div class="card-header">Perfuracao</div>
+      <div class="card-header">Perfuração</div>
       <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanco na perfuracao?</p>
       <div class="toggle-group" id="togglePerfuracao">
         <button class="toggle-btn" data-value="yes">Sim</button>
@@ -290,7 +290,7 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
           <div><label for="profFinal">Prof. Final (m)</label><input type="number" step="0.01" id="profFinal"></div>
         </div>
         <div class="row">
-          <div><label for="formacao">Formacao</label><input type="text" id="formacao" placeholder="ex: Serra Geral"></div>
+          <div><label for="formacao">Formação</label><input type="text" id="formacao" placeholder="ex: Serra Geral"></div>
           <div><label for="topoForm">Topo (m)</label><input type="number" step="0.01" id="topoForm"></div>
           <div><label for="baseForm">Base (m)</label><input type="number" step="0.01" id="baseForm"></div>
         </div>
@@ -301,30 +301,30 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
           <tr><th>Campo</th><th>Atual</th><th>Anterior</th></tr>
           <tr><td>Fabricante</td><td><input type="text" id="brocaFabAtual"></td><td><input type="text" id="brocaFabAnt"></td></tr>
           <tr><td>Serie</td><td><input type="text" id="brocaSerieAtual"></td><td><input type="text" id="brocaSerieAnt"></td></tr>
-          <tr><td>Diametro (pol)</td><td><input type="text" id="brocaDiamAtual"></td><td><input type="text" id="brocaDiamAnt"></td></tr>
+          <tr><td>Diâmetro (pol)</td><td><input type="text" id="brocaDiamAtual"></td><td><input type="text" id="brocaDiamAnt"></td></tr>
           <tr><td>Modelo IADC</td><td><input type="text" id="brocaModAtual" placeholder="ex: 517"></td><td><input type="text" id="brocaModAnt"></td></tr>
           <tr><td>Jatos (pol)</td><td><input type="text" id="brocaJatosAtual" placeholder="16-16-16"></td><td><input type="text" id="brocaJatosAnt"></td></tr>
           <tr><td>Perfurado (m)</td><td><input type="number" step="0.1" id="brocaPerfAtual"></td><td><input type="number" step="0.1" id="brocaPerfAnt"></td></tr>
           <tr><td>Oper. (hs)</td><td><input type="number" step="0.1" id="brocaHsAtual"></td><td><input type="number" step="0.1" id="brocaHsAnt"></td></tr>
-          <tr><td>ROP medio (m/h)</td><td><input type="number" step="0.1" id="brocaRopAtual"></td><td><input type="number" step="0.1" id="brocaRopAnt"></td></tr>
+          <tr><td>ROP médio (m/h)</td><td><input type="number" step="0.1" id="brocaRopAtual"></td><td><input type="number" step="0.1" id="brocaRopAnt"></td></tr>
         </table>
 
         <!-- Parametros (3 medicoes) -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Parametros de Perfuracao</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Parâmetros de Perfuração</label>
         <table class="ops-table" id="paramTable">
-          <tr><th>Campo</th><th>Medicao 1</th><th>Medicao 2</th><th>Medicao 3</th></tr>
+          <tr><th>Campo</th><th>Medição 1</th><th>Medição 2</th><th>Medição 3</th></tr>
           <tr><td>Prof. (m)</td><td><input type="number" step="0.1" class="param-prof" data-med="1"></td><td><input type="number" step="0.1" class="param-prof" data-med="2"></td><td><input type="number" step="0.1" class="param-prof" data-med="3"></td></tr>
           <tr><td>BBA</td><td><input type="text" class="param-bba" data-med="1"></td><td><input type="text" class="param-bba" data-med="2"></td><td><input type="text" class="param-bba" data-med="3"></td></tr>
           <tr><td>Peso (ton)</td><td><input type="number" step="0.1" class="param-peso" data-med="1"></td><td><input type="number" step="0.1" class="param-peso" data-med="2"></td><td><input type="number" step="0.1" class="param-peso" data-med="3"></td></tr>
           <tr><td>RPM</td><td><input type="number" class="param-rpm" data-med="1"></td><td><input type="number" class="param-rpm" data-med="2"></td><td><input type="number" class="param-rpm" data-med="3"></td></tr>
           <tr><td>Torque</td><td><input type="number" step="0.1" class="param-torque" data-med="1"></td><td><input type="number" step="0.1" class="param-torque" data-med="2"></td><td><input type="number" step="0.1" class="param-torque" data-med="3"></td></tr>
           <tr><td>SPM</td><td><input type="number" class="param-spm" data-med="1"></td><td><input type="number" class="param-spm" data-med="2"></td><td><input type="number" class="param-spm" data-med="3"></td></tr>
-          <tr><td>Pressao (psi)</td><td><input type="number" class="param-pressao" data-med="1"></td><td><input type="number" class="param-pressao" data-med="2"></td><td><input type="number" class="param-pressao" data-med="3"></td></tr>
-          <tr><td>Vazao (L/min)</td><td><input type="number" class="param-vazao" data-med="1"></td><td><input type="number" class="param-vazao" data-med="2"></td><td><input type="number" class="param-vazao" data-med="3"></td></tr>
+          <tr><td>Pressão (psi)</td><td><input type="number" class="param-pressao" data-med="1"></td><td><input type="number" class="param-pressao" data-med="2"></td><td><input type="number" class="param-pressao" data-med="3"></td></tr>
+          <tr><td>Vazão (L/min)</td><td><input type="number" class="param-vazao" data-med="1"></td><td><input type="number" class="param-vazao" data-med="2"></td><td><input type="number" class="param-vazao" data-med="3"></td></tr>
         </table>
 
         <!-- Coluna (BHA) -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Composicao de Coluna (BHA)</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Composição de Coluna (BHA)</label>
         <table class="ops-table" id="colunaTable">
           <tr><th>Item</th><th>Qty</th><th>ID (in)</th><th>OD (in)</th><th>Length (m)</th><th>Total (m)</th><th></th></tr>
         </table>
@@ -333,10 +333,10 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
     </div>
 
     <!-- ============================================================
-         TOGGLE: Fluido / Quimicos
+         TOGGLE: Fluido / Químicos
          ============================================================ -->
     <div class="card">
-      <div class="card-header">Fluido e Quimicos</div>
+      <div class="card-header">Fluido e Químicos</div>
       <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de quimicos/fluido?</p>
       <div class="toggle-group" id="toggleFluido">
         <button class="toggle-btn" data-value="yes">Sim</button>
@@ -345,7 +345,7 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 
       <div class="conditional" id="sectionFluido">
         <!-- Fluido params -->
-        <label style="font-size:.82rem;color:#1e3a5f;">Parametros do Fluido</label>
+        <label style="font-size:.82rem;color:#1e3a5f;">Parâmetros do Fluido</label>
         <div class="row">
           <div><label for="fluDensidade">Densidade (lb/gal)</label><input type="number" step="0.1" id="fluDensidade"></div>
           <div><label for="fluViscosidade">Visc. Marsh (s/qt)</label><input type="number" step="0.1" id="fluViscosidade"></div>
@@ -353,18 +353,18 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
         <div class="row">
           <div><label for="fluFiltrado">Filtrado API (mL)</label><input type="number" step="0.1" id="fluFiltrado"></div>
           <div><label for="fluPh">pH</label><input type="number" step="0.1" id="fluPh"></div>
-          <div><label for="fluAguaLivre">Agua Livre (%)</label><input type="number" step="0.1" id="fluAguaLivre"></div>
+          <div><label for="fluÁguaLivre">Água Livre (%)</label><input type="number" step="0.1" id="fluÁguaLivre"></div>
         </div>
         <div class="row">
           <div><label for="fluAreia">Areia (%)</label><input type="number" step="0.1" id="fluAreia"></div>
           <div><label for="fluApiCake">API Cake (1/32 in)</label><input type="number" step="0.1" id="fluApiCake"></div>
-          <div><label for="fluSolidos">Solidos (%)</label><input type="number" step="0.1" id="fluSolidos"></div>
+          <div><label for="fluSólidos">Sólidos (%)</label><input type="number" step="0.1" id="fluSólidos"></div>
         </div>
 
         <!-- Insumos -->
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Insumos (preencher com valor ou "-")</label>
         <div class="row">
-          <div><label for="insAgua">Agua</label><input type="text" id="insAgua" placeholder="-"></div>
+          <div><label for="insÁgua">Água</label><input type="text" id="insÁgua" placeholder="-"></div>
           <div><label for="insLimpaFossa">Limpa Fossa</label><input type="text" id="insLimpaFossa" placeholder="-"></div>
           <div><label for="insLimpezaBanh">Limpeza Banheiro</label><input type="text" id="insLimpezaBanh" placeholder="-"></div>
         </div>
@@ -375,20 +375,20 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
           <div><label for="insRemCacamba">Rem. Cacamba</label><input type="text" id="insRemCacamba" placeholder="-"></div>
         </div>
 
-        <!-- Quimicos -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Quimicos (consumo / estoque)</label>
+        <!-- Químicos -->
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Químicos (consumo / estoque)</label>
         <table class="ops-table">
           <tr><th>Produto</th><th>Consumo</th><th>Estoque</th></tr>
           <tr><td>Bentonita (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="bentonita"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="bentonita"></td></tr>
           <tr><td>CMC (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="cmc"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="cmc"></td></tr>
-          <tr><td>Soda Caustica (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="soda_caustica"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="soda_caustica"></td></tr>
+          <tr><td>Soda Cáustica (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="soda_caustica"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="soda_caustica"></td></tr>
           <tr><td>Goma Xantana (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="goma_xantana"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="goma_xantana"></td></tr>
           <tr><td>Sal (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="sal"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="sal"></td></tr>
           <tr><td>Barrilha (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="barrilha"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="barrilha"></td></tr>
         </table>
 
-        <!-- Combustivel -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Combustivel</label>
+        <!-- Combustível -->
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Combustível</label>
         <div class="row">
           <div><label for="combDieselCons">Diesel Consumo (L)</label><input type="number" step="0.1" id="combDieselCons"></div>
           <div><label for="combDieselEst">Diesel Estoque (L)</label><input type="number" step="0.1" id="combDieselEst"></div>
@@ -399,9 +399,9 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
         <table class="ops-table">
           <tr><th>Material</th><th>Consumo</th><th>Estoque</th></tr>
           <tr><td>Camisa Bomba</td><td><input type="number" step="0.1" class="mat-consumo" data-key="camisa_bomba"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="camisa_bomba"></td></tr>
-          <tr><td>Valvula</td><td><input type="number" step="0.1" class="mat-consumo" data-key="valvula"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="valvula"></td></tr>
+          <tr><td>Válvula</td><td><input type="number" step="0.1" class="mat-consumo" data-key="valvula"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="valvula"></td></tr>
           <tr><td>Gaxeta de Swivel</td><td><input type="number" step="0.1" class="mat-consumo" data-key="gaxeta_swivel"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="gaxeta_swivel"></td></tr>
-          <tr><td>Oleo 40 - Motor (L)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="oleo_40"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="oleo_40"></td></tr>
+          <tr><td>Óleo 40 - Motor (L)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="oleo_40"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="oleo_40"></td></tr>
           <tr><td>Hexa-T (Kg)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="hexa_t"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="hexa_t"></td></tr>
         </table>
       </div>
@@ -411,38 +411,29 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
          OPERACOES (always visible)
          ============================================================ -->
     <div class="card">
-      <div class="card-header">Operacoes</div>
+      <div class="card-header">Operações</div>
       <table class="ops-table" id="opsTable">
-        <tr><th>Inicio</th><th>Termino</th><th>Codigo (opc.)</th><th>Descritivo</th><th></th></tr>
+        <tr><th>Início</th><th>Término</th><th>Código (opc.)</th><th>Descritivo</th><th></th></tr>
       </table>
-      <button class="btn btn-secondary btn-sm" id="btnAddOp" style="margin-top:.3rem;">+ Adicionar operacao</button>
+      <button class="btn btn-secondary btn-sm" id="btnAddOp" style="margin-top:.3rem;">+ Adicionar operação</button>
     </div>
 
     <!-- ============================================================
-         EQUIPE (always visible)
+         EQUIPE (always visible, dynamic rows)
          ============================================================ -->
     <div class="card">
       <div class="card-header">Equipe</div>
-      <div class="row">
-        <div><label for="eqSondador">Sondador</label><input type="text" id="eqSondador"></div>
-        <div><label for="eqTorrista">Torrista</label><input type="text" id="eqTorrista"></div>
-      </div>
-      <div class="row">
-        <div><label for="eqPlat1">Plat. / Auxiliar 1</label><input type="text" id="eqPlat1"></div>
-        <div><label for="eqPlat2">Plat. / Auxiliar 2</label><input type="text" id="eqPlat2"></div>
-      </div>
-      <div class="row">
-        <div><label for="eqTst">TST</label><input type="text" id="eqTst"></div>
-        <div><label for="eqGeologo">Geologo</label><input type="text" id="eqGeologo"></div>
-        <div><label for="eqCoordenador">Coordenador</label><input type="text" id="eqCoordenador"></div>
-      </div>
+      <table class="ops-table" id="equipeTable">
+        <tr><th>Funcao</th><th>Nome</th><th></th></tr>
+      </table>
+      <button class="btn btn-secondary btn-sm" id="btnAddEquipe" style="margin-top:.3rem;">+ Adicionar pessoa</button>
     </div>
 
     <!-- ============================================================
          HSE (always visible)
          ============================================================ -->
     <div class="card">
-      <div class="card-header">HSE / Seguranca</div>
+      <div class="card-header">HSE / Segurança</div>
       <div class="row">
         <div><label><input type="checkbox" id="hseDds"> DDS realizado</label></div>
         <div><label><input type="checkbox" id="hseEpis"> EPIs vistoriados</label></div>
@@ -456,10 +447,10 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
          CLIMATICAS (always visible)
          ============================================================ -->
     <div class="card">
-      <div class="card-header">Condicoes Climaticas</div>
+      <div class="card-header">Condições Climáticas</div>
       <div class="row">
         <div>
-          <label for="condClima">Condicao</label>
+          <label for="condClima">Condição</label>
           <select id="condClima">
             <option value="Bom">Bom</option>
             <option value="Nublado">Nublado</option>
@@ -478,21 +469,21 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
          OBSERVACOES / PLANEJAMENTO (always visible)
          ============================================================ -->
     <div class="card">
-      <div class="card-header">Observacoes e Planejamento</div>
-      <label for="obsGeral">Observacoes</label>
-      <textarea id="obsGeral" rows="3" placeholder="Registre ocorrencias, decisoes, visitas..."></textarea>
-      <label for="planProxTurno">Planejamento proximo turno</label>
-      <textarea id="planProxTurno" rows="2" placeholder="O que esta previsto para as proximas 24h?"></textarea>
+      <div class="card-header">Observações e Planejamento</div>
+      <label for="obsGeral">Observações</label>
+      <textarea id="obsGeral" rows="3" placeholder="Registre ocorrências, decisões, visitas..."></textarea>
+      <label for="planProxTurno">Planejamento próximo turno</label>
+      <textarea id="planProxTurno" rows="2" placeholder="O que está previsto para as próximas 24h?"></textarea>
     </div>
 
     <!-- ============================================================
          APROVACAO (always visible)
          ============================================================ -->
     <div class="card">
-      <div class="card-header">Aprovacao</div>
+      <div class="card-header">Aprovação</div>
       <div class="row">
-        <div><label for="aprGeologo">Geologo</label><input type="text" id="aprGeologo"></div>
-        <div><label for="aprGerOper">Ger. Operacoes</label><input type="text" id="aprGerOper"></div>
+        <div><label for="aprGeologo">Geólogo</label><input type="text" id="aprGeologo"></div>
+        <div><label for="aprGerOper">Ger. Operações</label><input type="text" id="aprGerOper"></div>
       </div>
       <div class="row">
         <div><label for="aprPreposto1">Preposto 1</label><input type="text" id="aprPreposto1"></div>
@@ -531,7 +522,7 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
     <label for="newLocalidade">Localidade</label><input type="text" id="newLocalidade" placeholder="ex: Ribeirao Preto - SP">
     <label for="newSonda">Sonda</label><input type="text" id="newSonda">
     <div class="row">
-      <div><label for="newDataInicio">Data Inicio</label><input type="date" id="newDataInicio"></div>
+      <div><label for="newDataInício">Data Início</label><input type="date" id="newDataInício"></div>
       <div><label for="newTurno">Turno</label><input type="text" id="newTurno" value="07h x 17h"></div>
     </div>
     <div style="display:flex;gap:.5rem;margin-top:1rem;">
@@ -627,9 +618,11 @@ projectSelect.addEventListener("change", () => {
 
 function showRdoForm() {
   rdoForm.style.display = "block";
-  // Set today's date by default
-  if (!$("#rdoData").value) {
-    $("#rdoData").value = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0];
+  const dateInput = $("#rdoData");
+  dateInput.max = today;
+  if (!dateInput.value) {
+    dateInput.value = today;
   }
 }
 
@@ -638,7 +631,7 @@ function showRdoForm() {
 // ============================================================
 btnNewProject.addEventListener("click", () => {
   modalOverlay.classList.add("show");
-  $("#newDataInicio").value = new Date().toISOString().split("T")[0];
+  $("#newDataInício").value = new Date().toISOString().split("T")[0];
 });
 
 btnModalCancel.addEventListener("click", () => {
@@ -649,10 +642,10 @@ btnModalSave.addEventListener("click", async () => {
   const cliente = $("#newCliente").value.trim();
   const localidade = $("#newLocalidade").value.trim();
   const sonda = $("#newSonda").value.trim();
-  const dataInicio = $("#newDataInicio").value;
+  const dataInício = $("#newDataInício").value;
   const turno = $("#newTurno").value.trim() || "07h x 17h";
 
-  if (!cliente || !localidade || !sonda || !dataInicio) {
+  if (!cliente || !localidade || !sonda || !dataInício) {
     showToast("Preencha todos os campos obrigatorios.", "error");
     return;
   }
@@ -660,7 +653,7 @@ btnModalSave.addEventListener("click", async () => {
   btnModalSave.disabled = true;
   const { data, error } = await sb
     .from("projetos")
-    .insert({ cliente, localidade, sonda, data_inicio: dataInicio, turno })
+    .insert({ cliente, localidade, sonda, data_inicio: dataInício, turno })
     .select()
     .single();
 
@@ -739,6 +732,40 @@ $("#btnAddOp").addEventListener("click", () => addOpRow("", "", "", ""));
 
 // Start with 1 empty row
 addOpRow("", "", "", "");
+
+// ============================================================
+// EQUIPE TABLE (dynamic)
+// ============================================================
+function addEquipeRow(funcao, nome) {
+  const tbody = $("#equipeTable");
+  const row = tbody.insertRow(-1);
+  row.innerHTML = `
+    <td><input type="text" value="${funcao || ''}" class="eq-funcao" placeholder="ex: Sondador" style="min-width:100px"></td>
+    <td><input type="text" value="${nome || ''}" class="eq-nome" placeholder="Nome"></td>
+    <td><button class="btn btn-danger btn-sm eq-remove">&times;</button></td>
+  `;
+  row.querySelector(".eq-remove").addEventListener("click", () => row.remove());
+}
+
+$("#btnAddEquipe").addEventListener("click", () => addEquipeRow("", ""));
+
+// Pre-populate with common roles
+const DEFAULT_ROLES = ["Sondador", "Torrista", "Plat. / Auxiliar 1", "Plat. / Auxiliar 2", "TST", "Geologo", "Coordenador"];
+DEFAULT_ROLES.forEach(r => addEquipeRow(r, ""));
+
+function collectEquipe() {
+  const rows = $$("#equipeTable tr");
+  const members = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const funcao = row.querySelector(".eq-funcao")?.value || "";
+    const nome = row.querySelector(".eq-nome")?.value || "";
+    if (funcao || nome) {
+      members.push({ funcao: funcao || null, nome: nome || null });
+    }
+  }
+  return members.length > 0 ? members : null;
+}
 
 // ============================================================
 // COLUNA (BHA) TABLE
@@ -927,10 +954,10 @@ function collectFluido() {
     viscosidade: parseFloat($("#fluViscosidade").value) || null,
     filtrado: parseFloat($("#fluFiltrado").value) || null,
     ph: parseFloat($("#fluPh").value) || null,
-    agua_livre: parseFloat($("#fluAguaLivre").value) || null,
+    agua_livre: parseFloat($("#fluÁguaLivre").value) || null,
     areia: parseFloat($("#fluAreia").value) || null,
     api_cake: parseFloat($("#fluApiCake").value) || null,
-    solidos: parseFloat($("#fluSolidos").value) || null,
+    solidos: parseFloat($("#fluSólidos").value) || null,
   };
   return Object.values(f).some(v => v !== null) ? f : null;
 }
@@ -950,7 +977,7 @@ function collectQuimicos() {
 
 function collectInsumos() {
   const i = {
-    agua: $("#insAgua").value || null,
+    agua: $("#insÁgua").value || null,
     limpa_fossa: $("#insLimpaFossa").value || null,
     limpeza_banheiro: $("#insLimpezaBanh").value || null,
     pta: $("#insPta").value || null,
@@ -1023,7 +1050,7 @@ $("#btnSubmit").addEventListener("click", async () => {
       fotos: photoUrls.length > 0 ? photoUrls : null,
     };
 
-    // Perfuracao (conditional)
+    // Perfuração (conditional)
     if (perfOn) {
       payload.profundidade_inicial = parseFloat($("#profInicial").value) || null;
       payload.profundidade_final = parseFloat($("#profFinal").value) || null;
@@ -1035,7 +1062,7 @@ $("#btnSubmit").addEventListener("click", async () => {
       payload.coluna = collectColuna();
     }
 
-    // Fluido/Quimicos (conditional)
+    // Fluido/Químicos (conditional)
     if (fluOn) {
       payload.fluido = collectFluido();
       payload.quimicos = collectQuimicos();
@@ -1115,6 +1142,11 @@ function resetForm() {
   const colTable = $("#colunaTable");
   while (colTable.rows.length > 1) colTable.deleteRow(1);
   addColunaRow("", "", "", "", "", "");
+
+  // Clear equipe
+  const eqTable = $("#equipeTable");
+  while (eqTable.rows.length > 1) eqTable.deleteRow(1);
+  DEFAULT_ROLES.forEach(r => addEquipeRow(r, ""));
 
   // Clear photos
   selectedFiles = [];
