@@ -9,6 +9,15 @@ node_modules/
 __pycache__/
 *.pyc
 
+# Private — not for GitHub
+01-consultoria/
+02-insumos/
+03-produtos/
+scripts/
+post linkedin/
+AGENTS.md
+WHALE.md
+
 # OS
 .DS_Store
 Thumbs.db
