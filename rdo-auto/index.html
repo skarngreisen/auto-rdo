@@ -22,19 +22,42 @@ body {
 }
 
 /* ============================================================
+   VIEW CONTAINER
+   ============================================================ */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ============================================================
+   SPLASH
+   ============================================================ */
+#splashView {
+  position: fixed; inset: 0; z-index: 999;
+  background: #fff;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+}
+#splashView img { width: 180px; margin-bottom: 0; }
+#splashView .tagline { color: #9ca3af; font-size: .85rem; margin-top: .5rem; }
+
+/* ============================================================
    HEADER
    ============================================================ */
 header {
   background: #1e3a5f;
   color: #fff;
-  padding: .75rem 1rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: .5rem 1rem;
+  position: sticky; top: 0; z-index: 100;
   box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  display: flex; align-items: center; gap: .6rem;
 }
-header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; }
-header .sub { font-size: .75rem; opacity: .75; margin-top: .1rem; }
+header img { width: 32px; height: 32px; border-radius: 4px; }
+header h1 { font-size: 1rem; font-weight: 700; }
+header .sub { font-size: .7rem; opacity: .75; }
+header .back-btn {
+  color: #fff; background: none; border: none; font-size: 1.2rem;
+  cursor: pointer; padding: .2rem .4rem; margin-right: .2rem;
+}
 
 /* ============================================================
    CONTAINER & CARDS
@@ -48,48 +71,62 @@ header .sub { font-size: .75rem; opacity: .75; margin-top: .1rem; }
   margin-bottom: .75rem;
 }
 .card-header {
-  font-size: .85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  color: #1e3a5f;
-  margin-bottom: .75rem;
-  padding-bottom: .5rem;
+  font-size: .85rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .04em; color: #1e3a5f;
+  margin-bottom: .75rem; padding-bottom: .5rem;
   border-bottom: 2px solid #e8ecf1;
 }
+
+/* ============================================================
+   RDO LIST CARDS
+   ============================================================ */
+.rdo-card {
+  background: #fff; border-radius: 10px; padding: .85rem 1rem;
+  margin-bottom: .5rem; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background .15s;
+}
+.rdo-card:hover { background: #f8fafc; }
+.rdo-card .rdo-info { flex: 1; }
+.rdo-card .rdo-info .rdo-date { font-weight: 700; font-size: .9rem; }
+.rdo-card .rdo-info .rdo-meta { font-size: .78rem; color: #6b7280; margin-top: .15rem; }
+.rdo-card .rdo-badge {
+  font-size: .7rem; font-weight: 700; padding: .2rem .5rem; border-radius: 12px;
+  text-transform: uppercase;
+}
+.badge-enviado { background: #d1fae5; color: #065f46; }
+.badge-rascunho { background: #fef3c7; color: #92400e; }
+
+.rdo-actions { display: flex; gap: .5rem; margin-top: .75rem; }
+.rdo-actions .btn { flex: 1; }
+
+.empty-state { text-align: center; padding: 2rem; color: #9ca3af; }
+.empty-state .icon { font-size: 2.5rem; margin-bottom: .5rem; }
 
 /* ============================================================
    FORM CONTROLS
    ============================================================ */
 label {
-  display: block;
-  font-size: .78rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: .2rem;
-  margin-top: .6rem;
+  display: block; font-size: .78rem; font-weight: 600;
+  color: #374151; margin-bottom: .2rem; margin-top: .6rem;
 }
 label:first-of-type { margin-top: 0; }
 input, select, textarea {
-  width: 100%;
-  padding: .55rem .65rem;
-  font-size: .9rem;
-  border: 1.5px solid #d1d5db;
-  border-radius: 7px;
-  background: #fafbfc;
-  color: #1a1a2e;
-  font-family: inherit;
-  transition: border-color .15s;
-  -webkit-appearance: none;
+  width: 100%; padding: .55rem .65rem; font-size: .9rem;
+  border: 1.5px solid #d1d5db; border-radius: 7px;
+  background: #fafbfc; color: #1a1a2e; font-family: inherit;
+  transition: border-color .15s; -webkit-appearance: none;
 }
 input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,.12);
-  background: #fff;
+  outline: none; border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.12); background: #fff;
 }
 textarea { resize: vertical; min-height: 60px; }
-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .6rem center; padding-right: 2rem; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right .6rem center; padding-right: 2rem;
+}
 input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6; -webkit-appearance: checkbox !important; appearance: auto; }
 .row { display: flex; gap: .5rem; }
 .row > * { flex: 1; }
@@ -98,20 +135,18 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
    BUTTONS
    ============================================================ */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: .35rem;
-  padding: .6rem 1.2rem;
-  font-size: .88rem; font-weight: 600;
-  border: none; border-radius: 8px;
-  cursor: pointer;
-  transition: background .15s, opacity .15s;
-  font-family: inherit;
+  display: inline-flex; align-items: center; justify-content: center; gap: .35rem;
+  padding: .6rem 1.2rem; font-size: .88rem; font-weight: 600;
+  border: none; border-radius: 8px; cursor: pointer;
+  transition: background .15s, opacity .15s; font-family: inherit;
 }
 .btn:active { transform: scale(.97); }
 .btn-primary { background: #1e3a5f; color: #fff; width: 100%; }
 .btn-primary:hover { background: #162d4a; }
 .btn-secondary { background: #e8ecf1; color: #374151; }
 .btn-secondary:hover { background: #dde1e7; }
+.btn-draft { background: #fef3c7; color: #92400e; }
+.btn-draft:hover { background: #fde68a; }
 .btn-danger { background: #fee2e2; color: #991b1b; }
 .btn-sm { padding: .35rem .7rem; font-size: .78rem; }
 .btn-full { width: 100%; margin-top: .5rem; }
@@ -120,19 +155,11 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 /* ============================================================
    TOGGLES (Sim/Nao)
    ============================================================ */
-.toggle-group {
-  display: flex; gap: .4rem; margin: .5rem 0;
-}
+.toggle-group { display: flex; gap: .4rem; margin: .5rem 0; }
 .toggle-btn {
-  flex: 1;
-  padding: .5rem;
-  font-size: .82rem; font-weight: 700;
-  border: 2px solid #d1d5db;
-  border-radius: 8px;
-  background: #fff;
-  color: #6b7280;
-  cursor: pointer;
-  text-align: center;
+  flex: 1; padding: .5rem; font-size: .82rem; font-weight: 700;
+  border: 2px solid #d1d5db; border-radius: 8px;
+  background: #fff; color: #6b7280; cursor: pointer; text-align: center;
   transition: all .15s;
 }
 .toggle-btn.active-yes { border-color: #10b981; background: #d1fae5; color: #065f46; }
@@ -145,7 +172,7 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 .conditional.show { display: block; }
 
 /* ============================================================
-   OPERATIONS TABLE
+   TABLES
    ============================================================ */
 .ops-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-top: .4rem; }
 .ops-table th {
@@ -164,8 +191,7 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
   border: 2px solid #e5e7eb;
 }
 .photo-placeholder {
-  width: 72px; height: 72px; border-radius: 8px;
-  border: 2px dashed #d1d5db;
+  width: 72px; height: 72px; border-radius: 8px; border: 2px dashed #d1d5db;
   display: flex; align-items: center; justify-content: center;
   color: #9ca3af; font-size: 1.5rem;
 }
@@ -174,9 +200,8 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
    MODAL
    ============================================================ */
 .modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.45); z-index: 200;
-  align-items: center; justify-content: center; padding: 1rem;
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  z-index: 200; align-items: center; justify-content: center; padding: 1rem;
 }
 .modal-overlay.show { display: flex; }
 .modal {
@@ -187,13 +212,21 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 .modal h2 { font-size: 1.1rem; margin-bottom: 1rem; }
 
 /* ============================================================
-   STATUS MESSAGE
+   READ-ONLY VIEW
+   ============================================================ */
+.ro-section { margin-bottom: 1rem; }
+.ro-section h3 { font-size: .82rem; color: #1e3a5f; margin-bottom: .4rem; border-bottom: 1px solid #e8ecf1; padding-bottom: .3rem; }
+.ro-row { display: flex; font-size: .82rem; padding: .15rem 0; }
+.ro-label { color: #6b7280; width: 100px; flex-shrink: 0; }
+.ro-value { color: #1a1a2e; font-weight: 600; }
+
+/* ============================================================
+   TOAST
    ============================================================ */
 .toast {
   position: fixed; bottom: 1rem; left: 1rem; right: 1rem;
   padding: .75rem 1rem; border-radius: 10px;
-  font-size: .85rem; font-weight: 600; text-align: center;
-  z-index: 300;
+  font-size: .85rem; font-weight: 600; text-align: center; z-index: 300;
   transform: translateY(120%); transition: transform .3s;
   max-width: 500px; margin: 0 auto;
 }
@@ -201,69 +234,83 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 .toast.success { background: #d1fae5; color: #065f46; }
 .toast.error { background: #fee2e2; color: #991b1b; }
 
-/* ============================================================
-   LOADING SPINNER
-   ============================================================ */
 .spinner {
   display: inline-block; width: 1rem; height: 1rem;
-  border: 2px solid rgba(255,255,255,.3);
-  border-top-color: #fff; border-radius: 50%;
-  animation: spin .6s linear infinite;
+  border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin .6s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ============================================================
-   EMPTY STATE
-   ============================================================ */
-.empty { text-align: center; padding: 2rem 1rem; color: #9ca3af; }
-.empty p { margin: .3rem 0; font-size: .85rem; }
-
-/* ============================================================
-   RESPONSIVE TWEAKS
-   ============================================================ */
 @media (max-width: 400px) {
   .row { flex-direction: column; gap: 0; }
-  .btn { font-size: .82rem; }
 }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>RDO Auto</h1>
-  <div class="sub">Relatório Diário de Obras</div>
+<!-- ============================================================
+     SPLASH
+     ============================================================ -->
+<div class="view active" id="splashView">
+  <img src="logo_DH.png" alt="DH Perfuracao">
+  <div class="tagline">Relatorio Diario de Obras</div>
+</div>
+
+<!-- ============================================================
+     HEADER (hidden during splash)
+     ============================================================ -->
+<header id="mainHeader" style="display:none;">
+  <button class="back-btn" id="btnBack" title="Voltar">&larr;</button>
+  <img src="logo_DH.png" alt="DH">
+  <div>
+    <h1>RDO Auto</h1>
+    <div class="sub" id="headerProjectName"></div>
+  </div>
 </header>
 
 <div class="container">
 
   <!-- ============================================================
-       PROJECT SELECTION
+       VIEW: PROJECT SELECTION
        ============================================================ -->
-  <div class="card" id="projectCard">
-    <div class="card-header">Projeto</div>
-    <label for="projectSelect">Selecionar projeto</label>
-    <div class="row">
-      <select id="projectSelect" style="flex:3">
-        <option value="">-- Carregando projetos...</option>
-      </select>
-      <button class="btn btn-secondary" id="btnNewProject" style="flex:1">+ Novo</button>
+  <div class="view" id="projectsView">
+    <div class="card" style="margin-top:.75rem;">
+      <div class="card-header">Projeto</div>
+      <label for="projectSelect">Selecionar projeto</label>
+      <div class="row">
+        <select id="projectSelect" style="flex:3">
+          <option value="">Carregando...</option>
+        </select>
+        <button class="btn btn-secondary" id="btnNewProject" style="flex:1">+ Novo</button>
+      </div>
     </div>
   </div>
 
   <!-- ============================================================
-       RDO FORM (hidden until project is selected)
+       VIEW: RDO LIST
        ============================================================ -->
-  <div id="rdoForm" style="display:none;">
+  <div class="view" id="rdosView">
+    <div id="rdosList"></div>
+    <button class="btn btn-primary btn-full" id="btnNewRDO">
+      + Novo RDO
+    </button>
+  </div>
 
+  <!-- ============================================================
+       VIEW: RDO FORM (new / edit draft)
+       ============================================================ -->
+  <div class="view" id="formView">
+    <form id="rdoFormInner" autocomplete="off">
+    <input type="hidden" id="rdoId">
     <!-- Date + Type -->
     <div class="card">
-      <div class="card-header">Identificação</div>
+      <div class="card-header">Identificacao</div>
       <div class="row">
         <div><label for="rdoData">Data do RDO</label><input type="date" id="rdoData"></div>
         <div>
           <label for="rdoTipoDia">Tipo de dia</label>
           <select id="rdoTipoDia">
-            <option value="perfuracao">Perfuração</option>
+            <option value="perfuracao">Perfuracao</option>
             <option value="montagem">Montagem</option>
             <option value="teste">Teste</option>
             <option value="parado">Parado</option>
@@ -273,79 +320,66 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
       </div>
     </div>
 
-    <!-- ============================================================
-         TOGGLE: Perfuração
-         ============================================================ -->
+    <!-- Perfuracao toggle -->
     <div class="card">
-      <div class="card-header">Perfuração</div>
+      <div class="card-header">Perfuracao</div>
       <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanco na perfuracao?</p>
       <div class="toggle-group" id="togglePerfuracao">
-        <button class="toggle-btn" data-value="yes">Sim</button>
-        <button class="toggle-btn active-no" data-value="no">Nao</button>
+        <button class="toggle-btn" data-value="yes" type="button">Sim</button>
+        <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
       </div>
-
       <div class="conditional" id="sectionPerfuracao">
         <div class="row">
           <div><label for="profInicial">Prof. Inicial (m)</label><input type="number" step="0.01" id="profInicial"></div>
           <div><label for="profFinal">Prof. Final (m)</label><input type="number" step="0.01" id="profFinal"></div>
         </div>
         <div class="row">
-          <div><label for="formacao">Formação</label><input type="text" id="formacao" placeholder="ex: Serra Geral"></div>
+          <div><label for="formacao">Formacao</label><input type="text" id="formacao" placeholder="ex: Serra Geral"></div>
           <div><label for="topoForm">Topo (m)</label><input type="number" step="0.01" id="topoForm"></div>
           <div><label for="baseForm">Base (m)</label><input type="number" step="0.01" id="baseForm"></div>
         </div>
-
-        <!-- Brocas -->
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Dados de Brocas</label>
         <table class="ops-table">
           <tr><th>Campo</th><th>Atual</th><th>Anterior</th></tr>
           <tr><td>Fabricante</td><td><input type="text" id="brocaFabAtual"></td><td><input type="text" id="brocaFabAnt"></td></tr>
           <tr><td>Serie</td><td><input type="text" id="brocaSerieAtual"></td><td><input type="text" id="brocaSerieAnt"></td></tr>
-          <tr><td>Diâmetro (pol)</td><td><input type="text" id="brocaDiamAtual"></td><td><input type="text" id="brocaDiamAnt"></td></tr>
+          <tr><td>Diametro (pol)</td><td><input type="text" id="brocaDiamAtual"></td><td><input type="text" id="brocaDiamAnt"></td></tr>
           <tr><td>Modelo IADC</td><td><input type="text" id="brocaModAtual" placeholder="ex: 517"></td><td><input type="text" id="brocaModAnt"></td></tr>
           <tr><td>Jatos (pol)</td><td><input type="text" id="brocaJatosAtual" placeholder="16-16-16"></td><td><input type="text" id="brocaJatosAnt"></td></tr>
           <tr><td>Perfurado (m)</td><td><input type="number" step="0.1" id="brocaPerfAtual"></td><td><input type="number" step="0.1" id="brocaPerfAnt"></td></tr>
           <tr><td>Oper. (hs)</td><td><input type="number" step="0.1" id="brocaHsAtual"></td><td><input type="number" step="0.1" id="brocaHsAnt"></td></tr>
-          <tr><td>ROP médio (m/h)</td><td><input type="number" step="0.1" id="brocaRopAtual"></td><td><input type="number" step="0.1" id="brocaRopAnt"></td></tr>
+          <tr><td>ROP medio (m/h)</td><td><input type="number" step="0.1" id="brocaRopAtual"></td><td><input type="number" step="0.1" id="brocaRopAnt"></td></tr>
         </table>
-
-        <!-- Parametros (3 medicoes) -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Parâmetros de Perfuração</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Parametros de Perfuracao</label>
         <table class="ops-table" id="paramTable">
-          <tr><th>Campo</th><th>Medição 1</th><th>Medição 2</th><th>Medição 3</th></tr>
+          <tr><th>Campo</th><th>Medicao 1</th><th>Medicao 2</th><th>Medicao 3</th></tr>
           <tr><td>Prof. (m)</td><td><input type="number" step="0.1" class="param-prof" data-med="1"></td><td><input type="number" step="0.1" class="param-prof" data-med="2"></td><td><input type="number" step="0.1" class="param-prof" data-med="3"></td></tr>
           <tr><td>BBA</td><td><input type="text" class="param-bba" data-med="1"></td><td><input type="text" class="param-bba" data-med="2"></td><td><input type="text" class="param-bba" data-med="3"></td></tr>
           <tr><td>Peso (ton)</td><td><input type="number" step="0.1" class="param-peso" data-med="1"></td><td><input type="number" step="0.1" class="param-peso" data-med="2"></td><td><input type="number" step="0.1" class="param-peso" data-med="3"></td></tr>
           <tr><td>RPM</td><td><input type="number" class="param-rpm" data-med="1"></td><td><input type="number" class="param-rpm" data-med="2"></td><td><input type="number" class="param-rpm" data-med="3"></td></tr>
           <tr><td>Torque</td><td><input type="number" step="0.1" class="param-torque" data-med="1"></td><td><input type="number" step="0.1" class="param-torque" data-med="2"></td><td><input type="number" step="0.1" class="param-torque" data-med="3"></td></tr>
           <tr><td>SPM</td><td><input type="number" class="param-spm" data-med="1"></td><td><input type="number" class="param-spm" data-med="2"></td><td><input type="number" class="param-spm" data-med="3"></td></tr>
-          <tr><td>Pressão (psi)</td><td><input type="number" class="param-pressao" data-med="1"></td><td><input type="number" class="param-pressao" data-med="2"></td><td><input type="number" class="param-pressao" data-med="3"></td></tr>
-          <tr><td>Vazão (L/min)</td><td><input type="number" class="param-vazao" data-med="1"></td><td><input type="number" class="param-vazao" data-med="2"></td><td><input type="number" class="param-vazao" data-med="3"></td></tr>
+          <tr><td>Pressao (psi)</td><td><input type="number" class="param-pressao" data-med="1"></td><td><input type="number" class="param-pressao" data-med="2"></td><td><input type="number" class="param-pressao" data-med="3"></td></tr>
+          <tr><td>Vazao (L/min)</td><td><input type="number" class="param-vazao" data-med="1"></td><td><input type="number" class="param-vazao" data-med="2"></td><td><input type="number" class="param-vazao" data-med="3"></td></tr>
         </table>
-
-        <!-- Coluna (BHA) -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Composição de Coluna (BHA)</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Composicao de Coluna (BHA)</label>
         <table class="ops-table" id="colunaTable">
           <tr><th>Item</th><th>Qty</th><th>ID (in)</th><th>OD (in)</th><th>Length (m)</th><th>Total (m)</th><th></th></tr>
         </table>
-        <button class="btn btn-secondary btn-sm" id="btnAddColuna" style="margin-top:.3rem;">+ Adicionar item</button>
+        <button class="btn btn-secondary btn-sm" id="btnAddColuna" type="button" style="margin-top:.3rem;">+ Adicionar item</button>
       </div>
     </div>
 
-    <!-- ============================================================
-         TOGGLE: Fluido / Químicos
-         ============================================================ -->
+    <!-- Fluido toggle -->
     <div class="card">
-      <div class="card-header">Fluido e Químicos</div>
+      <div class="card-header">Fluido e Quimicos</div>
       <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de quimicos/fluido?</p>
       <div class="toggle-group" id="toggleFluido">
-        <button class="toggle-btn" data-value="yes">Sim</button>
-        <button class="toggle-btn active-no" data-value="no">Nao</button>
+        <button class="toggle-btn" data-value="yes" type="button">Sim</button>
+        <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
       </div>
-
       <div class="conditional" id="sectionFluido">
-        <!-- Fluido params -->
-        <label style="font-size:.82rem;color:#1e3a5f;">Parâmetros do Fluido</label>
+        <label style="font-size:.82rem;color:#1e3a5f;">Parametros do Fluido</label>
         <div class="row">
           <div><label for="fluDensidade">Densidade (lb/gal)</label><input type="number" step="0.1" id="fluDensidade"></div>
           <div><label for="fluViscosidade">Visc. Marsh (s/qt)</label><input type="number" step="0.1" id="fluViscosidade"></div>
@@ -353,18 +387,16 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
         <div class="row">
           <div><label for="fluFiltrado">Filtrado API (mL)</label><input type="number" step="0.1" id="fluFiltrado"></div>
           <div><label for="fluPh">pH</label><input type="number" step="0.1" id="fluPh"></div>
-          <div><label for="fluÁguaLivre">Água Livre (%)</label><input type="number" step="0.1" id="fluÁguaLivre"></div>
+          <div><label for="fluAguaLivre">Agua Livre (%)</label><input type="number" step="0.1" id="fluAguaLivre"></div>
         </div>
         <div class="row">
           <div><label for="fluAreia">Areia (%)</label><input type="number" step="0.1" id="fluAreia"></div>
           <div><label for="fluApiCake">API Cake (1/32 in)</label><input type="number" step="0.1" id="fluApiCake"></div>
-          <div><label for="fluSólidos">Sólidos (%)</label><input type="number" step="0.1" id="fluSólidos"></div>
+          <div><label for="fluSolidos">Solidos (%)</label><input type="number" step="0.1" id="fluSolidos"></div>
         </div>
-
-        <!-- Insumos -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Insumos (preencher com valor ou "-")</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Insumos</label>
         <div class="row">
-          <div><label for="insÁgua">Água</label><input type="text" id="insÁgua" placeholder="-"></div>
+          <div><label for="insAgua">Agua</label><input type="text" id="insAgua" placeholder="-"></div>
           <div><label for="insLimpaFossa">Limpa Fossa</label><input type="text" id="insLimpaFossa" placeholder="-"></div>
           <div><label for="insLimpezaBanh">Limpeza Banheiro</label><input type="text" id="insLimpezaBanh" placeholder="-"></div>
         </div>
@@ -374,88 +406,72 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
           <div><label for="insGuindaste">Guindaste 70T</label><input type="text" id="insGuindaste" placeholder="-"></div>
           <div><label for="insRemCacamba">Rem. Cacamba</label><input type="text" id="insRemCacamba" placeholder="-"></div>
         </div>
-
-        <!-- Químicos -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Químicos (consumo / estoque)</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Quimicos (consumo / estoque)</label>
         <table class="ops-table">
           <tr><th>Produto</th><th>Consumo</th><th>Estoque</th></tr>
           <tr><td>Bentonita (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="bentonita"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="bentonita"></td></tr>
           <tr><td>CMC (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="cmc"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="cmc"></td></tr>
-          <tr><td>Soda Cáustica (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="soda_caustica"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="soda_caustica"></td></tr>
+          <tr><td>Soda Caustica (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="soda_caustica"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="soda_caustica"></td></tr>
           <tr><td>Goma Xantana (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="goma_xantana"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="goma_xantana"></td></tr>
           <tr><td>Sal (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="sal"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="sal"></td></tr>
           <tr><td>Barrilha (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="barrilha"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="barrilha"></td></tr>
         </table>
-
-        <!-- Combustível -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Combustível</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Combustivel</label>
         <div class="row">
           <div><label for="combDieselCons">Diesel Consumo (L)</label><input type="number" step="0.1" id="combDieselCons"></div>
           <div><label for="combDieselEst">Diesel Estoque (L)</label><input type="number" step="0.1" id="combDieselEst"></div>
         </div>
-
-        <!-- Outros materiais -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Outros Materiais (consumo / estoque)</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Outros Materiais</label>
         <table class="ops-table">
           <tr><th>Material</th><th>Consumo</th><th>Estoque</th></tr>
           <tr><td>Camisa Bomba</td><td><input type="number" step="0.1" class="mat-consumo" data-key="camisa_bomba"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="camisa_bomba"></td></tr>
-          <tr><td>Válvula</td><td><input type="number" step="0.1" class="mat-consumo" data-key="valvula"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="valvula"></td></tr>
+          <tr><td>Valvula</td><td><input type="number" step="0.1" class="mat-consumo" data-key="valvula"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="valvula"></td></tr>
           <tr><td>Gaxeta de Swivel</td><td><input type="number" step="0.1" class="mat-consumo" data-key="gaxeta_swivel"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="gaxeta_swivel"></td></tr>
-          <tr><td>Óleo 40 - Motor (L)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="oleo_40"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="oleo_40"></td></tr>
+          <tr><td>Oleo 40 - Motor (L)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="oleo_40"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="oleo_40"></td></tr>
           <tr><td>Hexa-T (Kg)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="hexa_t"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="hexa_t"></td></tr>
         </table>
       </div>
     </div>
 
-    <!-- ============================================================
-         OPERACOES (always visible)
-         ============================================================ -->
+    <!-- Operacoes -->
     <div class="card">
-      <div class="card-header">Operações</div>
+      <div class="card-header">Operacoes</div>
       <table class="ops-table" id="opsTable">
-        <tr><th>Início</th><th>Término</th><th>Código (opc.)</th><th>Descritivo</th><th></th></tr>
+        <tr><th>Inicio</th><th>Termino</th><th>Codigo (opc.)</th><th>Descritivo</th><th></th></tr>
       </table>
-      <button class="btn btn-secondary btn-sm" id="btnAddOp" style="margin-top:.3rem;">+ Adicionar operação</button>
+      <button class="btn btn-secondary btn-sm" id="btnAddOp" type="button" style="margin-top:.3rem;">+ Adicionar operacao</button>
     </div>
 
-    <!-- ============================================================
-         EQUIPE (always visible, dynamic rows)
-         ============================================================ -->
+    <!-- Equipe -->
     <div class="card">
       <div class="card-header">Equipe</div>
       <table class="ops-table" id="equipeTable">
         <tr><th>Funcao</th><th>Nome</th><th></th></tr>
       </table>
-      <button class="btn btn-secondary btn-sm" id="btnAddEquipe" style="margin-top:.3rem;">+ Adicionar pessoa</button>
+      <button class="btn btn-secondary btn-sm" id="btnAddEquipe" type="button" style="margin-top:.3rem;">+ Adicionar pessoa</button>
     </div>
 
-    <!-- ============================================================
-         HSE (always visible)
-         ============================================================ -->
+    <!-- HSE -->
     <div class="card">
-      <div class="card-header">HSE / Segurança</div>
+      <div class="card-header">HSE / Seguranca</div>
       <div class="row">
         <div><label><input type="checkbox" id="hseDds"> DDS realizado</label></div>
         <div><label><input type="checkbox" id="hseEpis"> EPIs vistoriados</label></div>
       </div>
       <div><label for="hseHh">Horas-homem expostas</label><input type="number" step="0.1" id="hseHh"></div>
-      <div><label for="hseIncidentes">Incidentes</label><textarea id="hseIncidentes" rows="2" placeholder="Descreva incidentes ocorridos no dia..."></textarea></div>
-      <div><label for="hseQuase">Quase-acidentes</label><textarea id="hseQuase" rows="2" placeholder="Relate quase-acidentes observados..."></textarea></div>
+      <div><label for="hseIncidentes">Incidentes</label><textarea id="hseIncidentes" rows="2" placeholder="Descreva incidentes..."></textarea></div>
+      <div><label for="hseQuase">Quase-acidentes</label><textarea id="hseQuase" rows="2" placeholder="Relate quase-acidentes..."></textarea></div>
     </div>
 
-    <!-- ============================================================
-         CLIMATICAS (always visible)
-         ============================================================ -->
+    <!-- Climaticas -->
     <div class="card">
-      <div class="card-header">Condições Climáticas</div>
+      <div class="card-header">Condicoes Climaticas</div>
       <div class="row">
         <div>
-          <label for="condClima">Condição</label>
+          <label for="condClima">Condicao</label>
           <select id="condClima">
-            <option value="Bom">Bom</option>
-            <option value="Nublado">Nublado</option>
-            <option value="Chuva">Chuva</option>
-            <option value="Tempestade">Tempestade</option>
+            <option value="Bom">Bom</option><option value="Nublado">Nublado</option>
+            <option value="Chuva">Chuva</option><option value="Tempestade">Tempestade</option>
             <option value="Vento Forte">Vento Forte</option>
           </select>
         </div>
@@ -465,25 +481,21 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
       </div>
     </div>
 
-    <!-- ============================================================
-         OBSERVACOES / PLANEJAMENTO (always visible)
-         ============================================================ -->
+    <!-- Observacoes -->
     <div class="card">
-      <div class="card-header">Observações e Planejamento</div>
-      <label for="obsGeral">Observações</label>
-      <textarea id="obsGeral" rows="3" placeholder="Registre ocorrências, decisões, visitas..."></textarea>
-      <label for="planProxTurno">Planejamento próximo turno</label>
-      <textarea id="planProxTurno" rows="2" placeholder="O que está previsto para as próximas 24h?"></textarea>
+      <div class="card-header">Observacoes e Planejamento</div>
+      <label for="obsGeral">Observacoes</label>
+      <textarea id="obsGeral" rows="3" placeholder="Registre ocorrencias, decisoes, visitas..."></textarea>
+      <label for="planProxTurno">Planejamento proximo turno</label>
+      <textarea id="planProxTurno" rows="2" placeholder="Proximas 24h?"></textarea>
     </div>
 
-    <!-- ============================================================
-         APROVACAO (always visible)
-         ============================================================ -->
+    <!-- Aprovacao -->
     <div class="card">
-      <div class="card-header">Aprovação</div>
+      <div class="card-header">Aprovacao</div>
       <div class="row">
-        <div><label for="aprGeologo">Geólogo</label><input type="text" id="aprGeologo"></div>
-        <div><label for="aprGerOper">Ger. Operações</label><input type="text" id="aprGerOper"></div>
+        <div><label for="aprGeologo">Geologo</label><input type="text" id="aprGeologo"></div>
+        <div><label for="aprGerOper">Ger. Operacoes</label><input type="text" id="aprGerOper"></div>
       </div>
       <div class="row">
         <div><label for="aprPreposto1">Preposto 1</label><input type="text" id="aprPreposto1"></div>
@@ -491,25 +503,32 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
       </div>
     </div>
 
-    <!-- ============================================================
-         FOTOS (always visible)
-         ============================================================ -->
+    <!-- Fotos -->
     <div class="card">
       <div class="card-header">Fotos (ate 3)</div>
       <input type="file" id="fotoInput" accept="image/*" multiple>
       <div class="photo-grid" id="photoPreview"></div>
+      <!-- Existing photo URLs for drafts -->
+      <div id="existingPhotos"></div>
     </div>
 
-    <!-- ============================================================
-         SUBMIT
-         ============================================================ -->
-    <button class="btn btn-primary btn-full" id="btnSubmit" style="margin-bottom:2rem;">
-      Salvar RDO
-    </button>
+    <!-- Buttons -->
+    <div style="display:flex;gap:.5rem;margin-bottom:2rem;">
+      <button class="btn btn-draft" id="btnSaveDraft" type="button" style="flex:1;">Salvar Rascunho</button>
+      <button class="btn btn-primary" id="btnSubmit" type="button" style="flex:1;">Enviar RDO</button>
+    </div>
+    </form>
+  </div>
 
-  </div><!-- #rdoForm -->
+  <!-- ============================================================
+       VIEW: READ-ONLY RDO
+       ============================================================ -->
+  <div class="view" id="readonlyView">
+    <div class="card" id="readonlyContent"></div>
+    <button class="btn btn-secondary btn-full" id="btnBackFromRO" style="margin-bottom:2rem;">Voltar</button>
+  </div>
 
-</div><!-- .container -->
+</div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
@@ -522,193 +541,475 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
     <label for="newLocalidade">Localidade</label><input type="text" id="newLocalidade" placeholder="ex: Ribeirao Preto - SP">
     <label for="newSonda">Sonda</label><input type="text" id="newSonda">
     <div class="row">
-      <div><label for="newDataInício">Data Início</label><input type="date" id="newDataInício"></div>
+      <div><label for="newDataInicio">Data Inicio</label><input type="date" id="newDataInicio"></div>
       <div><label for="newTurno">Turno</label><input type="text" id="newTurno" value="07h x 17h"></div>
     </div>
     <div style="display:flex;gap:.5rem;margin-top:1rem;">
-      <button class="btn btn-secondary" id="btnModalCancel" style="flex:1;">Cancelar</button>
-      <button class="btn btn-primary" id="btnModalSave" style="flex:1;">Salvar Projeto</button>
+      <button class="btn btn-secondary" id="btnModalCancel" type="button" style="flex:1;">Cancelar</button>
+      <button class="btn btn-primary" id="btnModalSave" type="button" style="flex:1;">Salvar Projeto</button>
     </div>
   </div>
 </div>
 
-<!-- ============================================================
-     SUPABASE SDK
-     ============================================================ -->
+<!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
 // ============================================================
-// CONFIG — replace with your own Supabase credentials if needed
+// CONFIG
 // ============================================================
 const SUPABASE_URL = "https://fecskilrtsaeavoznwgi.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_VjwnlFeGz7zJkZx_KPxukA_GCTRxcgi";
 const STORAGE_BUCKET = "fotos";
-
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ============================================================
-// DOM REFS
-// ============================================================
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
-const projectSelect = $("#projectSelect");
-const rdoForm = $("#rdoForm");
-const btnNewProject = $("#btnNewProject");
-const modalOverlay = $("#modalNewProject");
-const btnModalCancel = $("#btnModalCancel");
-const btnModalSave = $("#btnModalSave");
-const btnSubmit = $("#btnSubmit");
-const toast = $("#toast");
-const photoPreview = $("#photoPreview");
-const fotoInput = $("#fotoInput");
+// ============================================================
+// VIEW NAVIGATION
+// ============================================================
+let currentProjectId = null;
+let currentProjectName = "";
+
+function showView(viewId) {
+  $$(".view").forEach(v => v.classList.remove("active"));
+  const target = $("#" + viewId);
+  if (target) target.classList.add("active");
+
+  // Header: show only after splash
+  const header = $("#mainHeader");
+  if (viewId === "splashView") {
+    header.style.display = "none";
+  } else {
+    header.style.display = "flex";
+  }
+
+  // Back button visibility
+  const btnBack = $("#btnBack");
+  if (viewId === "projectsView") {
+    btnBack.style.visibility = "hidden";
+  } else {
+    btnBack.style.visibility = "visible";
+  }
+}
+
+// ============================================================
+// SPLASH
+// ============================================================
+$("#splashView").addEventListener("click", () => {
+  showView("projectsView");
+  loadProjects();
+});
+// Auto-dismiss after 2.5s
+setTimeout(() => {
+  if ($("#splashView").classList.contains("active")) {
+    showView("projectsView");
+    loadProjects();
+  }
+}, 2500);
+
+// ============================================================
+// BACK BUTTON
+// ============================================================
+$("#btnBack").addEventListener("click", () => {
+  const formActive = $("#formView").classList.contains("active");
+  const roActive = $("#readonlyView").classList.contains("active");
+  if (formActive || roActive) {
+    showView("rdosView");
+    loadRDOs();
+  } else if ($("#rdosView").classList.contains("active")) {
+    showView("projectsView");
+  }
+});
+
+$("#btnBackFromRO").addEventListener("click", () => {
+  showView("rdosView");
+  loadRDOs();
+});
 
 // ============================================================
 // TOAST
 // ============================================================
 let toastTimer;
 function showToast(msg, type) {
-  toast.textContent = msg;
-  toast.className = "toast " + type + " show";
+  const t = $("#toast");
+  t.textContent = msg;
+  t.className = "toast " + type + " show";
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { toast.className = "toast"; }, 3500);
+  toastTimer = setTimeout(() => { t.className = "toast"; }, 3500);
 }
 
 // ============================================================
 // PROJECT MANAGEMENT
 // ============================================================
 async function loadProjects() {
-  const { data, error } = await sb
-    .from("projetos")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    projectSelect.innerHTML = '<option value="">Erro ao carregar projetos</option>';
-    showToast("Erro ao carregar projetos: " + error.message, "error");
+  const { data, error } = await sb.from("projetos").select("*").order("created_at", { ascending: false });
+  const sel = $("#projectSelect");
+  if (error || !data || data.length === 0) {
+    sel.innerHTML = '<option value="">Nenhum projeto. Clique em "+ Novo"</option>';
     return;
   }
-
-  if (!data || data.length === 0) {
-    projectSelect.innerHTML = '<option value="">Nenhum projeto. Clique em "+ Novo"</option>';
-    return;
-  }
-
-  projectSelect.innerHTML = '<option value="">-- Selecionar projeto --</option>' +
+  sel.innerHTML = '<option value="">Selecionar projeto...</option>' +
     data.map(p => `<option value="${p.id}">${p.cliente} — ${p.localidade} (${p.sonda})</option>`).join("");
-
-  // Restore last selected from localStorage
   const savedId = localStorage.getItem("rdo_selected_project");
   if (savedId && data.find(p => p.id === savedId)) {
-    projectSelect.value = savedId;
-    showRdoForm();
+    sel.value = savedId;
   }
 }
 
-projectSelect.addEventListener("change", () => {
-  if (projectSelect.value) {
-    localStorage.setItem("rdo_selected_project", projectSelect.value);
-    showRdoForm();
-  } else {
-    localStorage.removeItem("rdo_selected_project");
-    rdoForm.style.display = "none";
-  }
+$("#projectSelect").addEventListener("change", () => {
+  const id = $("#projectSelect").value;
+  if (!id) return;
+  currentProjectId = id;
+  currentProjectName = $("#projectSelect").selectedOptions[0]?.text || "";
+  localStorage.setItem("rdo_selected_project", id);
+  $("#headerProjectName").textContent = currentProjectName;
+  showView("rdosView");
+  loadRDOs();
 });
-
-function showRdoForm() {
-  rdoForm.style.display = "block";
-  const today = new Date().toISOString().split("T")[0];
-  const dateInput = $("#rdoData");
-  dateInput.max = today;
-  if (!dateInput.value) {
-    dateInput.value = today;
-  }
-}
 
 // ============================================================
 // NEW PROJECT MODAL
 // ============================================================
-btnNewProject.addEventListener("click", () => {
-  modalOverlay.classList.add("show");
-  $("#newDataInício").value = new Date().toISOString().split("T")[0];
+$("#btnNewProject").addEventListener("click", () => {
+  $("#modalNewProject").classList.add("show");
+  $("#newDataInicio").value = new Date().toISOString().split("T")[0];
+});
+$("#btnModalCancel").addEventListener("click", () => $("#modalNewProject").classList.remove("show"));
+$("#modalNewProject").addEventListener("click", (e) => {
+  if (e.target === $("#modalNewProject")) $("#modalNewProject").classList.remove("show");
 });
 
-btnModalCancel.addEventListener("click", () => {
-  modalOverlay.classList.remove("show");
-});
-
-btnModalSave.addEventListener("click", async () => {
+$("#btnModalSave").addEventListener("click", async () => {
   const cliente = $("#newCliente").value.trim();
   const localidade = $("#newLocalidade").value.trim();
   const sonda = $("#newSonda").value.trim();
-  const dataInício = $("#newDataInício").value;
+  const dataInicio = $("#newDataInicio").value;
   const turno = $("#newTurno").value.trim() || "07h x 17h";
-
-  if (!cliente || !localidade || !sonda || !dataInício) {
-    showToast("Preencha todos os campos obrigatorios.", "error");
-    return;
+  if (!cliente || !localidade || !sonda || !dataInicio) {
+    showToast("Preencha todos os campos.", "error"); return;
   }
+  $("#btnModalSave").disabled = true;
+  const { data, error } = await sb.from("projetos").insert({ cliente, localidade, sonda, data_inicio: dataInicio, turno }).select().single();
+  $("#btnModalSave").disabled = false;
+  if (error) { showToast("Erro: " + error.message, "error"); return; }
+  showToast("Projeto criado!", "success");
+  $("#modalNewProject").classList.remove("show");
+  ["#newCliente","#newLocalidade","#newSonda"].forEach(id => $(id).value = "");
+  await loadProjects();
+  $("#projectSelect").value = data.id;
+  currentProjectId = data.id;
+  currentProjectName = `${data.cliente} — ${data.localidade} (${data.sonda})`;
+  localStorage.setItem("rdo_selected_project", data.id);
+  $("#headerProjectName").textContent = currentProjectName;
+  showView("rdosView");
+  loadRDOs();
+});
 
-  btnModalSave.disabled = true;
-  const { data, error } = await sb
-    .from("projetos")
-    .insert({ cliente, localidade, sonda, data_inicio: dataInício, turno })
-    .select()
-    .single();
+// ============================================================
+// RDO LIST
+// ============================================================
+async function loadRDOs() {
+  const container = $("#rdosList");
+  container.innerHTML = '<div style="text-align:center;padding:1rem;color:#9ca3af;">Carregando...</div>';
 
-  btnModalSave.disabled = false;
+  const { data, error } = await sb.from("rdos")
+    .select("id,data,tipo_dia,profundidade_inicial,profundidade_final,formacao,status")
+    .eq("projeto_id", currentProjectId)
+    .order("data", { ascending: false })
+    .limit(50);
 
   if (error) {
-    showToast("Erro ao criar projeto: " + error.message, "error");
+    container.innerHTML = `<div class="empty-state"><div class="icon">!</div><p>Erro ao carregar: ${error.message}</p></div>`;
     return;
   }
 
-  showToast("Projeto criado!", "success");
-  modalOverlay.classList.remove("show");
-  // Clear modal fields
-  $("#newCliente").value = "";
-  $("#newLocalidade").value = "";
-  $("#newSonda").value = "";
+  if (!data || data.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>Nenhum RDO neste projeto ainda.</p><p style="font-size:.75rem;">Toque em "+ Novo RDO" para comecar.</p></div>`;
+    return;
+  }
 
-  await loadProjects();
-  projectSelect.value = data.id;
-  localStorage.setItem("rdo_selected_project", data.id);
-  showRdoForm();
+  container.innerHTML = data.map(r => {
+    const badgeClass = r.status === 'rascunho' ? 'badge-rascunho' : 'badge-enviado';
+    const badgeText = r.status === 'rascunho' ? 'Rascunho' : 'Enviado';
+    const depthInfo = r.profundidade_final != null
+      ? `${r.profundidade_inicial || 0} → ${r.profundidade_final} m`
+      : 'Sem perfuracao';
+    return `
+      <div class="rdo-card" data-id="${r.id}" data-status="${r.status}">
+        <div class="rdo-info">
+          <div class="rdo-date">${r.data} — ${r.tipo_dia || 'N/D'}</div>
+          <div class="rdo-meta">${depthInfo}${r.formacao ? ' | ' + r.formacao : ''}</div>
+        </div>
+        <div class="rdo-badge ${badgeClass}">${badgeText}</div>
+      </div>`;
+  }).join("");
+
+  // Click handlers
+  $$(".rdo-card").forEach(card => {
+    card.addEventListener("click", async () => {
+      const id = card.dataset.id;
+      const status = card.dataset.status;
+      const { data } = await sb.from("rdos").select("*").eq("id", id).single();
+      if (!data) return;
+      if (status === "rascunho") {
+        openDraft(data);
+      } else {
+        viewRDO(data);
+      }
+    });
+  });
+}
+
+// ============================================================
+// NEW RDO
+// ============================================================
+$("#btnNewRDO").addEventListener("click", () => {
+  $("#rdoId").value = "";
+  resetForm();
+  showView("formView");
 });
 
-// Close modal on overlay click
-modalOverlay.addEventListener("click", (e) => {
-  if (e.target === modalOverlay) modalOverlay.classList.remove("show");
-});
+// ============================================================
+// OPEN DRAFT (edit mode)
+// ============================================================
+function openDraft(rdo) {
+  resetForm();
+  $("#rdoId").value = rdo.id;
+  populateForm(rdo);
+  showView("formView");
+}
+
+// ============================================================
+// VIEW RDO (read-only)
+// ============================================================
+function viewRDO(rdo) {
+  const c = $("#readonlyContent");
+  const depthInfo = rdo.profundidade_final != null
+    ? `<div class="ro-row"><span class="ro-label">Profundidade</span><span class="ro-value">${rdo.profundidade_inicial || 0} → ${rdo.profundidade_final} m</span></div>`
+    : "";
+  const ops = rdo.operacoes ? rdo.operacoes.map(o =>
+    `<div class="ro-row"><span class="ro-label">${o.inicio}-${o.termino}</span><span class="ro-value">${o.codigo ? '['+o.codigo+'] ' : ''}${o.descritivo}</span></div>`
+  ).join("") : "";
+  const equipe = rdo.equipe ? rdo.equipe.map(e =>
+    `<div class="ro-row"><span class="ro-label">${e.funcao || ''}</span><span class="ro-value">${e.nome || ''}</span></div>`
+  ).join("") : "";
+  const fotos = rdo.fotos && rdo.fotos.length > 0
+    ? rdo.fotos.map(url => `<img src="${url}" class="photo-thumb" style="cursor:pointer" onclick="window.open('${url}')">`).join("")
+    : "<span style='color:#9ca3af;font-size:.8rem;'>Nenhuma foto</span>";
+
+  c.innerHTML = `
+    <div class="card-header">RDO ${rdo.data} — ${rdo.tipo_dia || 'N/D'} <span class="rdo-badge badge-enviado" style="margin-left:.5rem;">Enviado</span></div>
+    <div class="ro-section"><h3>Perfuracao</h3>${depthInfo || '<p style="color:#9ca3af;font-size:.8rem;">Sem perfuracao neste dia.</p>'}</div>
+    ${rdo.formacao ? `<div class="ro-section"><h3>Formacao</h3><div class="ro-row"><span class="ro-label">Formacao</span><span class="ro-value">${rdo.formacao} (${rdo.topo || '?'} — ${rdo.base || '?'} m)</span></div></div>` : ''}
+    <div class="ro-section"><h3>Operacoes</h3>${ops || '<p style="color:#9ca3af;font-size:.8rem;">Nenhuma operacao registrada.</p>'}</div>
+    <div class="ro-section"><h3>Equipe</h3>${equipe || '<p style="color:#9ca3af;font-size:.8rem;">Nenhum membro registrado.</p>'}</div>
+    <div class="ro-section"><h3>HSE</h3>
+      <div class="ro-row"><span class="ro-label">DDS</span><span class="ro-value">${rdo.hse_dds ? 'Sim' : 'Nao'}</span></div>
+      <div class="ro-row"><span class="ro-label">EPIs</span><span class="ro-value">${rdo.hse_epis_vistoriados ? 'Sim' : 'Nao'}</span></div>
+      <div class="ro-row"><span class="ro-label">HH Expostas</span><span class="ro-value">${rdo.hse_hh_expostas || '-'}</span></div>
+      ${rdo.hse_incidentes ? `<div class="ro-row"><span class="ro-label">Incidentes</span><span class="ro-value">${rdo.hse_incidentes}</span></div>` : ''}
+    </div>
+    <div class="ro-section"><h3>Clima</h3><div class="ro-row"><span class="ro-label">Condicao</span><span class="ro-value">${rdo.condicoes_climaticas || '-'}${rdo.chuva ? ' (choveu)' : ''}</span></div></div>
+    ${rdo.observacoes ? `<div class="ro-section"><h3>Observacoes</h3><p style="font-size:.82rem;">${rdo.observacoes}</p></div>` : ''}
+    ${rdo.planejamento_proximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.82rem;">${rdo.planejamento_proximo_turno}</p></div>` : ''}
+    <div class="ro-section"><h3>Fotos</h3><div class="photo-grid">${fotos}</div></div>
+  `;
+  showView("readonlyView");
+}
+
+// ============================================================
+// POPULATE FORM (for draft editing)
+// ============================================================
+function populateForm(rdo) {
+  $("#rdoData").value = rdo.data;
+  $("#rdoTipoDia").value = rdo.tipo_dia || "perfuracao";
+
+  if (rdo.profundidade_final != null) {
+    setToggle("#togglePerfuracao", true);
+    $("#profInicial").value = rdo.profundidade_inicial || "";
+    $("#profFinal").value = rdo.profundidade_final || "";
+    $("#formacao").value = rdo.formacao || "";
+    $("#topoForm").value = rdo.topo || "";
+    $("#baseForm").value = rdo.base || "";
+
+    if (rdo.brocas) {
+      const b = rdo.brocas;
+      if (b.atual) {
+        $("#brocaFabAtual").value = b.atual.fabricante || "";
+        $("#brocaSerieAtual").value = b.atual.serie || "";
+        $("#brocaDiamAtual").value = b.atual.diametro || "";
+        $("#brocaModAtual").value = b.atual.modelo || "";
+        $("#brocaJatosAtual").value = b.atual.jatos || "";
+        $("#brocaPerfAtual").value = b.atual.perfurado || "";
+        $("#brocaHsAtual").value = b.atual.oper_hs || "";
+        $("#brocaRopAtual").value = b.atual.rop || "";
+      }
+      if (b.anterior) {
+        $("#brocaFabAnt").value = b.anterior.fabricante || "";
+        $("#brocaSerieAnt").value = b.anterior.serie || "";
+        $("#brocaDiamAnt").value = b.anterior.diametro || "";
+        $("#brocaModAnt").value = b.anterior.modelo || "";
+        $("#brocaJatosAnt").value = b.anterior.jatos || "";
+        $("#brocaPerfAnt").value = b.anterior.perfurado || "";
+        $("#brocaHsAnt").value = b.anterior.oper_hs || "";
+        $("#brocaRopAnt").value = b.anterior.rop || "";
+      }
+    }
+    if (rdo.parametros) {
+      for (const med of [1,2,3]) {
+        const m = rdo.parametros[`med${med}`];
+        if (!m) continue;
+        const setParam = (cls, val) => {
+          const el = document.querySelector(`.${cls}[data-med="${med}"]`);
+          if (el && val != null) el.value = val;
+        };
+        setParam("param-prof", m.prof); setParam("param-bba", m.bba);
+        setParam("param-peso", m.peso); setParam("param-rpm", m.rpm);
+        setParam("param-torque", m.torque); setParam("param-spm", m.spm);
+        setParam("param-pressao", m.pressao); setParam("param-vazao", m.vazao);
+      }
+    }
+    if (rdo.coluna) {
+      clearTable("#colunaTable");
+      rdo.coluna.forEach(item => {
+        addColunaRow(item.item, item.qty, item.id_pol, item.od_pol, item.length_m, item.total_m);
+      });
+    } else { addColunaRow("","","","","",""); }
+  } else {
+    setToggle("#togglePerfuracao", false);
+    if (!hasColunaRows()) addColunaRow("","","","","","");
+  }
+
+  // Fluido
+  const hasFluido = rdo.fluido || rdo.quimicos || rdo.insumos;
+  if (hasFluido) {
+    setToggle("#toggleFluido", true);
+    if (rdo.fluido) {
+      const f = rdo.fluido;
+      $("#fluDensidade").value = f.densidade || "";
+      $("#fluViscosidade").value = f.viscosidade || "";
+      $("#fluFiltrado").value = f.filtrado || "";
+      $("#fluPh").value = f.ph || "";
+      $("#fluAguaLivre").value = f.agua_livre || "";
+      $("#fluAreia").value = f.areia || "";
+      $("#fluApiCake").value = f.api_cake || "";
+      $("#fluSolidos").value = f.solidos || "";
+    }
+    if (rdo.insumos) {
+      const i = rdo.insumos;
+      $("#insAgua").value = i.agua || ""; $("#insLimpaFossa").value = i.limpa_fossa || "";
+      $("#insLimpezaBanh").value = i.limpeza_banheiro || ""; $("#insPta").value = i.pta || "";
+      $("#insMunck").value = i.munck || ""; $("#insGuindaste").value = i.guindaste || "";
+      $("#insRemCacamba").value = i.remocao_cacamba || "";
+    }
+    if (rdo.quimicos) {
+      for (const [key, val] of Object.entries(rdo.quimicos)) {
+        const consEl = document.querySelector(`.quim-consumo[data-key="${key}"]`);
+        const estEl = document.querySelector(`.quim-estoque[data-key="${key}"]`);
+        if (consEl && val.consumo != null) consEl.value = val.consumo;
+        if (estEl && val.estoque != null) estEl.value = val.estoque;
+      }
+    }
+    if (rdo.combustivel?.diesel) {
+      $("#combDieselCons").value = rdo.combustivel.diesel.consumo || "";
+      $("#combDieselEst").value = rdo.combustivel.diesel.estoque || "";
+    }
+    if (rdo.outros_materiais) {
+      for (const [key, val] of Object.entries(rdo.outros_materiais)) {
+        const consEl = document.querySelector(`.mat-consumo[data-key="${key}"]`);
+        const estEl = document.querySelector(`.mat-estoque[data-key="${key}"]`);
+        if (consEl && val.consumo != null) consEl.value = val.consumo;
+        if (estEl && val.estoque != null) estEl.value = val.estoque;
+      }
+    }
+  }
+
+  // Operacoes
+  if (rdo.operacoes && rdo.operacoes.length > 0) {
+    clearTable("#opsTable");
+    rdo.operacoes.forEach(o => addOpRow(o.inicio, o.termino, o.codigo, o.descritivo));
+  } else if (!hasOpsRows()) {
+    addOpRow("","","","");
+  }
+
+  // Equipe
+  if (rdo.equipe && rdo.equipe.length > 0) {
+    clearTable("#equipeTable");
+    rdo.equipe.forEach(e => addEquipeRow(e.funcao, e.nome));
+  }
+
+  // HSE
+  $("#hseDds").checked = !!rdo.hse_dds;
+  $("#hseEpis").checked = !!rdo.hse_epis_vistoriados;
+  $("#hseHh").value = rdo.hse_hh_expostas || "";
+  $("#hseIncidentes").value = rdo.hse_incidentes || "";
+  $("#hseQuase").value = rdo.hse_quase_acidentes || "";
+
+  // Clima
+  $("#condClima").value = rdo.condicoes_climaticas || "Bom";
+  $("#condChuva").checked = !!rdo.chuva;
+
+  // Obs
+  $("#obsGeral").value = rdo.observacoes || "";
+  $("#planProxTurno").value = rdo.planejamento_proximo_turno || "";
+
+  // Aprovacao
+  $("#aprGeologo").value = rdo.aprovacao_geologo || "";
+  $("#aprGerOper").value = rdo.aprovacao_ger_oper || "";
+  $("#aprPreposto1").value = rdo.aprovacao_preposto1 || "";
+  $("#aprPreposto2").value = rdo.aprovacao_preposto2 || "";
+
+  // Existing photos
+  selectedFiles = [];
+  fotoInput.value = "";
+  if (rdo.fotos && rdo.fotos.length > 0) {
+    $("#existingPhotos").innerHTML = `<p style="font-size:.78rem;color:#6b7280;margin-top:.5rem;">Fotos existentes (serao mantidas):</p><div class="photo-grid">${rdo.fotos.map(url => `<img src="${url}" class="photo-thumb">`).join("")}</div>`;
+  } else {
+    $("#existingPhotos").innerHTML = "";
+  }
+  renderPhotoPreview();
+}
+
+function setToggle(groupId, show) {
+  const group = $(groupId);
+  group.querySelectorAll(".toggle-btn").forEach(b => {
+    b.classList.remove("active-yes", "active-no");
+  });
+  if (show) {
+    group.querySelector('[data-value="yes"]').classList.add("active-yes");
+    $(groupId.replace("toggle","section")).classList.add("show");
+  } else {
+    group.querySelector('[data-value="no"]').classList.add("active-no");
+    $(groupId.replace("toggle","section")).classList.remove("show");
+  }
+}
+
+function clearTable(tableId) {
+  const tbody = $(tableId);
+  while (tbody.rows.length > 1) tbody.deleteRow(1);
+}
+function hasOpsRows() { return $("#opsTable").rows.length > 1; }
+function hasColunaRows() { return $("#colunaTable").rows.length > 1; }
 
 // ============================================================
 // TOGGLE BUTTONS
 // ============================================================
 function setupToggle(groupId, sectionId) {
   const group = $(groupId);
-  const section = $(sectionId);
-  if (!group || !section) return;
-
   group.addEventListener("click", (e) => {
     const btn = e.target.closest(".toggle-btn");
     if (!btn) return;
-
-    // Update active states
-    group.querySelectorAll(".toggle-btn").forEach(b => {
-      b.classList.remove("active-yes", "active-no");
-    });
-
+    group.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active-yes", "active-no"));
     if (btn.dataset.value === "yes") {
       btn.classList.add("active-yes");
-      section.classList.add("show");
+      $(sectionId).classList.add("show");
     } else {
       btn.classList.add("active-no");
-      section.classList.remove("show");
+      $(sectionId).classList.remove("show");
     }
   });
 }
-
 setupToggle("#togglePerfuracao", "#sectionPerfuracao");
 setupToggle("#toggleFluido", "#sectionFluido");
 
@@ -721,54 +1022,16 @@ function addOpRow(inicio, termino, codigo, descritivo) {
   row.innerHTML = `
     <td><input type="time" value="${inicio || ''}" class="op-inicio"></td>
     <td><input type="time" value="${termino || ''}" class="op-termino"></td>
-    <td><input type="text" value="${codigo || ''}" class="op-codigo" placeholder="ex: PERF-01" style="min-width:70px"></td>
+    <td><input type="text" value="${codigo || ''}" class="op-codigo" placeholder="PERF-01" style="min-width:70px"></td>
     <td><input type="text" value="${descritivo || ''}" class="op-descritivo" placeholder="Descreva..."></td>
-    <td><button class="btn btn-danger btn-sm op-remove">&times;</button></td>
-  `;
+    <td><button class="btn btn-danger btn-sm op-remove" type="button">&times;</button></td>`;
   row.querySelector(".op-remove").addEventListener("click", () => row.remove());
 }
-
-$("#btnAddOp").addEventListener("click", () => addOpRow("", "", "", ""));
-
-// Start with 1 empty row
-addOpRow("", "", "", "");
+$("#btnAddOp").addEventListener("click", () => addOpRow("","","",""));
+addOpRow("","","","");
 
 // ============================================================
-// EQUIPE TABLE (dynamic)
-// ============================================================
-function addEquipeRow(funcao, nome) {
-  const tbody = $("#equipeTable");
-  const row = tbody.insertRow(-1);
-  row.innerHTML = `
-    <td><input type="text" value="${funcao || ''}" class="eq-funcao" placeholder="ex: Sondador" style="min-width:100px"></td>
-    <td><input type="text" value="${nome || ''}" class="eq-nome" placeholder="Nome"></td>
-    <td><button class="btn btn-danger btn-sm eq-remove">&times;</button></td>
-  `;
-  row.querySelector(".eq-remove").addEventListener("click", () => row.remove());
-}
-
-$("#btnAddEquipe").addEventListener("click", () => addEquipeRow("", ""));
-
-// Pre-populate with common roles
-const DEFAULT_ROLES = ["Sondador", "Torrista", "Plat. / Auxiliar 1", "Plat. / Auxiliar 2", "TST", "Geologo", "Coordenador"];
-DEFAULT_ROLES.forEach(r => addEquipeRow(r, ""));
-
-function collectEquipe() {
-  const rows = $$("#equipeTable tr");
-  const members = [];
-  for (let i = 1; i < rows.length; i++) {
-    const row = rows[i];
-    const funcao = row.querySelector(".eq-funcao")?.value || "";
-    const nome = row.querySelector(".eq-nome")?.value || "";
-    if (funcao || nome) {
-      members.push({ funcao: funcao || null, nome: nome || null });
-    }
-  }
-  return members.length > 0 ? members : null;
-}
-
-// ============================================================
-// COLUNA (BHA) TABLE
+// COLUNA TABLE
 // ============================================================
 function addColunaRow(item, qty, idPol, odPol, lengthM, totalM) {
   const tbody = $("#colunaTable");
@@ -780,40 +1043,50 @@ function addColunaRow(item, qty, idPol, odPol, lengthM, totalM) {
     <td><input type="number" step="0.01" value="${odPol || ''}" class="col-od" style="min-width:60px"></td>
     <td><input type="number" step="0.01" value="${lengthM || ''}" class="col-length" style="min-width:70px"></td>
     <td><input type="number" step="0.01" value="${totalM || ''}" class="col-total" style="min-width:70px"></td>
-    <td><button class="btn btn-danger btn-sm col-remove">&times;</button></td>
-  `;
+    <td><button class="btn btn-danger btn-sm col-remove" type="button">&times;</button></td>`;
   row.querySelector(".col-remove").addEventListener("click", () => row.remove());
 }
-
-$("#btnAddColuna").addEventListener("click", () => addColunaRow("", "", "", "", "", ""));
-addColunaRow("", "", "", "", "", "");
+$("#btnAddColuna").addEventListener("click", () => addColunaRow("","","","","",""));
+addColunaRow("","","","","","");
 
 // ============================================================
-// PHOTO UPLOAD & PREVIEW
+// EQUIPE TABLE
+// ============================================================
+function addEquipeRow(funcao, nome) {
+  const tbody = $("#equipeTable");
+  const row = tbody.insertRow(-1);
+  row.innerHTML = `
+    <td><input type="text" value="${funcao || ''}" class="eq-funcao" placeholder="ex: Sondador" style="min-width:100px"></td>
+    <td><input type="text" value="${nome || ''}" class="eq-nome" placeholder="Nome"></td>
+    <td><button class="btn btn-danger btn-sm eq-remove" type="button">&times;</button></td>`;
+  row.querySelector(".eq-remove").addEventListener("click", () => row.remove());
+}
+$("#btnAddEquipe").addEventListener("click", () => addEquipeRow("",""));
+const DEFAULT_ROLES = ["Sondador","Torrista","Plat. / Auxiliar 1","Plat. / Auxiliar 2","TST","Geologo","Coordenador"];
+DEFAULT_ROLES.forEach(r => addEquipeRow(r,""));
+
+// ============================================================
+// PHOTOS
 // ============================================================
 let selectedFiles = [];
-
-fotoInput.addEventListener("change", () => {
-  selectedFiles = Array.from(fotoInput.files).slice(0, 3);
+$("#fotoInput").addEventListener("change", () => {
+  selectedFiles = Array.from($("#fotoInput").files).slice(0, 3);
   renderPhotoPreview();
 });
-
 function renderPhotoPreview() {
-  photoPreview.innerHTML = "";
-  selectedFiles.forEach((file, i) => {
-    const url = URL.createObjectURL(file);
+  const pg = $("#photoPreview");
+  pg.innerHTML = "";
+  selectedFiles.forEach((file) => {
     const img = document.createElement("img");
-    img.src = url;
+    img.src = URL.createObjectURL(file);
     img.className = "photo-thumb";
-    img.title = file.name;
-    photoPreview.appendChild(img);
+    pg.appendChild(img);
   });
-  // Show empty slots
   for (let i = selectedFiles.length; i < 3; i++) {
     const div = document.createElement("div");
     div.className = "photo-placeholder";
     div.textContent = "+";
-    photoPreview.appendChild(div);
+    pg.appendChild(div);
   }
 }
 renderPhotoPreview();
@@ -821,89 +1094,54 @@ renderPhotoPreview();
 async function uploadPhotos() {
   if (selectedFiles.length === 0) return [];
   const urls = [];
-
   for (const file of selectedFiles) {
-    const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-    const { data, error } = await sb.storage
-      .from(STORAGE_BUCKET)
-      .upload(fileName, file, { cacheControl: "3600", upsert: false });
-
-    if (error) {
-      console.error("Upload error:", error);
-      showToast("Erro ao enviar foto: " + error.message, "error");
-      continue;
-    }
-
-    const { data: urlData } = sb.storage
-      .from(STORAGE_BUCKET)
-      .getPublicUrl(data.path);
-
+    const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+    const { data, error } = await sb.storage.from(STORAGE_BUCKET).upload(fileName, file, { cacheControl:"3600", upsert:false });
+    if (error) { showToast("Erro ao enviar foto: "+error.message,"error"); continue; }
+    const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(data.path);
     urls.push(urlData.publicUrl);
   }
-
   return urls;
 }
 
 // ============================================================
-// FORM DATA COLLECTION
+// DATA COLLECTION
 // ============================================================
-function val(id) {
-  const el = $(id);
-  if (!el) return null;
-  const v = el.value;
-  if (v === "" || v === null || v === undefined) return null;
-  if (el.type === "number") {
-    const n = parseFloat(v);
-    return isNaN(n) ? null : n;
-  }
-  return v;
-}
-
-function getToggleState(groupId) {
-  const active = $(groupId).querySelector(".active-yes");
-  return !!active;
-}
-
+function getToggleState(groupId) { return !!$(groupId).querySelector(".active-yes"); }
 function collectOperacoes() {
-  const rows = $$("#opsTable tr");
   const ops = [];
-  // Skip header row
-  for (let i = 1; i < rows.length; i++) {
-    const row = rows[i];
+  for (let i = 1; i < $("#opsTable").rows.length; i++) {
+    const row = $("#opsTable").rows[i];
     const inicio = row.querySelector(".op-inicio")?.value || "";
     const termino = row.querySelector(".op-termino")?.value || "";
     const codigo = row.querySelector(".op-codigo")?.value || "";
     const descritivo = row.querySelector(".op-descritivo")?.value || "";
-    if (inicio || termino || descritivo) {
-      ops.push({ inicio, termino, codigo: codigo || null, descritivo });
-    }
+    if (inicio || termino || descritivo) ops.push({ inicio, termino, codigo: codigo || null, descritivo });
   }
   return ops.length > 0 ? ops : null;
 }
-
 function collectColuna() {
-  const rows = $$("#colunaTable tr");
   const items = [];
-  for (let i = 1; i < rows.length; i++) {
-    const row = rows[i];
+  for (let i = 1; i < $("#colunaTable").rows.length; i++) {
+    const row = $("#colunaTable").rows[i];
     const item = row.querySelector(".col-item")?.value || "";
-    const qty = parseInt(row.querySelector(".col-qty")?.value) || null;
-    const idPol = parseFloat(row.querySelector(".col-id")?.value) || null;
-    const odPol = parseFloat(row.querySelector(".col-od")?.value) || null;
-    const lengthM = parseFloat(row.querySelector(".col-length")?.value) || null;
-    const totalM = parseFloat(row.querySelector(".col-total")?.value) || null;
-    if (item) {
-      items.push({ item, qty, id_pol: idPol, od_pol: odPol, length_m: lengthM, total_m: totalM });
-    }
+    if (!item) continue;
+    items.push({
+      item,
+      qty: parseInt(row.querySelector(".col-qty")?.value) || null,
+      id_pol: parseFloat(row.querySelector(".col-id")?.value) || null,
+      od_pol: parseFloat(row.querySelector(".col-od")?.value) || null,
+      length_m: parseFloat(row.querySelector(".col-length")?.value) || null,
+      total_m: parseFloat(row.querySelector(".col-total")?.value) || null,
+    });
   }
   return items.length > 0 ? items : null;
 }
-
 function collectParametros() {
   const result = {};
-  for (const med of [1, 2, 3]) {
+  for (const med of [1,2,3]) {
     const prof = parseFloat(document.querySelector(`.param-prof[data-med="${med}"]`)?.value);
-    if (!prof && prof !== 0) continue; // skip if no depth set
+    if (!prof && prof !== 0) continue;
     result[`med${med}`] = {
       prof: prof || null,
       bba: document.querySelector(`.param-bba[data-med="${med}"]`)?.value || null,
@@ -917,254 +1155,199 @@ function collectParametros() {
   }
   return Object.keys(result).length > 0 ? result : null;
 }
-
 function collectBrocas() {
-  const atual = {
-    fabricante: $("#brocaFabAtual").value || null,
-    serie: $("#brocaSerieAtual").value || null,
-    diametro: $("#brocaDiamAtual").value || null,
-    modelo: $("#brocaModAtual").value || null,
-    jatos: $("#brocaJatosAtual").value || null,
-    perfurado: parseFloat($("#brocaPerfAtual").value) || null,
-    oper_hs: parseFloat($("#brocaHsAtual").value) || null,
-    rop: parseFloat($("#brocaRopAtual").value) || null,
-  };
-  const anterior = {
-    fabricante: $("#brocaFabAnt").value || null,
-    serie: $("#brocaSerieAnt").value || null,
-    diametro: $("#brocaDiamAnt").value || null,
-    modelo: $("#brocaModAnt").value || null,
-    jatos: $("#brocaJatosAnt").value || null,
-    perfurado: parseFloat($("#brocaPerfAnt").value) || null,
-    oper_hs: parseFloat($("#brocaHsAnt").value) || null,
-    rop: parseFloat($("#brocaRopAnt").value) || null,
-  };
-  const hasAtual = Object.values(atual).some(v => v !== null && v !== "");
-  const hasAnt = Object.values(anterior).some(v => v !== null && v !== "");
-  if (!hasAtual && !hasAnt) return null;
-  const result = {};
-  if (hasAtual) result.atual = atual;
-  if (hasAnt) result.anterior = anterior;
-  return result;
+  const atual = { fabricante:$("#brocaFabAtual").value||null, serie:$("#brocaSerieAtual").value||null, diametro:$("#brocaDiamAtual").value||null, modelo:$("#brocaModAtual").value||null, jatos:$("#brocaJatosAtual").value||null, perfurado:parseFloat($("#brocaPerfAtual").value)||null, oper_hs:parseFloat($("#brocaHsAtual").value)||null, rop:parseFloat($("#brocaRopAtual").value)||null };
+  const anterior = { fabricante:$("#brocaFabAnt").value||null, serie:$("#brocaSerieAnt").value||null, diametro:$("#brocaDiamAnt").value||null, modelo:$("#brocaModAnt").value||null, jatos:$("#brocaJatosAnt").value||null, perfurado:parseFloat($("#brocaPerfAnt").value)||null, oper_hs:parseFloat($("#brocaHsAnt").value)||null, rop:parseFloat($("#brocaRopAnt").value)||null };
+  const ha = Object.values(atual).some(v=>v!==null&&v!=="");
+  const han = Object.values(anterior).some(v=>v!==null&&v!=="");
+  if (!ha && !han) return null;
+  const r = {};
+  if (ha) r.atual = atual;
+  if (han) r.anterior = anterior;
+  return r;
 }
-
 function collectFluido() {
-  const f = {
-    densidade: parseFloat($("#fluDensidade").value) || null,
-    viscosidade: parseFloat($("#fluViscosidade").value) || null,
-    filtrado: parseFloat($("#fluFiltrado").value) || null,
-    ph: parseFloat($("#fluPh").value) || null,
-    agua_livre: parseFloat($("#fluÁguaLivre").value) || null,
-    areia: parseFloat($("#fluAreia").value) || null,
-    api_cake: parseFloat($("#fluApiCake").value) || null,
-    solidos: parseFloat($("#fluSólidos").value) || null,
-  };
-  return Object.values(f).some(v => v !== null) ? f : null;
+  const f = { densidade:parseFloat($("#fluDensidade").value)||null, viscosidade:parseFloat($("#fluViscosidade").value)||null, filtrado:parseFloat($("#fluFiltrado").value)||null, ph:parseFloat($("#fluPh").value)||null, agua_livre:parseFloat($("#fluAguaLivre").value)||null, areia:parseFloat($("#fluAreia").value)||null, api_cake:parseFloat($("#fluApiCake").value)||null, solidos:parseFloat($("#fluSolidos").value)||null };
+  return Object.values(f).some(v=>v!==null) ? f : null;
 }
-
 function collectQuimicos() {
-  const result = {};
+  const r = {};
   $$(".quim-consumo").forEach(el => {
-    const key = el.dataset.key;
+    const k = el.dataset.key;
     const cons = parseFloat(el.value);
-    const est = parseFloat(document.querySelector(`.quim-estoque[data-key="${key}"]`)?.value);
-    if (!isNaN(cons) || !isNaN(est)) {
-      result[key] = { consumo: isNaN(cons) ? null : cons, estoque: isNaN(est) ? null : est };
-    }
+    const est = parseFloat(document.querySelector(`.quim-estoque[data-key="${k}"]`)?.value);
+    if (!isNaN(cons) || !isNaN(est)) r[k] = { consumo:isNaN(cons)?null:cons, estoque:isNaN(est)?null:est };
   });
-  return Object.keys(result).length > 0 ? result : null;
+  return Object.keys(r).length>0 ? r : null;
 }
-
 function collectInsumos() {
-  const i = {
-    agua: $("#insÁgua").value || null,
-    limpa_fossa: $("#insLimpaFossa").value || null,
-    limpeza_banheiro: $("#insLimpezaBanh").value || null,
-    pta: $("#insPta").value || null,
-    munck: $("#insMunck").value || null,
-    guindaste: $("#insGuindaste").value || null,
-    remocao_cacamba: $("#insRemCacamba").value || null,
-  };
-  return Object.values(i).some(v => v !== null && v !== "") ? i : null;
+  const i = { agua:$("#insAgua").value||null, limpa_fossa:$("#insLimpaFossa").value||null, limpeza_banheiro:$("#insLimpezaBanh").value||null, pta:$("#insPta").value||null, munck:$("#insMunck").value||null, guindaste:$("#insGuindaste").value||null, remocao_cacamba:$("#insRemCacamba").value||null };
+  return Object.values(i).some(v=>v!==null&&v!=="") ? i : null;
 }
-
 function collectOutrosMateriais() {
-  const result = {};
+  const r = {};
   $$(".mat-consumo").forEach(el => {
-    const key = el.dataset.key;
+    const k = el.dataset.key;
     const cons = parseFloat(el.value);
-    const est = parseFloat(document.querySelector(`.mat-estoque[data-key="${key}"]`)?.value);
-    if (!isNaN(cons) || !isNaN(est)) {
-      result[key] = { consumo: isNaN(cons) ? null : cons, estoque: isNaN(est) ? null : est };
-    }
+    const est = parseFloat(document.querySelector(`.mat-estoque[data-key="${k}"]`)?.value);
+    if (!isNaN(cons) || !isNaN(est)) r[k] = { consumo:isNaN(cons)?null:cons, estoque:isNaN(est)?null:est };
   });
-  return Object.keys(result).length > 0 ? result : null;
+  return Object.keys(r).length>0 ? r : null;
 }
-
 function collectCombustivel() {
   const cons = parseFloat($("#combDieselCons").value);
   const est = parseFloat($("#combDieselEst").value);
   if (isNaN(cons) && isNaN(est)) return null;
-  return { diesel: { consumo: isNaN(cons) ? null : cons, estoque: isNaN(est) ? null : est } };
+  return { diesel: { consumo:isNaN(cons)?null:cons, estoque:isNaN(est)?null:est } };
 }
+function collectEquipe() {
+  const m = [];
+  for (let i = 1; i < $("#equipeTable").rows.length; i++) {
+    const row = $("#equipeTable").rows[i];
+    const funcao = row.querySelector(".eq-funcao")?.value || "";
+    const nome = row.querySelector(".eq-nome")?.value || "";
+    if (funcao || nome) m.push({ funcao:funcao||null, nome:nome||null });
+  }
+  return m.length>0 ? m : null;
+}
+
+// ============================================================
+// BUILD PAYLOAD
+// ============================================================
+function buildPayload(status) {
+  const perfOn = getToggleState("#togglePerfuracao");
+  const fluOn = getToggleState("#toggleFluido");
+  const p = {
+    projeto_id: currentProjectId,
+    data: $("#rdoData").value || new Date().toISOString().split("T")[0],
+    tipo_dia: $("#rdoTipoDia").value || null,
+    hse_dds: $("#hseDds").checked,
+    hse_incidentes: $("#hseIncidentes").value || null,
+    hse_quase_acidentes: $("#hseQuase").value || null,
+    hse_hh_expostas: parseFloat($("#hseHh").value) || null,
+    hse_epis_vistoriados: $("#hseEpis").checked,
+    observacoes: $("#obsGeral").value || null,
+    planejamento_proximo_turno: $("#planProxTurno").value || null,
+    condicoes_climaticas: $("#condClima").value,
+    chuva: $("#condChuva").checked,
+    aprovacao_geologo: $("#aprGeologo").value || null,
+    aprovacao_ger_oper: $("#aprGerOper").value || null,
+    aprovacao_preposto1: $("#aprPreposto1").value || null,
+    aprovacao_preposto2: $("#aprPreposto2").value || null,
+    operacoes: collectOperacoes(),
+    equipe: collectEquipe(),
+    status: status,
+  };
+  if (perfOn) {
+    p.profundidade_inicial = parseFloat($("#profInicial").value) || null;
+    p.profundidade_final = parseFloat($("#profFinal").value) || null;
+    p.formacao = $("#formacao").value || null;
+    p.topo = parseFloat($("#topoForm").value) || null;
+    p.base = parseFloat($("#baseForm").value) || null;
+    p.brocas = collectBrocas();
+    p.parametros = collectParametros();
+    p.coluna = collectColuna();
+  }
+  if (fluOn) {
+    p.fluido = collectFluido();
+    p.quimicos = collectQuimicos();
+    p.insumos = collectInsumos();
+    p.outros_materiais = collectOutrosMateriais();
+    p.combustivel = collectCombustivel();
+  }
+  // Strip nulls
+  Object.keys(p).forEach(k => { if (p[k]===null||p[k]===undefined) delete p[k]; });
+  return p;
+}
+
+// ============================================================
+// SAVE DRAFT
+// ============================================================
+$("#btnSaveDraft").addEventListener("click", async () => {
+  if (!currentProjectId) { showToast("Selecione um projeto.","error"); return; }
+  $("#btnSaveDraft").disabled = true;
+  $("#btnSubmit").disabled = true;
+  try {
+    const payload = buildPayload("rascunho");
+    const rdoId = $("#rdoId").value;
+    let result;
+    if (rdoId) {
+      result = await sb.from("rdos").update(payload).eq("id", rdoId).select().single();
+    } else {
+      result = await sb.from("rdos").insert(payload).select().single();
+    }
+    if (result.error) { showToast("Erro: "+result.error.message,"error"); return; }
+    $("#rdoId").value = result.data.id;
+    showToast("Rascunho salvo!","success");
+  } catch(e) { showToast("Erro: "+e.message,"error"); }
+  finally { $("#btnSaveDraft").disabled = false; $("#btnSubmit").disabled = false; }
+});
 
 // ============================================================
 // SUBMIT RDO
 // ============================================================
 $("#btnSubmit").addEventListener("click", async () => {
-  const projetoId = projectSelect.value;
-  if (!projetoId) {
-    showToast("Selecione um projeto primeiro.", "error");
-    return;
-  }
-
-  btnSubmit.disabled = true;
-  btnSubmit.innerHTML = '<span class="spinner"></span> Salvando...';
-
+  if (!currentProjectId) { showToast("Selecione um projeto.","error"); return; }
+  $("#btnSaveDraft").disabled = true;
+  $("#btnSubmit").disabled = true;
+  $("#btnSubmit").innerHTML = '<span class="spinner"></span> Enviando...';
   try {
-    // Upload photos first
     const photoUrls = await uploadPhotos();
+    const payload = buildPayload("enviado");
+    // Merge new photos with existing ones
+    const existingUrls = [];
+    $("#existingPhotos img").each(img => existingUrls.push(img.src));
+    payload.fotos = [...existingUrls, ...photoUrls];
+    if (payload.fotos.length === 0) delete payload.fotos;
 
-    // Build payload
-    const perfOn = getToggleState("#togglePerfuracao");
-    const fluOn = getToggleState("#toggleFluido");
-
-    const payload = {
-      projeto_id: projetoId,
-      data: $("#rdoData").value || new Date().toISOString().split("T")[0],
-      tipo_dia: $("#rdoTipoDia").value || null,
-      hse_dds: $("#hseDds").checked,
-      hse_incidentes: $("#hseIncidentes").value || null,
-      hse_quase_acidentes: $("#hseQuase").value || null,
-      hse_hh_expostas: parseFloat($("#hseHh").value) || null,
-      hse_epis_vistoriados: $("#hseEpis").checked,
-      observacoes: $("#obsGeral").value || null,
-      planejamento_proximo_turno: $("#planProxTurno").value || null,
-      condicoes_climaticas: $("#condClima").value,
-      chuva: $("#condChuva").checked,
-      aprovacao_geologo: $("#aprGeologo").value || null,
-      aprovacao_ger_oper: $("#aprGerOper").value || null,
-      aprovacao_preposto1: $("#aprPreposto1").value || null,
-      aprovacao_preposto2: $("#aprPreposto2").value || null,
-      operacoes: collectOperacoes(),
-      fotos: photoUrls.length > 0 ? photoUrls : null,
-    };
-
-    // Perfuração (conditional)
-    if (perfOn) {
-      payload.profundidade_inicial = parseFloat($("#profInicial").value) || null;
-      payload.profundidade_final = parseFloat($("#profFinal").value) || null;
-      payload.formacao = $("#formacao").value || null;
-      payload.topo = parseFloat($("#topoForm").value) || null;
-      payload.base = parseFloat($("#baseForm").value) || null;
-      payload.brocas = collectBrocas();
-      payload.parametros = collectParametros();
-      payload.coluna = collectColuna();
+    const rdoId = $("#rdoId").value;
+    let result;
+    if (rdoId) {
+      result = await sb.from("rdos").update(payload).eq("id", rdoId).select().single();
+    } else {
+      result = await sb.from("rdos").insert(payload).select().single();
     }
-
-    // Fluido/Químicos (conditional)
-    if (fluOn) {
-      payload.fluido = collectFluido();
-      payload.quimicos = collectQuimicos();
-      payload.insumos = collectInsumos();
-      payload.outros_materiais = collectOutrosMateriais();
-      payload.combustivel = collectCombustivel();
-    }
-
-    // Remove null keys from payload
-    Object.keys(payload).forEach(k => {
-      if (payload[k] === null || payload[k] === undefined) delete payload[k];
-    });
-
-    console.log("Submitting RDO:", payload);
-
-    const { data, error } = await sb
-      .from("rdos")
-      .insert(payload)
-      .select()
-      .single();
-
-    if (error) {
-      showToast("Erro ao salvar RDO: " + error.message, "error");
-      console.error("Supabase error:", error);
-      return;
-    }
-
-    showToast("RDO salvo com sucesso! (id=" + data.id.slice(0, 8) + "...)", "success");
-
-    // Reset form (keep project selected)
+    if (result.error) { showToast("Erro: "+result.error.message,"error"); return; }
+    showToast("RDO enviado com sucesso!","success");
     resetForm();
-
-  } catch (err) {
-    showToast("Erro inesperado: " + err.message, "error");
-    console.error(err);
-  } finally {
-    btnSubmit.disabled = false;
-    btnSubmit.textContent = "Salvar RDO";
+    showView("rdosView");
+    loadRDOs();
+  } catch(e) { showToast("Erro: "+e.message,"error"); }
+  finally {
+    $("#btnSaveDraft").disabled = false;
+    $("#btnSubmit").disabled = false;
+    $("#btnSubmit").textContent = "Enviar RDO";
   }
 });
 
+// ============================================================
+// RESET FORM
+// ============================================================
 function resetForm() {
-  // Reset date to today
-  $("#rdoData").value = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0];
+  $("#rdoData").value = today;
+  $("#rdoData").max = today;
   $("#rdoTipoDia").value = "perfuracao";
-
-  // Reset toggles to "No"
-  $$(".toggle-group").forEach(group => {
-    group.querySelectorAll(".toggle-btn").forEach(b => {
-      b.classList.remove("active-yes", "active-no");
-      if (b.dataset.value === "no") b.classList.add("active-no");
-    });
+  setToggle("#togglePerfuracao", false);
+  setToggle("#toggleFluido", false);
+  $$("input[type='text'], input[type='number'], textarea").forEach(el => {
+    if (!["rdoData","rdoTipoDia","projectSelect"].includes(el.id)) el.value = "";
   });
-  $$(".conditional").forEach(s => s.classList.remove("show"));
-
-  // Clear text/number fields in visible cards
-  $$("input[type='text'], input[type='number'], input[type='date'], textarea").forEach(el => {
-    if (el.id !== "rdoData" && el.id !== "rdoTipoDia" && el.id !== "projectSelect") {
-      if (el.type === "date") {
-        // keep default dates
-      } else {
-        el.value = "";
-      }
-    }
-  });
-  // Uncheck checkboxes
   $$("input[type='checkbox']").forEach(el => el.checked = false);
-  // Reset selects to first option
   $("#condClima").value = "Bom";
-
-  // Clear operations
-  const opsTable = $("#opsTable");
-  while (opsTable.rows.length > 1) opsTable.deleteRow(1);
-  addOpRow("", "", "", "");
-
-  // Clear coluna
-  const colTable = $("#colunaTable");
-  while (colTable.rows.length > 1) colTable.deleteRow(1);
-  addColunaRow("", "", "", "", "", "");
-
-  // Clear equipe
-  const eqTable = $("#equipeTable");
-  while (eqTable.rows.length > 1) eqTable.deleteRow(1);
-  DEFAULT_ROLES.forEach(r => addEquipeRow(r, ""));
-
-  // Clear photos
+  clearTable("#opsTable"); addOpRow("","","","");
+  clearTable("#colunaTable"); addColunaRow("","","","","","");
+  clearTable("#equipeTable"); DEFAULT_ROLES.forEach(r => addEquipeRow(r,""));
   selectedFiles = [];
-  fotoInput.value = "";
+  $("#fotoInput").value = "";
+  $("#existingPhotos").innerHTML = "";
   renderPhotoPreview();
-
-  // Keep HSE textareas clean
-  $("#hseIncidentes").value = "";
-  $("#hseQuase").value = "";
-  $("#obsGeral").value = "";
-  $("#planProxTurno").value = "";
 }
 
 // ============================================================
 // INIT
 // ============================================================
-loadProjects();
+// Splash is already visible via .active class
 </script>
-
 </body>
 </html>

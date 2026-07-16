@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS rdos (
     -- Photos
     fotos           JSONB,    -- [ "url1", "url2", "url3" ]
 
+    status          TEXT NOT NULL DEFAULT 'enviado' CHECK (status IN ('rascunho','enviado')),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
