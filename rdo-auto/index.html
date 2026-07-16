@@ -32,10 +32,11 @@ body {
    ============================================================ */
 #splashView {
   position: fixed; inset: 0; z-index: 999;
-  background: #fff;
+  background: #fff; cursor: pointer;
+}
+#splashView.active {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  cursor: pointer;
 }
 #splashView img { width: 180px; margin-bottom: 0; }
 #splashView .tagline { color: #9ca3af; font-size: .85rem; margin-top: .5rem; }
