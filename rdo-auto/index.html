@@ -133,6 +133,26 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 .row > * { flex: 1; }
 
 /* ============================================================
+   PRE-FILL (inherited from yesterday)
+   ============================================================ */
+.prefill-link {
+  font-size: .7rem; font-weight: 600; color: #3b82f6;
+  cursor: pointer; text-decoration: none; float: right;
+  margin-left: .5rem; white-space: nowrap;
+}
+.prefill-link:hover { color: #1d4ed8; text-decoration: underline; }
+.prefill-note {
+  font-size: .7rem; color: #b91c1c; font-style: italic;
+  margin-top: .3rem; display: none;
+}
+.prefill-note.show { display: block; }
+input.inherited, textarea.inherited {
+  color: #b91c1c !important;
+  border-color: #fca5a5 !important;
+  background: #fef2f2 !important;
+}
+
+/* ============================================================
    BUTTONS
    ============================================================ */
 .btn {
@@ -317,7 +337,8 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 
     <!-- Perfuracao toggle -->
     <div class="card">
-      <div class="card-header">Perfuracao</div>
+      <div class="card-header">Perfuracao <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
+      <div class="prefill-note" data-section="perfuracao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
       <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanco na perfuracao?</p>
       <div class="toggle-group" id="togglePerfuracao">
         <button class="toggle-btn" data-value="yes" type="button">Sim</button>
@@ -367,7 +388,8 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 
     <!-- Fluido toggle -->
     <div class="card">
-      <div class="card-header">Fluido e Quimicos</div>
+      <div class="card-header">Fluido e Quimicos <span class="prefill-link" data-section="fluido" title="Copiar dados de ontem">copiar de ontem</span></div>
+      <div class="prefill-note" data-section="fluido">Preenchido com dados de ontem. Confira e edite se necessario.</div>
       <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de quimicos/fluido?</p>
       <div class="toggle-group" id="toggleFluido">
         <button class="toggle-btn" data-value="yes" type="button">Sim</button>
@@ -439,7 +461,8 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 
     <!-- Equipe -->
     <div class="card">
-      <div class="card-header">Equipe</div>
+      <div class="card-header">Equipe <span class="prefill-link" data-section="equipe" title="Copiar dados de ontem">copiar de ontem</span></div>
+      <div class="prefill-note" data-section="equipe">Preenchido com dados de ontem. Confira e edite se necessario.</div>
       <table class="ops-table" id="equipeTable">
         <tr><th>Funcao</th><th>Nome</th><th></th></tr>
       </table>
@@ -487,7 +510,8 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
 
     <!-- Aprovacao -->
     <div class="card">
-      <div class="card-header">Aprovacao</div>
+      <div class="card-header">Aprovacao <span class="prefill-link" data-section="aprovacao" title="Copiar dados de ontem">copiar de ontem</span></div>
+      <div class="prefill-note" data-section="aprovacao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
       <div class="row">
         <div><label for="aprGeologo">Geologo</label><input type="text" id="aprGeologo"></div>
         <div><label for="aprGerOper">Ger. Operacoes</label><input type="text" id="aprGerOper"></div>
@@ -508,9 +532,12 @@ input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6
     </div>
 
     <!-- Buttons -->
-    <div style="display:flex;gap:.5rem;margin-bottom:2rem;">
+    <div style="display:flex;gap:.5rem;margin-bottom:.3rem;">
       <button class="btn btn-draft" id="btnSaveDraft" type="button" style="flex:1;">Salvar Rascunho</button>
       <button class="btn btn-primary" id="btnSubmit" type="button" style="flex:1;">Enviar RDO</button>
+    </div>
+    <div style="margin-bottom:2rem;">
+      <button class="btn btn-secondary btn-sm" id="btnClearForm" type="button">Limpar formulario</button>
     </div>
     </form>
   </div>
@@ -763,11 +790,148 @@ async function loadRDOs() {
 // ============================================================
 // NEW RDO
 // ============================================================
-$("#btnNewRDO").addEventListener("click", () => {
+let yesterdayRDO = null;
+
+async function loadYesterdayRDO() {
+  if (!currentProjectId) { yesterdayRDO = null; return; }
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const yStr = yesterday.toISOString().split("T")[0];
+  const { data } = await sb.from("rdos")
+    .select("*")
+    .eq("projeto_id", currentProjectId)
+    .eq("data", yStr)
+    .eq("status", "enviado")
+    .limit(1)
+    .single();
+  yesterdayRDO = data || null;
+  updatePrefillVisibility();
+}
+
+function updatePrefillVisibility() {
+  $$(".prefill-link").forEach(link => {
+    link.style.display = yesterdayRDO ? "inline" : "none";
+  });
+}
+
+$("#btnNewRDO").addEventListener("click", async () => {
   $("#rdoId").value = "";
   resetForm();
+  await loadYesterdayRDO();
   showView("formView");
 });
+
+// ============================================================
+// PRE-FILL SECTION HANDLERS
+// ============================================================
+$$(".prefill-link").forEach(link => {
+  link.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const section = link.dataset.section;
+    if (!yesterdayRDO) return;
+    if (section === "perfuracao") prefillPerfuracao();
+    else if (section === "fluido") prefillFluido();
+    else if (section === "equipe") prefillEquipe();
+    else if (section === "aprovacao") prefillAprovacao();
+    // Show note
+    const note = document.querySelector(`.prefill-note[data-section="${section}"]`);
+    if (note) note.classList.add("show");
+  });
+});
+
+function markInherited(inputs) {
+  inputs.forEach(el => {
+    el.classList.add("inherited");
+    // Remove inherited on edit
+    const handler = () => { el.classList.remove("inherited"); el.removeEventListener("input", handler); el.removeEventListener("change", handler); };
+    el.addEventListener("input", handler);
+    el.addEventListener("change", handler);
+  });
+}
+
+function prefillPerfuracao() {
+  const y = yesterdayRDO;
+  if (!y || y.profundidade_final == null) return;
+  setToggle("#togglePerfuracao", true);
+  const profIni = $("#profInicial");
+  profIni.value = y.profundidade_final || "";
+  markInherited([profIni]);
+  // Copy broca: ontem.atual → hoje.anterior
+  if (y.brocas) {
+    const b = y.brocas;
+    if (b.atual) {
+      $("#brocaFabAnt").value = b.atual.fabricante || ""; $("#brocaSerieAnt").value = b.atual.serie || "";
+      $("#brocaDiamAnt").value = b.atual.diametro || ""; $("#brocaModAnt").value = b.atual.modelo || "";
+      $("#brocaJatosAnt").value = b.atual.jatos || ""; $("#brocaPerfAnt").value = b.atual.perfurado || "";
+      $("#brocaHsAnt").value = b.atual.oper_hs || ""; $("#brocaRopAnt").value = b.atual.rop || "";
+      markInherited(["#brocaFabAnt","#brocaSerieAnt","#brocaDiamAnt","#brocaModAnt","#brocaJatosAnt","#brocaPerfAnt","#brocaHsAnt","#brocaRopAnt"].map(id => $(id)));
+    }
+  }
+  // Copy coluna
+  if (y.coluna && y.coluna.length > 0) {
+    clearTable("#colunaTable");
+    y.coluna.forEach(item => {
+      addColunaRow(item.item, item.qty, item.id_pol, item.od_pol, item.length_m, item.total_m);
+    });
+    // Mark coluna inputs as inherited
+    $$("#colunaTable input").forEach(el => markInherited([el]));
+  }
+}
+
+function prefillFluido() {
+  const y = yesterdayRDO;
+  if (!y) return;
+  setToggle("#toggleFluido", true);
+  if (y.fluido) {
+    const f = y.fluido;
+    $("#fluDensidade").value = f.densidade || ""; $("#fluViscosidade").value = f.viscosidade || "";
+    $("#fluFiltrado").value = f.filtrado || ""; $("#fluPh").value = f.ph || "";
+    $("#fluAguaLivre").value = f.agua_livre || ""; $("#fluAreia").value = f.areia || "";
+    $("#fluApiCake").value = f.api_cake || ""; $("#fluSolidos").value = f.solidos || "";
+    markInherited(["#fluDensidade","#fluViscosidade","#fluFiltrado","#fluPh","#fluAguaLivre","#fluAreia","#fluApiCake","#fluSolidos"].map(id => $(id)));
+  }
+  if (y.insumos) {
+    const i = y.insumos;
+    $("#insAgua").value = i.agua || ""; $("#insLimpaFossa").value = i.limpa_fossa || "";
+    $("#insLimpezaBanh").value = i.limpeza_banheiro || ""; $("#insPta").value = i.pta || "";
+    $("#insMunck").value = i.munck || ""; $("#insGuindaste").value = i.guindaste || "";
+    $("#insRemCacamba").value = i.remocao_cacamba || "";
+    markInherited(["#insAgua","#insLimpaFossa","#insLimpezaBanh","#insPta","#insMunck","#insGuindaste","#insRemCacamba"].map(id => $(id)));
+  }
+  if (y.quimicos) {
+    for (const [key, val] of Object.entries(y.quimicos)) {
+      const consEl = document.querySelector(`.quim-consumo[data-key="${key}"]`);
+      const estEl = document.querySelector(`.quim-estoque[data-key="${key}"]`);
+      if (estEl && val.estoque != null) estEl.value = val.estoque;
+      // Only copy estoque, not consumo (consumo resets daily)
+      if (estEl) markInherited([estEl]);
+    }
+  }
+  if (y.outros_materiais) {
+    for (const [key, val] of Object.entries(y.outros_materiais)) {
+      const estEl = document.querySelector(`.mat-estoque[data-key="${key}"]`);
+      if (estEl && val.estoque != null) estEl.value = val.estoque;
+      if (estEl) markInherited([estEl]);
+    }
+  }
+}
+
+function prefillEquipe() {
+  if (!yesterdayRDO || !yesterdayRDO.equipe || yesterdayRDO.equipe.length === 0) return;
+  clearTable("#equipeTable");
+  yesterdayRDO.equipe.forEach(e => addEquipeRow(e.funcao, e.nome));
+  $$("#equipeTable input").forEach(el => markInherited([el]));
+}
+
+function prefillAprovacao() {
+  if (!yesterdayRDO) return;
+  $("#aprGeologo").value = yesterdayRDO.aprovacao_geologo || "";
+  $("#aprGerOper").value = yesterdayRDO.aprovacao_ger_oper || "";
+  $("#aprPreposto1").value = yesterdayRDO.aprovacao_preposto1 || "";
+  $("#aprPreposto2").value = yesterdayRDO.aprovacao_preposto2 || "";
+  markInherited(["#aprGeologo","#aprGerOper","#aprPreposto1","#aprPreposto2"].map(id => $(id)));
+}
 
 // ============================================================
 // OPEN DRAFT (edit mode)
@@ -1285,6 +1449,13 @@ $("#btnSaveDraft").addEventListener("click", async () => {
 // ============================================================
 // SUBMIT RDO
 // ============================================================
+$("#btnClearForm").addEventListener("click", () => {
+  if (confirm("Tem certeza? Os dados nao salvos serao perdidos.")) {
+    resetForm();
+    showToast("Formulario limpo.", "success");
+  }
+});
+
 $("#btnSubmit").addEventListener("click", async () => {
   if (!currentProjectId) { showToast("Selecione um projeto.","error"); return; }
   $("#btnSaveDraft").disabled = true;
@@ -1343,6 +1514,11 @@ function resetForm() {
   $("#fotoInput").value = "";
   $("#existingPhotos").innerHTML = "";
   renderPhotoPreview();
+
+  // Clear pre-fill notes and inherited markers
+  $$(".prefill-note").forEach(n => n.classList.remove("show"));
+  yesterdayRDO = null;
+  updatePrefillVisibility();
 }
 
 // ============================================================
