@@ -793,19 +793,30 @@ async function loadRDOs() {
 let yesterdayRDO = null;
 
 async function loadYesterdayRDO() {
-  if (!currentProjectId) { yesterdayRDO = null; return; }
+  yesterdayRDO = null;
+  if (!currentProjectId) { updatePrefillVisibility(); return; }
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
   const yStr = yesterday.toISOString().split("T")[0];
-  const { data } = await sb.from("rdos")
-    .select("*")
-    .eq("projeto_id", currentProjectId)
-    .eq("data", yStr)
-    .eq("status", "enviado")
-    .limit(1)
-    .single();
-  yesterdayRDO = data || null;
+  try {
+    // Fetch yesterday's RDO — prefer most recent (enviado or rascunho)
+    const { data } = await sb.from("rdos")
+      .select("*")
+      .eq("projeto_id", currentProjectId)
+      .eq("data", yStr)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (data && data.length > 0) {
+      yesterdayRDO = data[0];
+      if (yesterdayRDO.status === "rascunho") {
+        showToast(`Atencao: o RDO de ontem (${yStr}) nao foi enviado. Use os dados mesmo assim ou finalize-o.`, "error");
+      }
+    }
+  } catch (e) {
+    console.warn("Could not fetch yesterday RDO:", e.message);
+    yesterdayRDO = null;
+  }
   updatePrefillVisibility();
 }
 
