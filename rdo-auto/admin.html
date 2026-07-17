@@ -105,7 +105,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
       <div class="row">
         <div><label>Projeto</label><select id="filtroProjeto"><option value="">Todos</option></select></div>
         <div><label>De</label><input type="date" id="filtroDe"></div>
-        <div><label>Ate</label><input type="date" id="filtroAte"></div>
+        <div><label>Até</label><input type="date" id="filtroAté"></div>
         <div><label>Status</label><select id="filtroStatus"><option value="">Todos</option><option value="enviado">Enviado</option><option value="rascunho">Rascunho</option></select></div>
       </div>
       <div style="margin-top:.5rem;display:flex;gap:.5rem;">
@@ -145,7 +145,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <label>Localidade</label><input type="text" id="modalLocalidade" placeholder="ex: Ribeirao Preto - SP">
     <label>Sonda</label><input type="text" id="modalSonda">
     <div class="row">
-      <div><label>Data Inicio</label><input type="date" id="modalDataInicio"></div>
+      <div><label>Data Início</label><input type="date" id="modalDataInício"></div>
       <div><label>Turno</label><input type="text" id="modalTurno" value="07h x 17h"></div>
     </div>
     <div style="display:flex;gap:.5rem;margin-top:1rem;">
@@ -223,7 +223,7 @@ $("#btnNewProject").addEventListener("click", () => {
   $("#modalProjectTitle").textContent = "Novo Projeto";
   $("#editProjectId").value = "";
   $("#modalCliente").value = ""; $("#modalLocalidade").value = "";
-  $("#modalSonda").value = ""; $("#modalDataInicio").value = new Date().toISOString().split("T")[0];
+  $("#modalSonda").value = ""; $("#modalDataInício").value = new Date().toISOString().split("T")[0];
   $("#modalTurno").value = "07h x 17h";
   $("#modalProject").classList.add("show");
 });
@@ -234,7 +234,7 @@ async function editProject(id) {
   $("#modalProjectTitle").textContent = "Editar Projeto";
   $("#editProjectId").value = data.id;
   $("#modalCliente").value = data.cliente; $("#modalLocalidade").value = data.localidade;
-  $("#modalSonda").value = data.sonda; $("#modalDataInicio").value = data.data_inicio;
+  $("#modalSonda").value = data.sonda; $("#modalDataInício").value = data.data_inicio;
   $("#modalTurno").value = data.turno;
   $("#modalProject").classList.add("show");
 }
@@ -248,7 +248,7 @@ $("#btnModalSave").addEventListener("click", async () => {
     cliente: $("#modalCliente").value.trim(),
     localidade: $("#modalLocalidade").value.trim(),
     sonda: $("#modalSonda").value.trim(),
-    data_inicio: $("#modalDataInicio").value,
+    data_inicio: $("#modalDataInício").value,
     turno: $("#modalTurno").value.trim() || "07h x 17h",
   };
   if (!payload.cliente || !payload.localidade || !payload.sonda || !payload.data_inicio) {
@@ -271,7 +271,7 @@ let deleteTarget = null;
 function confirmDeleteProject(id, name) {
   deleteTarget = { type: "project", id, name };
   $("#confirmTitle").textContent = "Excluir projeto?";
-  $("#confirmMsg").textContent = `Tem certeza que deseja excluir "${name}"? Todos os RDOs deste projeto serao excluidos.`;
+  $("#confirmMsg").textContent = `Tem certeza que deseja excluir "${name}"? Todos os RDOs deste projeto serão excluídos.`;
   $("#modalConfirm").classList.add("show");
 }
 
@@ -289,7 +289,7 @@ async function loadRDOFilters() {
 async function loadRDOs() {
   const projetoId = $("#filtroProjeto").value;
   const de = $("#filtroDe").value;
-  const ate = $("#filtroAte").value;
+  const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
 
   let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,projeto_id,projetos(cliente,sonda)").order("data", { ascending: false }).limit(200);
@@ -341,19 +341,19 @@ async function viewRDO(id) {
       <div class="ro-row"><span class="ro-label">Projeto</span><span class="ro-value">${r.projetos?.cliente || '-'} (${r.projetos?.sonda || '-'})</span></div>
       <div class="ro-row"><span class="ro-label">Data</span><span class="ro-value">${r.data} — ${r.tipo_dia||'-'}</span></div>
       <div class="ro-row"><span class="ro-label">Prof.</span><span class="ro-value">${r.profundidade_final!=null ? (r.profundidade_inicial||0)+' → '+r.profundidade_final+' m' : '-'}</span></div>
-      ${r.formacao ? `<div class="ro-row"><span class="ro-label">Formacao</span><span class="ro-value">${r.formacao} (${r.topo||'?'}—${r.base||'?'} m)</span></div>` : ''}
+      ${r.formacao ? `<div class="ro-row"><span class="ro-label">Formação</span><span class="ro-value">${r.formacao} (${r.topo||'?'}—${r.base||'?'} m)</span></div>` : ''}
     </div>
-    <div class="ro-section"><h3>Operacoes</h3>${ops}</div>
+    <div class="ro-section"><h3>Operações</h3>${ops}</div>
     <div class="ro-section"><h3>Equipe</h3>${equipe}</div>
     <div class="ro-section"><h3>HSE</h3>
-      <div class="ro-row"><span class="ro-label">DDS</span><span class="ro-value">${r.hse_dds?'Sim':'Nao'}</span></div>
-      <div class="ro-row"><span class="ro-label">EPIs</span><span class="ro-value">${r.hse_epis_vistoriados?'Sim':'Nao'}</span></div>
+      <div class="ro-row"><span class="ro-label">DDS</span><span class="ro-value">${r.hse_dds?'Sim':'Não'}</span></div>
+      <div class="ro-row"><span class="ro-label">EPIs</span><span class="ro-value">${r.hse_epis_vistoriados?'Sim':'Não'}</span></div>
       <div class="ro-row"><span class="ro-label">HH Exp.</span><span class="ro-value">${r.hse_hh_expostas||'-'}</span></div>
       ${r.hse_incidentes ? `<div class="ro-row"><span class="ro-label">Incidentes</span><span class="ro-value">${r.hse_incidentes}</span></div>` : ''}
       ${r.hse_quase_acidentes ? `<div class="ro-row"><span class="ro-label">Quase-acid.</span><span class="ro-value">${r.hse_quase_acidentes}</span></div>` : ''}
     </div>
-    <div class="ro-section"><h3>Clima</h3><div class="ro-row"><span class="ro-label">Condicao</span><span class="ro-value">${r.condicoes_climaticas||'-'}${r.chuva?' (choveu)':''}</span></div></div>
-    ${r.observacoes ? `<div class="ro-section"><h3>Observacoes</h3><p style="font-size:.8rem;">${r.observacoes}</p></div>` : ''}
+    <div class="ro-section"><h3>Clima</h3><div class="ro-row"><span class="ro-label">Condição</span><span class="ro-value">${r.condicoes_climaticas||'-'}${r.chuva?' (choveu)':''}</span></div></div>
+    ${r.observacoes ? `<div class="ro-section"><h3>Observações</h3><p style="font-size:.8rem;">${r.observacoes}</p></div>` : ''}
     ${r.planejamento_proximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.8rem;">${r.planejamento_proximo_turno}</p></div>` : ''}
   `;
   $("#rdoDetail").style.display = "block";
@@ -384,7 +384,7 @@ $("#btnConfirmOk").addEventListener("click", async () => {
     ({ error } = await sb.from("rdos").delete().eq("id", deleteTarget.id));
   }
   if (error) { toast("Erro: " + error.message, "error"); }
-  else { toast(deleteTarget.type === "project" ? "Projeto excluido!" : "RDO excluido!", "success"); }
+  else { toast(deleteTarget.type === "project" ? "Projeto excluído!" : "RDO excluído!", "success"); }
   deleteTarget = null;
   $("#modalConfirm").classList.remove("show");
   if (deleteTarget?.type === "project") { loadProjetos(); loadRDOFilters(); }
@@ -397,7 +397,7 @@ $("#btnConfirmOk").addEventListener("click", async () => {
 $("#btnExportCSV").addEventListener("click", async () => {
   const projetoId = $("#filtroProjeto").value;
   const de = $("#filtroDe").value;
-  const ate = $("#filtroAte").value;
+  const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
   let query = sb.from("rdos").select("data,tipo_dia,profundidade_inicial,profundidade_final,formacao,status,observacoes,condicoes_climaticas,chuva,hse_dds,hse_hh_expostas,projetos(cliente,sonda)").order("data").limit(500);
   if (projetoId) query = query.eq("projeto_id", projetoId);
@@ -410,8 +410,8 @@ $("#btnExportCSV").addEventListener("click", async () => {
   const rows = data.map(r => [
     r.data, r.tipo_dia, r.projetos?.cliente||"", r.projetos?.sonda||"",
     r.profundidade_inicial||"", r.profundidade_final||"", r.formacao||"",
-    r.hse_dds?"Sim":"Nao", r.hse_hh_expostas||"", r.condicoes_climaticas||"",
-    r.chuva?"Sim":"Nao", r.status, (r.observacoes||"").replace(/"/g,'""')
+    r.hse_dds?"Sim":"Não", r.hse_hh_expostas||"", r.condicoes_climaticas||"",
+    r.chuva?"Sim":"Não", r.status, (r.observacoes||"").replace(/"/g,'""')
   ]);
   const csv = [headers.join(","), ...rows.map(r => '"' + r.join('","') + '"')].join("\n");
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
