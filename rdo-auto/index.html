@@ -355,6 +355,9 @@ input.inherited, textarea.inherited {
           <div><label for="baseForm">Base (m)</label><input type="number" step="0.01" id="baseForm"></div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Dados de Brocas</label>
+        <div style="font-size:.75rem;color:#6b7280;margin-bottom:.3rem;">
+          <label><input type="checkbox" id="brocaTrocada" onchange="onBrocaToggle()"> Houve troca de broca? (move atual → anterior)</label>
+        </div>
         <table class="ops-table">
           <tr><th>Campo</th><th>Atual</th><th>Anterior</th></tr>
           <tr><td>Fabricante</td><td><input type="text" id="brocaFabAtual"></td><td><input type="text" id="brocaFabAnt"></td></tr>
@@ -868,25 +871,57 @@ function prefillPerfuracao() {
   const profIni = $("#profInicial");
   profIni.value = y.profundidade_final || "";
   markInherited([profIni]);
-  // Copy broca: ontem.atual → hoje.anterior
+  // Copy broca to ATUAL (assume same broca unless user says otherwise)
   if (y.brocas) {
     const b = y.brocas;
     if (b.atual) {
-      $("#brocaFabAnt").value = b.atual.fabricante || ""; $("#brocaSerieAnt").value = b.atual.serie || "";
-      $("#brocaDiamAnt").value = b.atual.diametro || ""; $("#brocaModAnt").value = b.atual.modelo || "";
-      $("#brocaJatosAnt").value = b.atual.jatos || ""; $("#brocaPerfAnt").value = b.atual.perfurado || "";
-      $("#brocaHsAnt").value = b.atual.oper_hs || ""; $("#brocaRopAnt").value = b.atual.rop || "";
-      markInherited(["#brocaFabAnt","#brocaSerieAnt","#brocaDiamAnt","#brocaModAnt","#brocaJatosAnt","#brocaPerfAnt","#brocaHsAnt","#brocaRopAnt"].map(id => $(id)));
+      $("#brocaFabAtual").value = b.atual.fabricante || ""; $("#brocaSerieAtual").value = b.atual.serie || "";
+      $("#brocaDiamAtual").value = b.atual.diametro || ""; $("#brocaModAtual").value = b.atual.modelo || "";
+      $("#brocaJatosAtual").value = b.atual.jatos || ""; $("#brocaPerfAtual").value = b.atual.perfurado || "";
+      $("#brocaHsAtual").value = b.atual.oper_hs || ""; $("#brocaRopAtual").value = b.atual.rop || "";
+      markInherited(["#brocaFabAtual","#brocaSerieAtual","#brocaDiamAtual","#brocaModAtual","#brocaJatosAtual","#brocaPerfAtual","#brocaHsAtual","#brocaRopAtual"].map(id => $(id)));
+    }
+    // Also fill anterior if yesterday had one (so swap works correctly)
+    if (b.anterior && Object.values(b.anterior).some(v => v !== null && v !== "")) {
+      $("#brocaFabAnt").value = b.anterior.fabricante || ""; $("#brocaSerieAnt").value = b.anterior.serie || "";
+      $("#brocaDiamAnt").value = b.anterior.diametro || ""; $("#brocaModAnt").value = b.anterior.modelo || "";
+      $("#brocaJatosAnt").value = b.anterior.jatos || "";
     }
   }
+  $("#brocaTrocada").checked = false;
   // Copy coluna
   if (y.coluna && y.coluna.length > 0) {
     clearTable("#colunaTable");
     y.coluna.forEach(item => {
       addColunaRow(item.item, item.qty, item.id_pol, item.od_pol, item.length_m, item.total_m);
     });
-    // Mark coluna inputs as inherited
     $$("#colunaTable input").forEach(el => markInherited([el]));
+  }
+}
+
+function onBrocaToggle() {
+  if ($("#brocaTrocada").checked) {
+    // Move atual → anterior, clear atual
+    const fields = ["Fab","Serie","Diam","Mod","Jatos","Perf","Hs","Rop"];
+    fields.forEach(f => {
+      const antEl = $(`#broca${f}Ant`);
+      const atuEl = $(`#broca${f}Atual`);
+      antEl.value = atuEl.value;
+      antEl.classList.remove("inherited");
+      atuEl.value = "";
+      atuEl.classList.remove("inherited");
+    });
+    // Clear inherited markers on anterior since it's now manually set
+    fields.forEach(f => $(`#broca${f}Ant`).classList.remove("inherited"));
+  } else {
+    // Reverted: move anterior → atual, clear anterior
+    const fields = ["Fab","Serie","Diam","Mod","Jatos","Perf","Hs","Rop"];
+    fields.forEach(f => {
+      const atuEl = $(`#broca${f}Atual`);
+      const antEl = $(`#broca${f}Ant`);
+      atuEl.value = antEl.value;
+      antEl.value = "";
+    });
   }
 }
 
@@ -1517,6 +1552,7 @@ function resetForm() {
     if (!["rdoData","rdoTipoDia","projectSelect"].includes(el.id)) el.value = "";
   });
   $$("input[type='checkbox']").forEach(el => el.checked = false);
+  $("#brocaTrocada").checked = false;
   $("#condClima").value = "Bom";
   clearTable("#opsTable"); addOpRow("","","","");
   clearTable("#colunaTable"); addColunaRow("","","","","","");
