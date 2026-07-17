@@ -694,18 +694,24 @@ $("#projectSelect").addEventListener("change", () => {
 });
 
 // ============================================================
-// NEW PROJECT MODAL
+// NEW PROJECT MODAL (admin-only, element may not exist in field app)
 // ============================================================
-$("#btnNewProject").addEventListener("click", () => {
-  $("#modalNewProject").classList.add("show");
-  $("#newDataInicio").value = new Date().toISOString().split("T")[0];
-});
-$("#btnModalCancel").addEventListener("click", () => $("#modalNewProject").classList.remove("show"));
-$("#modalNewProject").addEventListener("click", (e) => {
-  if (e.target === $("#modalNewProject")) $("#modalNewProject").classList.remove("show");
+const btnNewProj = $("#btnNewProject");
+if (btnNewProj) {
+  btnNewProj.addEventListener("click", () => {
+    $("#modalNewProject").classList.add("show");
+    $("#newDataInicio").value = new Date().toISOString().split("T")[0];
+  });
+}
+const btnModalCancel = $("#btnModalCancel");
+if (btnModalCancel) btnModalCancel.addEventListener("click", () => $("#modalNewProject").classList.remove("show"));
+const modalNewProj = $("#modalNewProject");
+if (modalNewProj) modalNewProj.addEventListener("click", (e) => {
+  if (e.target === modalNewProj) modalNewProj.classList.remove("show");
 });
 
-$("#btnModalSave").addEventListener("click", async () => {
+const btnModalSave = $("#btnModalSave");
+if (btnModalSave) btnModalSave.addEventListener("click", async () => {
   const cliente = $("#newCliente").value.trim();
   const localidade = $("#newLocalidade").value.trim();
   const sonda = $("#newSonda").value.trim();
@@ -714,9 +720,9 @@ $("#btnModalSave").addEventListener("click", async () => {
   if (!cliente || !localidade || !sonda || !dataInicio) {
     showToast("Preencha todos os campos.", "error"); return;
   }
-  $("#btnModalSave").disabled = true;
+  const bms = $("#btnModalSave"); if (bms) bms.disabled = true;
   const { data, error } = await sb.from("projetos").insert({ cliente, localidade, sonda, data_inicio: dataInicio, turno }).select().single();
-  $("#btnModalSave").disabled = false;
+  if (bms) bms.disabled = false;
   if (error) { showToast("Erro: " + error.message, "error"); return; }
   showToast("Projeto criado!", "success");
   $("#modalNewProject").classList.remove("show");
