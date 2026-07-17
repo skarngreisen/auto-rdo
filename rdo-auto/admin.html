@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RDO Auto — Admin</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+header { background: #1e3a5f; color: #fff; padding: .6rem 1rem; display: flex; align-items: center; gap: .8rem; position: sticky; top: 0; z-index: 100; }
+header h1 { font-size: 1rem; }
+header nav { display: flex; gap: .3rem; }
+header nav button { background: rgba(255,255,255,.12); color: #fff; border: none; padding: .4rem .9rem; border-radius: 6px; cursor: pointer; font-size: .82rem; font-weight: 600; }
+header nav button.active { background: #fff; color: #1e3a5f; }
+
+.container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+.card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); padding: 1rem; margin-bottom: .75rem; }
+.card-header { font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #1e3a5f; margin-bottom: .75rem; padding-bottom: .5rem; border-bottom: 2px solid #e8ecf1; }
+
+table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+th { background: #f3f4f6; color: #374151; font-weight: 600; padding: .5rem .4rem; text-align: left; font-size: .75rem; text-transform: uppercase; letter-spacing: .03em; }
+td { padding: .45rem .4rem; border-bottom: 1px solid #f3f4f6; }
+tr:hover { background: #f8fafc; }
+
+input, select, textarea {
+  padding: .45rem .55rem; font-size: .85rem; border: 1.5px solid #d1d5db; border-radius: 6px;
+  background: #fafbfc; font-family: inherit; width: 100%;
+}
+input:focus, select:focus { outline: none; border-color: #3b82f6; }
+.row { display: flex; gap: .5rem; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 120px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .45rem .85rem; font-size: .8rem; font-weight: 600;
+  border: none; border-radius: 6px; cursor: pointer; font-family: inherit;
+}
+.btn-primary { background: #1e3a5f; color: #fff; }
+.btn-danger { background: #fee2e2; color: #991b1b; }
+.btn-secondary { background: #e8ecf1; color: #374151; }
+.btn-sm { padding: .25rem .5rem; font-size: .72rem; }
+.btn:disabled { opacity: .5; pointer-events: none; }
+.actions { display: flex; gap: .3rem; }
+
+.badge { font-size: .7rem; font-weight: 700; padding: .15rem .45rem; border-radius: 10px; text-transform: uppercase; white-space: nowrap; }
+.badge-enviado { background: #d1fae5; color: #065f46; }
+.badge-rascunho { background: #fef3c7; color: #92400e; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-size: 1.05rem; margin-bottom: 1rem; }
+.modal label { display: block; font-size: .78rem; font-weight: 600; color: #374151; margin: .5rem 0 .2rem; }
+
+.toast {
+  position: fixed; bottom: 1rem; left: 1rem; right: 1rem; padding: .75rem 1rem;
+  border-radius: 10px; font-size: .85rem; font-weight: 600; text-align: center;
+  z-index: 300; max-width: 500px; margin: 0 auto;
+  transform: translateY(120%); transition: transform .3s;
+}
+.toast.show { transform: translateY(0); }
+.toast.success { background: #d1fae5; color: #065f46; }
+.toast.error { background: #fee2e2; color: #991b1b; }
+
+.tab { display: none; }
+.tab.active { display: block; }
+
+.ro-section { margin-bottom: .8rem; }
+.ro-section h3 { font-size: .8rem; color: #1e3a5f; margin-bottom: .3rem; border-bottom: 1px solid #e8ecf1; padding-bottom: .2rem; }
+.ro-row { display: flex; font-size: .78rem; padding: .1rem 0; }
+.ro-label { color: #6b7280; width: 100px; flex-shrink: 0; }
+.ro-value { color: #1a1a2e; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>RDO Auto — Admin</h1>
+  <nav>
+    <button class="active" data-tab="projetos">Projetos</button>
+    <button data-tab="rdos">RDOs</button>
+  </nav>
+</header>
+
+<div class="container">
+
+  <!-- ============ TAB: PROJETOS ============ -->
+  <div class="tab active" id="tabProjetos">
+    <div class="card">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        Projetos
+        <button class="btn btn-primary btn-sm" id="btnNewProject">+ Novo</button>
+      </div>
+      <table id="projetosTable">
+        <tr><th>Cliente</th><th>Localidade</th><th>Sonda</th><th>Início</th><th>Turno</th><th></th></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ TAB: RDOs ============ -->
+  <div class="tab" id="tabRDOs">
+    <div class="card">
+      <div class="card-header">Filtros</div>
+      <div class="row">
+        <div><label>Projeto</label><select id="filtroProjeto"><option value="">Todos</option></select></div>
+        <div><label>De</label><input type="date" id="filtroDe"></div>
+        <div><label>Ate</label><input type="date" id="filtroAte"></div>
+        <div><label>Status</label><select id="filtroStatus"><option value="">Todos</option><option value="enviado">Enviado</option><option value="rascunho">Rascunho</option></select></div>
+      </div>
+      <div style="margin-top:.5rem;display:flex;gap:.5rem;">
+        <button class="btn btn-primary btn-sm" id="btnFiltrar">Filtrar</button>
+        <button class="btn btn-secondary btn-sm" id="btnExportCSV">Exportar CSV</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">Resultados (<span id="rdosCount">0</span>)</div>
+      <div style="overflow-x:auto;">
+        <table id="rdosTable">
+          <tr><th>Data</th><th>Projeto</th><th>Tipo</th><th>Prof. (m)</th><th>Status</th><th></th></tr>
+        </table>
+      </div>
+    </div>
+    <!-- RDO Detail (read-only) -->
+    <div class="card" id="rdoDetail" style="display:none;">
+      <div class="card-header" style="display:flex;justify-content:space-between;">
+        <span>Detalhes do RDO</span>
+        <button class="btn btn-secondary btn-sm" id="btnCloseDetail">Fechar</button>
+      </div>
+      <div id="rdoDetailContent"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Modal: New/Edit Project -->
+<div class="modal-overlay" id="modalProject">
+  <div class="modal">
+    <h2 id="modalProjectTitle">Novo Projeto</h2>
+    <input type="hidden" id="editProjectId">
+    <label>Cliente</label><input type="text" id="modalCliente">
+    <label>Localidade</label><input type="text" id="modalLocalidade" placeholder="ex: Ribeirao Preto - SP">
+    <label>Sonda</label><input type="text" id="modalSonda">
+    <div class="row">
+      <div><label>Data Inicio</label><input type="date" id="modalDataInicio"></div>
+      <div><label>Turno</label><input type="text" id="modalTurno" value="07h x 17h"></div>
+    </div>
+    <div style="display:flex;gap:.5rem;margin-top:1rem;">
+      <button class="btn btn-secondary" id="btnModalCancel" style="flex:1;">Cancelar</button>
+      <button class="btn btn-primary" id="btnModalSave" style="flex:1;">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Confirm Delete -->
+<div class="modal-overlay" id="modalConfirm">
+  <div class="modal" style="text-align:center;">
+    <h2 id="confirmTitle">Confirmar</h2>
+    <p id="confirmMsg" style="margin:.8rem 0;font-size:.9rem;"></p>
+    <div style="display:flex;gap:.5rem;">
+      <button class="btn btn-secondary" id="btnConfirmCancel" style="flex:1;">Cancelar</button>
+      <button class="btn btn-danger" id="btnConfirmOk" style="flex:1;">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = window.supabase.createClient(
+  "https://fecskilrtsaeavoznwgi.supabase.co",
+  "sb_publishable_VjwnlFeGz7zJkZx_KPxukA_GCTRxcgi"
+);
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+let toastTimer;
+function toast(msg, type) {
+  const t = $("#toast");
+  t.textContent = msg; t.className = "toast " + type + " show";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = "toast", 3000);
+}
+
+// ============================================================
+// TAB NAVIGATION
+// ============================================================
+$$("header nav button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    $$("header nav button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    $$(".tab").forEach(t => t.classList.remove("active"));
+    $("#tab" + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1)).classList.add("active");
+    if (btn.dataset.tab === "projetos") loadProjetos();
+    else if (btn.dataset.tab === "rdos") { loadRDOFilters(); loadRDOs(); }
+  });
+});
+
+// ============================================================
+// PROJECTS
+// ============================================================
+async function loadProjetos() {
+  const { data } = await sb.from("projetos").select("*").order("created_at", { ascending: false });
+  const tbody = $("#projetosTable");
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum projeto.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td>${p.cliente}</td><td>${p.localidade}</td><td>${p.sonda}</td>
+      <td>${p.data_inicio}</td><td>${p.turno}</td>
+      <td class="actions">
+        <button class="btn btn-secondary btn-sm" onclick="editProject('${p.id}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteProject('${p.id}','${p.cliente}')">Excluir</button>
+      </td>
+    </tr>`).join("");
+}
+
+$("#btnNewProject").addEventListener("click", () => {
+  $("#modalProjectTitle").textContent = "Novo Projeto";
+  $("#editProjectId").value = "";
+  $("#modalCliente").value = ""; $("#modalLocalidade").value = "";
+  $("#modalSonda").value = ""; $("#modalDataInicio").value = new Date().toISOString().split("T")[0];
+  $("#modalTurno").value = "07h x 17h";
+  $("#modalProject").classList.add("show");
+});
+
+async function editProject(id) {
+  const { data } = await sb.from("projetos").select("*").eq("id", id).single();
+  if (!data) return;
+  $("#modalProjectTitle").textContent = "Editar Projeto";
+  $("#editProjectId").value = data.id;
+  $("#modalCliente").value = data.cliente; $("#modalLocalidade").value = data.localidade;
+  $("#modalSonda").value = data.sonda; $("#modalDataInicio").value = data.data_inicio;
+  $("#modalTurno").value = data.turno;
+  $("#modalProject").classList.add("show");
+}
+
+$("#btnModalCancel").addEventListener("click", () => $("#modalProject").classList.remove("show"));
+$("#modalProject").addEventListener("click", e => { if (e.target === $("#modalProject")) $("#modalProject").classList.remove("show"); });
+
+$("#btnModalSave").addEventListener("click", async () => {
+  const id = $("#editProjectId").value;
+  const payload = {
+    cliente: $("#modalCliente").value.trim(),
+    localidade: $("#modalLocalidade").value.trim(),
+    sonda: $("#modalSonda").value.trim(),
+    data_inicio: $("#modalDataInicio").value,
+    turno: $("#modalTurno").value.trim() || "07h x 17h",
+  };
+  if (!payload.cliente || !payload.localidade || !payload.sonda || !payload.data_inicio) {
+    toast("Preencha todos os campos.", "error"); return;
+  }
+  let error;
+  if (id) {
+    ({ error } = await sb.from("projetos").update(payload).eq("id", id));
+  } else {
+    ({ error } = await sb.from("projetos").insert(payload));
+  }
+  if (error) { toast("Erro: " + error.message, "error"); return; }
+  toast(id ? "Projeto atualizado!" : "Projeto criado!", "success");
+  $("#modalProject").classList.remove("show");
+  loadProjetos();
+  loadRDOFilters();
+});
+
+let deleteTarget = null;
+function confirmDeleteProject(id, name) {
+  deleteTarget = { type: "project", id, name };
+  $("#confirmTitle").textContent = "Excluir projeto?";
+  $("#confirmMsg").textContent = `Tem certeza que deseja excluir "${name}"? Todos os RDOs deste projeto serao excluidos.`;
+  $("#modalConfirm").classList.add("show");
+}
+
+// ============================================================
+// RDO FILTERS & LIST
+// ============================================================
+async function loadRDOFilters() {
+  const { data } = await sb.from("projetos").select("id,cliente,sonda").order("cliente");
+  const sel = $("#filtroProjeto");
+  if (data) {
+    sel.innerHTML = '<option value="">Todos</option>' + data.map(p => `<option value="${p.id}">${p.cliente} (${p.sonda})</option>`).join("");
+  }
+}
+
+async function loadRDOs() {
+  const projetoId = $("#filtroProjeto").value;
+  const de = $("#filtroDe").value;
+  const ate = $("#filtroAte").value;
+  const status = $("#filtroStatus").value;
+
+  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,projeto_id,projetos(cliente,sonda)").order("data", { ascending: false }).limit(200);
+  if (projetoId) query = query.eq("projeto_id", projetoId);
+  if (de) query = query.gte("data", de);
+  if (ate) query = query.lte("data", ate);
+  if (status) query = query.eq("status", status);
+
+  const { data, error } = await query;
+  const tbody = $("#rdosTable");
+  if (error || !data) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Erro ao carregar.</td></tr>';
+    return;
+  }
+  $("#rdosCount").textContent = data.length;
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum RDO encontrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(r => {
+    const proj = r.projetos || {};
+    return `
+    <tr>
+      <td>${r.data}</td><td>${proj.cliente || '-'} (${proj.sonda || '-'})</td><td>${r.tipo_dia || '-'}</td>
+      <td>${r.profundidade_final != null ? (r.profundidade_inicial||0) + ' → ' + r.profundidade_final : '-'}</td>
+      <td><span class="badge badge-${r.status}">${r.status}</span></td>
+      <td class="actions">
+        <button class="btn btn-secondary btn-sm" onclick="viewRDO('${r.id}')">Ver</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteRDO('${r.id}','${r.data}')">Excluir</button>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+$("#btnFiltrar").addEventListener("click", loadRDOs);
+
+// ============================================================
+// RDO VIEW (read-only)
+// ============================================================
+async function viewRDO(id) {
+  const { data } = await sb.from("rdos").select("*,projetos(cliente,sonda)").eq("id", id).single();
+  if (!data) return;
+  const r = data;
+  const c = $("#rdoDetailContent");
+  const ops = r.operacoes ? r.operacoes.map(o => `<div class="ro-row"><span class="ro-label">${o.inicio}-${o.termino}</span><span class="ro-value">${o.descritivo}</span></div>`).join("") : '<span style="color:#9ca3af;">—</span>';
+  const equipe = r.equipe ? r.equipe.map(e => `<div class="ro-row"><span class="ro-label">${e.funcao||''}</span><span class="ro-value">${e.nome||''}</span></div>`).join("") : '<span style="color:#9ca3af;">—</span>';
+  c.innerHTML = `
+    <div class="ro-section"><h3>Geral</h3>
+      <div class="ro-row"><span class="ro-label">Projeto</span><span class="ro-value">${r.projetos?.cliente || '-'} (${r.projetos?.sonda || '-'})</span></div>
+      <div class="ro-row"><span class="ro-label">Data</span><span class="ro-value">${r.data} — ${r.tipo_dia||'-'}</span></div>
+      <div class="ro-row"><span class="ro-label">Prof.</span><span class="ro-value">${r.profundidade_final!=null ? (r.profundidade_inicial||0)+' → '+r.profundidade_final+' m' : '-'}</span></div>
+      ${r.formacao ? `<div class="ro-row"><span class="ro-label">Formacao</span><span class="ro-value">${r.formacao} (${r.topo||'?'}—${r.base||'?'} m)</span></div>` : ''}
+    </div>
+    <div class="ro-section"><h3>Operacoes</h3>${ops}</div>
+    <div class="ro-section"><h3>Equipe</h3>${equipe}</div>
+    <div class="ro-section"><h3>HSE</h3>
+      <div class="ro-row"><span class="ro-label">DDS</span><span class="ro-value">${r.hse_dds?'Sim':'Nao'}</span></div>
+      <div class="ro-row"><span class="ro-label">EPIs</span><span class="ro-value">${r.hse_epis_vistoriados?'Sim':'Nao'}</span></div>
+      <div class="ro-row"><span class="ro-label">HH Exp.</span><span class="ro-value">${r.hse_hh_expostas||'-'}</span></div>
+      ${r.hse_incidentes ? `<div class="ro-row"><span class="ro-label">Incidentes</span><span class="ro-value">${r.hse_incidentes}</span></div>` : ''}
+      ${r.hse_quase_acidentes ? `<div class="ro-row"><span class="ro-label">Quase-acid.</span><span class="ro-value">${r.hse_quase_acidentes}</span></div>` : ''}
+    </div>
+    <div class="ro-section"><h3>Clima</h3><div class="ro-row"><span class="ro-label">Condicao</span><span class="ro-value">${r.condicoes_climaticas||'-'}${r.chuva?' (choveu)':''}</span></div></div>
+    ${r.observacoes ? `<div class="ro-section"><h3>Observacoes</h3><p style="font-size:.8rem;">${r.observacoes}</p></div>` : ''}
+    ${r.planejamento_proximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.8rem;">${r.planejamento_proximo_turno}</p></div>` : ''}
+  `;
+  $("#rdoDetail").style.display = "block";
+  $("#rdoDetail").scrollIntoView({ behavior: "smooth" });
+}
+
+$("#btnCloseDetail").addEventListener("click", () => $("#rdoDetail").style.display = "none");
+
+// ============================================================
+// DELETE
+// ============================================================
+function confirmDeleteRDO(id, data) {
+  deleteTarget = { type: "rdo", id, data };
+  $("#confirmTitle").textContent = "Excluir RDO?";
+  $("#confirmMsg").textContent = `Tem certeza que deseja excluir o RDO de ${data}?`;
+  $("#modalConfirm").classList.add("show");
+}
+
+$("#btnConfirmCancel").addEventListener("click", () => { deleteTarget = null; $("#modalConfirm").classList.remove("show"); });
+$("#modalConfirm").addEventListener("click", e => { if (e.target === $("#modalConfirm")) { deleteTarget = null; $("#modalConfirm").classList.remove("show"); } });
+
+$("#btnConfirmOk").addEventListener("click", async () => {
+  if (!deleteTarget) return;
+  let error;
+  if (deleteTarget.type === "project") {
+    ({ error } = await sb.from("projetos").delete().eq("id", deleteTarget.id));
+  } else {
+    ({ error } = await sb.from("rdos").delete().eq("id", deleteTarget.id));
+  }
+  if (error) { toast("Erro: " + error.message, "error"); }
+  else { toast(deleteTarget.type === "project" ? "Projeto excluido!" : "RDO excluido!", "success"); }
+  deleteTarget = null;
+  $("#modalConfirm").classList.remove("show");
+  if (deleteTarget?.type === "project") { loadProjetos(); loadRDOFilters(); }
+  else loadRDOs();
+});
+
+// ============================================================
+// CSV EXPORT
+// ============================================================
+$("#btnExportCSV").addEventListener("click", async () => {
+  const projetoId = $("#filtroProjeto").value;
+  const de = $("#filtroDe").value;
+  const ate = $("#filtroAte").value;
+  const status = $("#filtroStatus").value;
+  let query = sb.from("rdos").select("data,tipo_dia,profundidade_inicial,profundidade_final,formacao,status,observacoes,condicoes_climaticas,chuva,hse_dds,hse_hh_expostas,projetos(cliente,sonda)").order("data").limit(500);
+  if (projetoId) query = query.eq("projeto_id", projetoId);
+  if (de) query = query.gte("data", de);
+  if (ate) query = query.lte("data", ate);
+  if (status) query = query.eq("status", status);
+  const { data } = await query;
+  if (!data || data.length === 0) { toast("Nenhum dado para exportar.", "error"); return; }
+  const headers = ["data","tipo","cliente","sonda","prof_inicial","prof_final","formacao","hse_dds","hh_expostas","cond_clima","choveu","status","observacoes"];
+  const rows = data.map(r => [
+    r.data, r.tipo_dia, r.projetos?.cliente||"", r.projetos?.sonda||"",
+    r.profundidade_inicial||"", r.profundidade_final||"", r.formacao||"",
+    r.hse_dds?"Sim":"Nao", r.hse_hh_expostas||"", r.condicoes_climaticas||"",
+    r.chuva?"Sim":"Nao", r.status, (r.observacoes||"").replace(/"/g,'""')
+  ]);
+  const csv = [headers.join(","), ...rows.map(r => '"' + r.join('","') + '"')].join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "rdos_export_" + new Date().toISOString().split("T")[0] + ".csv";
+  a.click();
+  toast("CSV exportado!", "success");
+});
+
+// ============================================================
+// INIT
+// ============================================================
+loadProjetos();
+loadRDOFilters();
+</script>
+</body>
+</html>

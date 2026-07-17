@@ -302,7 +302,7 @@ input.inherited, textarea.inherited {
         <select id="projectSelect" style="flex:3">
           <option value="">Carregando...</option>
         </select>
-        <button class="btn btn-secondary" id="btnNewProject" style="flex:1">+ Novo</button>
+        <!-- Project creation moved to admin.html -->
       </div>
     </div>
     <div id="rdosList" style="display:none;"></div>
@@ -669,7 +669,7 @@ async function loadProjects() {
   const { data, error } = await sb.from("projetos").select("*").order("created_at", { ascending: false });
   const sel = $("#projectSelect");
   if (error || !data || data.length === 0) {
-    sel.innerHTML = '<option value="">Nenhum projeto. Clique em "+ Novo"</option>';
+    sel.innerHTML = '<option value="">Nenhum projeto disponivel.</option>';
     return;
   }
   sel.innerHTML = '<option value="">Selecionar projeto...</option>' +
