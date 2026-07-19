@@ -467,13 +467,13 @@ input.inherited, textarea.inherited {
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Quimicos (consumo / estoque)</label>
         <table class="ops-table">
-          <tr><th>Produto</th><th>Consumo</th><th>Estoque</th></tr>
-          <tr><td>Bentonita (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="bentonita"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="bentonita"></td></tr>
-          <tr><td>CMC (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="cmc"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="cmc"></td></tr>
-          <tr><td>Soda Caustica (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="soda_caustica"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="soda_caustica"></td></tr>
-          <tr><td>Goma Xantana (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="goma_xantana"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="goma_xantana"></td></tr>
-          <tr><td>Sal (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="sal"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="sal"></td></tr>
-          <tr><td>Barrilha (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="barrilha"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="barrilha"></td></tr>
+          <tr><th>Produto</th><th>Consumo</th><th>Estoque</th><th style="width:40px;">N/A</th></tr>
+          <tr><td>Bentonita (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="bentonita"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="bentonita"></td><td><input type="checkbox" class="quim-na" data-key="bentonita" onchange="toggleNA(this)"></td></tr>
+          <tr><td>CMC (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="cmc"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="cmc"></td><td><input type="checkbox" class="quim-na" data-key="cmc" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Soda Caustica (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="soda_caustica"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="soda_caustica"></td><td><input type="checkbox" class="quim-na" data-key="soda_caustica" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Goma Xantana (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="goma_xantana"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="goma_xantana"></td><td><input type="checkbox" class="quim-na" data-key="goma_xantana" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Sal (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="sal"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="sal"></td><td><input type="checkbox" class="quim-na" data-key="sal" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Barrilha (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="barrilha"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="barrilha"></td><td><input type="checkbox" class="quim-na" data-key="barrilha" onchange="toggleNA(this)"></td></tr>
         </table>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Combustivel</label>
         <div class="row">
@@ -482,12 +482,12 @@ input.inherited, textarea.inherited {
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Outros Materiais</label>
         <table class="ops-table">
-          <tr><th>Material</th><th>Consumo</th><th>Estoque</th></tr>
-          <tr><td>Camisa Bomba</td><td><input type="number" step="0.1" class="mat-consumo" data-key="camisa_bomba"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="camisa_bomba"></td></tr>
-          <tr><td>Valvula</td><td><input type="number" step="0.1" class="mat-consumo" data-key="valvula"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="valvula"></td></tr>
-          <tr><td>Gaxeta de Swivel</td><td><input type="number" step="0.1" class="mat-consumo" data-key="gaxeta_swivel"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="gaxeta_swivel"></td></tr>
-          <tr><td>Oleo 40 - Motor (L)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="oleo_40"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="oleo_40"></td></tr>
-          <tr><td>Hexa-T (Kg)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="hexa_t"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="hexa_t"></td></tr>
+          <tr><th>Material</th><th>Consumo</th><th>Estoque</th><th style="width:40px;">N/A</th></tr>
+          <tr><td>Camisa Bomba</td><td><input type="number" step="0.1" class="mat-consumo" data-key="camisa_bomba"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="camisa_bomba"></td><td><input type="checkbox" class="mat-na" data-key="camisa_bomba" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Valvula</td><td><input type="number" step="0.1" class="mat-consumo" data-key="valvula"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="valvula"></td><td><input type="checkbox" class="mat-na" data-key="valvula" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Gaxeta de Swivel</td><td><input type="number" step="0.1" class="mat-consumo" data-key="gaxeta_swivel"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="gaxeta_swivel"></td><td><input type="checkbox" class="mat-na" data-key="gaxeta_swivel" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Oleo 40 - Motor (L)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="oleo_40"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="oleo_40"></td><td><input type="checkbox" class="mat-na" data-key="oleo_40" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Hexa-T (Kg)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="hexa_t"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="hexa_t"></td><td><input type="checkbox" class="mat-na" data-key="hexa_t" onchange="toggleNA(this)"></td></tr>
         </table>
       </div>
     </div>
@@ -563,13 +563,7 @@ input.inherited, textarea.inherited {
     <div class="card">
       <div class="card-header">Aprovacao <span class="prefill-link" data-section="aprovacao" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="aprovacao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
-      <div class="row">
-        <div><label for="aprGeologo">Geologo</label><input type="text" id="aprGeologo"></div>
-        <div><label for="aprGerOper">Ger. Operacoes</label><input type="text" id="aprGerOper"></div>
-      </div>
-      <div class="row">
-        <div><label for="aprPreposto1">Preposto 1</label><input type="text" id="aprPreposto1"></div>
-        <div><label for="aprPreposto2">Preposto 2</label><input type="text" id="aprPreposto2"></div>
+      <div><label for="aprGeologo">Geologo / Gestor</label><input type="text" id="aprGeologo"></div>
       </div>
     </div>
 
@@ -1073,10 +1067,7 @@ function prefillEquipe() {
 function prefillAprovacao() {
   if (!lastRDO) return;
   $("#aprGeologo").value = lastRDO.aprovacao_geologo || "";
-  $("#aprGerOper").value = lastRDO.aprovacao_ger_oper || "";
-  $("#aprPreposto1").value = lastRDO.aprovacao_preposto1 || "";
-  $("#aprPreposto2").value = lastRDO.aprovacao_preposto2 || "";
-  markInherited(["#aprGeologo","#aprGerOper","#aprPreposto1","#aprPreposto2"].map(id => $(id)));
+  markInherited([$("#aprGeologo")]);
 }
 
 // ============================================================
@@ -1269,9 +1260,6 @@ function populateForm(rdo) {
 
   // Aprovacao
   $("#aprGeologo").value = rdo.aprovacao_geologo || "";
-  $("#aprGerOper").value = rdo.aprovacao_ger_oper || "";
-  $("#aprPreposto1").value = rdo.aprovacao_preposto1 || "";
-  $("#aprPreposto2").value = rdo.aprovacao_preposto2 || "";
 
   // Existing photos
   selectedFiles = [];
@@ -1507,6 +1495,23 @@ function collectColuna() {
   }
   return items.length > 0 ? items : null;
 }
+// ── N/A toggle for consumables ────────────────────────────────
+function toggleNA(checkbox) {
+  const key = checkbox.dataset.key;
+  const isNA = checkbox.checked;
+  // Find related consumo/estoque inputs in the same row
+  const row = checkbox.closest("tr");
+  const consumo = row.querySelector(".quim-consumo, .mat-consumo");
+  const estoque = row.querySelector(".quim-estoque, .mat-estoque");
+  if (isNA) {
+    if (consumo) { consumo.dataset.prev = consumo.value; consumo.value = "N/A"; consumo.disabled = true; }
+    if (estoque) { estoque.dataset.prev = estoque.value; estoque.value = "N/A"; estoque.disabled = true; }
+  } else {
+    if (consumo) { consumo.value = consumo.dataset.prev || ""; consumo.disabled = false; }
+    if (estoque) { estoque.value = estoque.dataset.prev || ""; estoque.disabled = false; }
+  }
+}
+
 // ── Anomalias de Perfuracao ──────────────────────────────────
 const PARAM_OPTIONS = ["Peso sobre Broca","RPM","Torque","SPM","Pressao","Vazao","ROP","Outro"];
 
@@ -1608,9 +1613,6 @@ function buildPayload(status) {
     condicoes_climaticas: $("#condClima").value,
     chuva: $("#condChuva").checked,
     aprovacao_geologo: $("#aprGeologo").value || null,
-    aprovacao_ger_oper: $("#aprGerOper").value || null,
-    aprovacao_preposto1: $("#aprPreposto1").value || null,
-    aprovacao_preposto2: $("#aprPreposto2").value || null,
     operacoes: collectOperacoes(),
     equipe: collectEquipe(),
     status: status,
@@ -1728,7 +1730,7 @@ function resetForm() {
   $$("input[type='text'], input[type='number'], textarea").forEach(el => {
     if (!["rdoData","rdoTipoDia","projectSelect"].includes(el.id)) el.value = "";
   });
-  $$("input[type='checkbox']").forEach(el => el.checked = false);
+  $$("input[type='checkbox']").forEach(el => { el.checked = false; if (el.dataset.key) toggleNA(el); });
   $("#brocaTrocada").checked = false;
   $("#condClima").value = "Bom";
   clearTable("#opsTable"); addOpRow("","","","");
