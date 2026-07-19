@@ -339,7 +339,7 @@ input.inherited, textarea.inherited {
     <div class="card">
       <div class="card-header">Identificacao</div>
       <div class="row">
-        <div><label for="rdoData">Data do RDO</label><input type="date" id="rdoData"></div>
+        <div><label for="rdoData">Data do RDO <span style="color:#ef4444;">*</span></label><input type="date" id="rdoData" required></div>
         <div>
           <label for="rdoTipoDia">Tipo de dia</label>
           <select id="rdoTipoDia">
@@ -353,6 +353,7 @@ input.inherited, textarea.inherited {
       </div>
     </div>
 
+    <div id="formBody">
     <!-- Perfuracao toggle -->
     <div class="card">
       <div class="card-header">Perfuracao <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
@@ -583,6 +584,7 @@ input.inherited, textarea.inherited {
     <div style="margin-bottom:2rem;">
       <button class="btn btn-secondary btn-sm" id="btnClearForm" type="button">Limpar formulario</button>
     </div>
+    </div><!-- #formBody -->
     </form>
   </div>
 
@@ -689,6 +691,18 @@ $("#btnBack").addEventListener("click", () => {
 $("#btnBackFromRO").addEventListener("click", () => {
   showView("homeView");
   loadRDOs();
+});
+
+// ============================================================
+// DATE REQUIRED — show form body only when date is set
+// ============================================================
+$("#rdoData").addEventListener("input", () => {
+  const hasDate = !!$("#rdoData").value;
+  $("#formBody").style.display = hasDate ? "block" : "none";
+});
+$("#rdoData").addEventListener("change", () => {
+  const hasDate = !!$("#rdoData").value;
+  $("#formBody").style.display = hasDate ? "block" : "none";
 });
 
 // ============================================================
@@ -920,18 +934,12 @@ async function loadLastEstratigrafia() {
 $("#btnNewRDO").addEventListener("click", async () => {
   $("#rdoId").value = "";
   resetForm();
+  showView("formView");
+  // Hide form body until date is set
+  $("#formBody").style.display = "none";
   await loadLastRDO();
-  // Default date: last RDO date + 1 day, or today if none
-  if (lastRDO) {
-    const next = new Date(lastRDO.data + "T00:00:00");
-    next.setDate(next.getDate() + 1);
-    const nextStr = next.toISOString().split("T")[0];
-    $("#rdoData").value = nextStr;
-    $("#rdoData").max = new Date().toISOString().split("T")[0];
-  }
   await loadLastEstratigrafia();
   renderPhotoPreview();
-  showView("formView");
 });
 
 // ============================================================
@@ -1095,6 +1103,7 @@ function openDraft(rdo) {
   resetForm();
   $("#rdoId").value = rdo.id;
   populateForm(rdo);
+  $("#formBody").style.display = "block";
   renderPhotoPreview();
   showView("formView");
 }
@@ -1738,8 +1747,9 @@ $("#btnSubmit").addEventListener("click", async () => {
 // ============================================================
 function resetForm() {
   const today = new Date().toISOString().split("T")[0];
-  $("#rdoData").value = today;
+  $("#rdoData").value = "";
   $("#rdoData").max = today;
+  $("#formBody").style.display = "none";
   $("#rdoTipoDia").value = "perfuracao";
   setToggle("#togglePerfuracao", false);
   setToggle("#toggleFluido", false);
