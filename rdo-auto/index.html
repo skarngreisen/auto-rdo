@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1e3a5f">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>RDO Auto</title>
 <style>
@@ -291,7 +292,7 @@ input.inherited, textarea.inherited {
      SPLASH
      ============================================================ -->
 <div class="view active" id="splashView">
-  <img src="logo_DH.png" alt="DH Perfuracao">
+  <img src="logo_DH.png" alt="DH Perfuração">
   <div class="tagline">Relatorio Diario de Obras</div>
 </div>
 
@@ -337,13 +338,13 @@ input.inherited, textarea.inherited {
     <input type="hidden" id="rdoId">
     <!-- Date + Type -->
     <div class="card">
-      <div class="card-header">Identificacao</div>
+      <div class="card-header">Identificação</div>
       <div class="row">
         <div><label for="rdoData">Data do RDO <span style="color:#ef4444;">*</span></label><input type="date" id="rdoData" required></div>
         <div>
           <label for="rdoTipoDia">Tipo de dia</label>
           <select id="rdoTipoDia">
-            <option value="perfuracao">Perfuracao</option>
+            <option value="perfuracao">Perfuração</option>
             <option value="montagem">Montagem</option>
             <option value="teste">Teste</option>
             <option value="parado">Parado</option>
@@ -354,11 +355,11 @@ input.inherited, textarea.inherited {
     </div>
 
     <div id="formBody">
-    <!-- Perfuracao toggle -->
+    <!-- Perfuração toggle -->
     <div class="card">
-      <div class="card-header">Perfuracao <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
+      <div class="card-header">Perfuração <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="perfuracao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
-      <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanco na perfuracao?</p>
+      <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanco na perfuração?</p>
       <div class="toggle-group" id="togglePerfuracao">
         <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
@@ -377,7 +378,7 @@ input.inherited, textarea.inherited {
         <div class="conditional" id="sectionEstratigrafia">
           <div class="row">
             <div><label for="estProfundidade">Profundidade da mudanca (m)</label><input type="number" step="0.01" id="estProfundidade"></div>
-            <div><label for="estDescricao">Nova descricao estratigrafica</label><input type="text" id="estDescricao" placeholder="ex: Fm. Botucatu, arenito fino avermelhado"></div>
+            <div><label for="estDescricao">Nova descrição estratigrafica</label><input type="text" id="estDescricao" placeholder="ex: Fm. Botucatu, arenito fino avermelhado"></div>
           </div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Dados de Brocas</label>
@@ -395,19 +396,19 @@ input.inherited, textarea.inherited {
           <tr><td>Oper. (hs)</td><td><input type="number" step="0.1" id="brocaHsAtual"></td><td><input type="number" step="0.1" id="brocaHsAnt"></td></tr>
           <tr><td>ROP medio (m/h)</td><td><input type="number" step="0.1" id="brocaRopAtual"></td><td><input type="number" step="0.1" id="brocaRopAnt"></td></tr>
         </table>
-        <!-- Anomalias de Perfuracao (event-based) -->
-        <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve anomalia nos parametros de perfuracao?</p>
+        <!-- Anomalias de Perfuração (event-based) -->
+        <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve anomalia nos parametros de perfuração?</p>
         <div class="toggle-group" id="toggleAnomalia">
           <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
           <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         </div>
         <div class="conditional" id="sectionAnomalia">
           <table class="ops-table" id="anomaliaTable">
-            <tr><th>Parametro</th><th>Descricao da anomalia</th><th></th></tr>
+            <tr><th>Parametro</th><th>Descrição da anomalia</th><th></th></tr>
           </table>
           <button class="btn btn-secondary btn-sm" id="btnAddAnomalia" type="button" style="margin-top:.3rem;">+ Adicionar anomalia</button>
         </div>
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Composicao de Coluna (BHA)</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Composição de Coluna (BHA)</label>
         <table class="ops-table" id="colunaTable">
           <tr><th>Item</th><th>Qty</th><th>ID (in)</th><th>OD (in)</th><th>Length (m)</th><th>Total (m)</th><th></th></tr>
         </table>
@@ -497,7 +498,7 @@ input.inherited, textarea.inherited {
     <div class="card">
       <div class="card-header">Registro de Atividades</div>
       <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
-        <label style="margin:0;font-size:.75rem;">Duracao do turno:</label>
+        <label style="margin:0;font-size:.75rem;">Duração do turno:</label>
         <input type="number" id="turnoHoras" value="12" min="1" max="24" step="0.5" style="width:60px;padding:.3rem .4rem;font-size:.8rem;">
         <span style="font-size:.75rem;color:#6b7280;">horas</span>
       </div>
@@ -516,7 +517,7 @@ input.inherited, textarea.inherited {
       <div class="card-header">Equipe <span class="prefill-link" data-section="equipe" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="equipe">Preenchido com dados de ontem. Confira e edite se necessario.</div>
       <table class="ops-table" id="equipeTable">
-        <tr><th>Funcao</th><th>Nome</th><th></th></tr>
+        <tr><th>Função</th><th>Nome</th><th></th></tr>
       </table>
       <button class="btn btn-secondary btn-sm" id="btnAddEquipe" type="button" style="margin-top:.3rem;">+ Adicionar pessoa</button>
     </div>
@@ -538,7 +539,7 @@ input.inherited, textarea.inherited {
       <div class="card-header">Condicoes Climaticas</div>
       <div class="row">
         <div>
-          <label for="condClima">Condicao</label>
+          <label for="condClima">Condição</label>
           <select id="condClima">
             <option value="Bom">Bom</option><option value="Nublado">Nublado</option>
             <option value="Chuva">Chuva</option><option value="Tempestade">Tempestade</option>
@@ -560,9 +561,9 @@ input.inherited, textarea.inherited {
       <textarea id="planProxTurno" rows="2" placeholder="Proximas 24h?"></textarea>
     </div>
 
-    <!-- Aprovacao -->
+    <!-- Aprovação -->
     <div class="card">
-      <div class="card-header">Aprovacao <span class="prefill-link" data-section="aprovacao" title="Copiar dados de ontem">copiar de ontem</span></div>
+      <div class="card-header">Aprovação <span class="prefill-link" data-section="aprovacao" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="aprovacao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
       <div><label for="aprGeologo">Geologo / Gestor</label><input type="text" id="aprGeologo"></div>
     </div>
@@ -824,7 +825,7 @@ async function loadRDOs() {
     const badgeText = r.status === 'rascunho' ? 'Rascunho' : 'Enviado';
     const depthInfo = r.profundidade_final != null
       ? `${r.profundidade_inicial || 0} → ${r.profundidade_final} m`
-      : 'Sem perfuracao';
+      : 'Sem perfuração';
     return `
       <div class="rdo-card" data-id="${r.id}" data-status="${r.status}">
         <div class="rdo-info">
