@@ -847,39 +847,65 @@ async function loadRDOs() {
 // ============================================================
 // NEW RDO
 // ============================================================
-let yesterdayRDO = null;
+let lastRDO = null;
 
-async function loadYesterdayRDO() {
-  yesterdayRDO = null;
+async function loadLastRDO() {
+  lastRDO = null;
   if (!currentProjectId) { updatePrefillVisibility(); return; }
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const yStr = yesterday.toISOString().split("T")[0];
+  const rdoDate = $("#rdoData").value; // use the form date, not today
+  if (!rdoDate) { updatePrefillVisibility(); return; }
+  const refDate = new Date(rdoDate + "T00:00:00");
+  const prevDate = new Date(refDate);
+  prevDate.setDate(refDate.getDate() - 1);
+  const refStr = refDate.toISOString().split("T")[0];
+  const prevStr = prevDate.toISOString().split("T")[0];
+
   try {
-    // Fetch yesterday's RDO — prefer most recent (enviado or rascunho)
-    const { data } = await sb.from("rdos")
+    // Search same day (other shift) OR previous day — most recent first
+    let { data } = await sb.from("rdos")
       .select("*")
       .eq("projeto_id", currentProjectId)
-      .eq("data", yStr)
+      .in("data", [refStr, prevStr])
       .order("created_at", { ascending: false })
       .limit(1);
+
     if (data && data.length > 0) {
-      yesterdayRDO = data[0];
-      if (yesterdayRDO.status === "rascunho") {
-        showToast(`Atencao: o RDO de ontem (${yStr}) nao foi enviado. Use os dados mesmo assim ou finalize-o.`, "error");
+      lastRDO = data[0];
+      if (lastRDO.status === "rascunho") {
+        showToast(`Atencao: o RDO de ${lastRDO.data} nao foi enviado. Use os dados mesmo assim ou finalize-o.`, "error");
+      }
+    } else {
+      // Fallback: long stoppage — find most recent RDO ever for this project
+      const { data: fallback } = await sb.from("rdos")
+        .select("data")
+        .eq("projeto_id", currentProjectId)
+        .order("data", { ascending: false })
+        .limit(1);
+      if (fallback && fallback.length > 0) {
+        const lastDate = fallback[0].data;
+        const daysAgo = Math.floor((refDate - new Date(lastDate + "T00:00:00")) / 86400000);
+        const ok = confirm(`O RDO mais recente e do dia ${lastDate.split("-").reverse().join("/")} (${daysAgo} dias atras). Deseja pre-preencher com esses dados?`);
+        if (ok) {
+          const { data: full } = await sb.from("rdos")
+            .select("*")
+            .eq("projeto_id", currentProjectId)
+            .eq("data", lastDate)
+            .order("created_at", { ascending: false })
+            .limit(1);
+          lastRDO = (full && full.length > 0) ? full[0] : null;
+        }
       }
     }
   } catch (e) {
-    console.warn("Could not fetch yesterday RDO:", e.message);
-    yesterdayRDO = null;
+    console.warn("Could not fetch last RDO:", e.message);
+    lastRDO = null;
   }
   updatePrefillVisibility();
 }
 
 function updatePrefillVisibility() {
   $$(".prefill-link").forEach(link => {
-    link.style.display = yesterdayRDO ? "inline" : "none";
+    link.style.display = lastRDO ? "inline" : "none";
   });
 }
 
@@ -905,7 +931,7 @@ async function loadLastEstratigrafia() {
 $("#btnNewRDO").addEventListener("click", async () => {
   $("#rdoId").value = "";
   resetForm();
-  await loadYesterdayRDO();
+  await loadLastRDO();
   await loadLastEstratigrafia();
   showView("formView");
 });
@@ -917,7 +943,7 @@ $$(".prefill-link").forEach(link => {
   link.addEventListener("click", (e) => {
     e.stopPropagation();
     const section = link.dataset.section;
-    if (!yesterdayRDO) return;
+    if (!lastRDO) return;
     if (section === "perfuracao") prefillPerfuracao();
     else if (section === "fluido") prefillFluido();
     else if (section === "equipe") prefillEquipe();
@@ -939,7 +965,7 @@ function markInherited(inputs) {
 }
 
 function prefillPerfuracao() {
-  const y = yesterdayRDO;
+  const y = lastRDO;
   if (!y || y.profundidade_final == null) return;
   setToggle("#togglePerfuracao", true);
   const profIni = $("#profInicial");
@@ -1000,7 +1026,7 @@ function onBrocaToggle() {
 }
 
 function prefillFluido() {
-  const y = yesterdayRDO;
+  const y = lastRDO;
   if (!y) return;
   setToggle("#toggleFluido", true);
   if (y.fluido) {
@@ -1038,18 +1064,18 @@ function prefillFluido() {
 }
 
 function prefillEquipe() {
-  if (!yesterdayRDO || !yesterdayRDO.equipe || yesterdayRDO.equipe.length === 0) return;
+  if (!lastRDO || !lastRDO.equipe || lastRDO.equipe.length === 0) return;
   clearTable("#equipeTable");
-  yesterdayRDO.equipe.forEach(e => addEquipeRow(e.funcao, e.nome));
+  lastRDO.equipe.forEach(e => addEquipeRow(e.funcao, e.nome));
   $$("#equipeTable input").forEach(el => markInherited([el]));
 }
 
 function prefillAprovacao() {
-  if (!yesterdayRDO) return;
-  $("#aprGeologo").value = yesterdayRDO.aprovacao_geologo || "";
-  $("#aprGerOper").value = yesterdayRDO.aprovacao_ger_oper || "";
-  $("#aprPreposto1").value = yesterdayRDO.aprovacao_preposto1 || "";
-  $("#aprPreposto2").value = yesterdayRDO.aprovacao_preposto2 || "";
+  if (!lastRDO) return;
+  $("#aprGeologo").value = lastRDO.aprovacao_geologo || "";
+  $("#aprGerOper").value = lastRDO.aprovacao_ger_oper || "";
+  $("#aprPreposto1").value = lastRDO.aprovacao_preposto1 || "";
+  $("#aprPreposto2").value = lastRDO.aprovacao_preposto2 || "";
   markInherited(["#aprGeologo","#aprGerOper","#aprPreposto1","#aprPreposto2"].map(id => $(id)));
 }
 
@@ -1717,7 +1743,7 @@ function resetForm() {
   // Clear pre-fill notes, inherited markers, and last stratigraphy
   $$(".prefill-note").forEach(n => n.classList.remove("show"));
   $("#lastEstratigrafia").style.display = "none";
-  yesterdayRDO = null;
+  lastRDO = null;
   updatePrefillVisibility();
 }
 
