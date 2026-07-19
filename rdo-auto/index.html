@@ -877,17 +877,13 @@ async function loadLastRDO() {
         .limit(1);
       if (fallback && fallback.length > 0) {
         const lastDate = fallback[0].data;
-        const daysAgo = Math.floor((refDate - new Date(lastDate + "T00:00:00")) / 86400000);
-        const ok = confirm(`O RDO mais recente e do dia ${lastDate.split("-").reverse().join("/")} (${daysAgo} dias atras). Deseja pre-preencher com esses dados?`);
-        if (ok) {
-          const { data: full } = await sb.from("rdos")
-            .select("*")
-            .eq("projeto_id", currentProjectId)
-            .eq("data", lastDate)
-            .order("created_at", { ascending: false })
-            .limit(1);
-          lastRDO = (full && full.length > 0) ? full[0] : null;
-        }
+        const { data: full } = await sb.from("rdos")
+          .select("*")
+          .eq("projeto_id", currentProjectId)
+          .eq("data", lastDate)
+          .order("created_at", { ascending: false })
+          .limit(1);
+        lastRDO = (full && full.length > 0) ? full[0] : null;
       }
     }
   } catch (e) {
@@ -926,6 +922,14 @@ $("#btnNewRDO").addEventListener("click", async () => {
   $("#rdoId").value = "";
   resetForm();
   await loadLastRDO();
+  // Default date: last RDO date + 1 day, or today if none
+  if (lastRDO) {
+    const next = new Date(lastRDO.data + "T00:00:00");
+    next.setDate(next.getDate() + 1);
+    const nextStr = next.toISOString().split("T")[0];
+    $("#rdoData").value = nextStr;
+    $("#rdoData").max = new Date().toISOString().split("T")[0];
+  }
   await loadLastEstratigrafia();
   renderPhotoPreview();
   showView("formView");
@@ -934,16 +938,30 @@ $("#btnNewRDO").addEventListener("click", async () => {
 // ============================================================
 // PRE-FILL SECTION HANDLERS
 // ============================================================
+function confirmStalePrefill() {
+  if (!lastRDO) return true;
+  const rdoDate = $("#rdoData").value;
+  if (!rdoDate) return true;
+  const refDate = new Date(rdoDate + "T00:00:00");
+  const lastDate = new Date(lastRDO.data + "T00:00:00");
+  const daysAgo = Math.floor((refDate - lastDate) / 86400000);
+  if (daysAgo <= 1) return true; // yesterday or same day — no warning needed
+  return confirm(
+    `O RDO mais recente e do dia ${lastRDO.data.split("-").reverse().join("/")} ` +
+    `(${daysAgo} dias atras). Os dados podem estar desatualizados. Deseja pre-preencher mesmo assim?`
+  );
+}
+
 $$(".prefill-link").forEach(link => {
   link.addEventListener("click", (e) => {
     e.stopPropagation();
-    const section = link.dataset.section;
     if (!lastRDO) return;
+    if (!confirmStalePrefill()) return;
+    const section = link.dataset.section;
     if (section === "perfuracao") prefillPerfuracao();
     else if (section === "fluido") prefillFluido();
     else if (section === "equipe") prefillEquipe();
     else if (section === "aprovacao") prefillAprovacao();
-    // Show note
     const note = document.querySelector(`.prefill-note[data-section="${section}"]`);
     if (note) note.classList.add("show");
   });
