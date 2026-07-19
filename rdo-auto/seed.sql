@@ -24,7 +24,14 @@ CREATE TABLE IF NOT EXISTS rdos (
     -- Drilling
     profundidade_inicial      NUMERIC(10,2),
     profundidade_final        NUMERIC(10,2),
-    formacao                  TEXT,                          -- formation name
+
+    -- Estratigrafia (event-based, not daily)
+    estratigrafia_mudou       BOOLEAN DEFAULT false,        -- was there a stratigraphic change today?
+    estratigrafia_profundidade NUMERIC(10,2),               -- depth at which the change occurred
+    estratigrafia_descricao   TEXT,                          -- description of new stratigraphy
+
+    -- Legacy columns (kept for backward compatibility)
+    formacao                  TEXT,
     topo                      NUMERIC(10,2),
     base                      NUMERIC(10,2),
 

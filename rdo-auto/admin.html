@@ -343,7 +343,7 @@ async function viewRDO(id) {
       <div class="ro-row"><span class="ro-label">Projeto</span><span class="ro-value">${r.projetos?.cliente || '-'} (${r.projetos?.sonda || '-'})</span></div>
       <div class="ro-row"><span class="ro-label">Data</span><span class="ro-value">${r.data} — ${r.tipo_dia||'-'}</span></div>
       <div class="ro-row"><span class="ro-label">Prof.</span><span class="ro-value">${r.profundidade_final!=null ? (r.profundidade_inicial||0)+' → '+r.profundidade_final+' m' : '-'}</span></div>
-      ${r.formacao ? `<div class="ro-row"><span class="ro-label">Formação</span><span class="ro-value">${r.formacao} (${r.topo||'?'}—${r.base||'?'} m)</span></div>` : ''}
+      ${r.estratigrafia_mudou ? `<div class="ro-row"><span class="ro-label">Estratigrafia</span><span class="ro-value">${r.estratigrafia_descricao||'-'} (${r.estratigrafia_profundidade||'?'} m)</span></div>` : ''}
     </div>
     <div class="ro-section"><h3>Operações</h3>${ops}</div>
     <div class="ro-section"><h3>Equipe</h3>${equipe}</div>

@@ -349,10 +349,17 @@ input.inherited, textarea.inherited {
           <div><label for="profInicial">Prof. Inicial (m)</label><input type="number" step="0.01" id="profInicial"></div>
           <div><label for="profFinal">Prof. Final (m)</label><input type="number" step="0.01" id="profFinal"></div>
         </div>
-        <div class="row">
-          <div><label for="formacao">Formacao</label><input type="text" id="formacao" placeholder="ex: Serra Geral"></div>
-          <div><label for="topoForm">Topo (m)</label><input type="number" step="0.01" id="topoForm"></div>
-          <div><label for="baseForm">Base (m)</label><input type="number" step="0.01" id="baseForm"></div>
+        <p style="font-size:.82rem;color:#6b7280;margin:.4rem 0;">Houve mudanca estratigrafica relevante?</p>
+        <div class="toggle-group" id="toggleEstratigrafia">
+          <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
+          <button class="toggle-btn" data-value="yes" type="button">Sim</button>
+        </div>
+        <div id="lastEstratigrafia" style="font-size:.72rem;color:#6b7280;margin:.2rem 0 .4rem 0;display:none;"></div>
+        <div class="conditional" id="sectionEstratigrafia">
+          <div class="row">
+            <div><label for="estProfundidade">Profundidade da mudanca (m)</label><input type="number" step="0.01" id="estProfundidade"></div>
+            <div><label for="estDescricao">Nova descricao estratigrafica</label><input type="text" id="estDescricao" placeholder="ex: Fm. Botucatu, arenito fino avermelhado"></div>
+          </div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Dados de Brocas</label>
         <div style="font-size:.75rem;color:#6b7280;margin-bottom:.3rem;">
@@ -835,10 +842,30 @@ function updatePrefillVisibility() {
   });
 }
 
+async function loadLastEstratigrafia() {
+  if (!currentProjectId) return;
+  const { data } = await sb.from("rdos")
+    .select("estratigrafia_descricao, data")
+    .eq("projeto_id", currentProjectId)
+    .eq("estratigrafia_mudou", true)
+    .order("data", { ascending: false })
+    .limit(1)
+    .single();
+  const el = $("#lastEstratigrafia");
+  if (data && data.estratigrafia_descricao) {
+    el.textContent = `Ultima descricao (${data.data}): "${data.estratigrafia_descricao}"`;
+    el.style.display = "block";
+  } else {
+    el.textContent = "";
+    el.style.display = "none";
+  }
+}
+
 $("#btnNewRDO").addEventListener("click", async () => {
   $("#rdoId").value = "";
   resetForm();
   await loadYesterdayRDO();
+  await loadLastEstratigrafia();
   showView("formView");
 });
 
@@ -1016,7 +1043,7 @@ function viewRDO(rdo) {
   c.innerHTML = `
     <div class="card-header">RDO ${rdo.data} — ${rdo.tipo_dia || 'N/D'} <span class="rdo-badge badge-enviado" style="margin-left:.5rem;">Enviado</span></div>
     <div class="ro-section"><h3>Perfuracao</h3>${depthInfo || '<p style="color:#9ca3af;font-size:.8rem;">Sem perfuracao neste dia.</p>'}</div>
-    ${rdo.formacao ? `<div class="ro-section"><h3>Formacao</h3><div class="ro-row"><span class="ro-label">Formacao</span><span class="ro-value">${rdo.formacao} (${rdo.topo || '?'} — ${rdo.base || '?'} m)</span></div></div>` : ''}
+    ${rdo.estratigrafia_mudou ? `<div class="ro-section"><h3>Estratigrafia</h3><div class="ro-row"><span class="ro-label">Mudanca</span><span class="ro-value">${rdo.estratigrafia_descricao || '-'} (${rdo.estratigrafia_profundidade || '?'} m)</span></div></div>` : ''}
     <div class="ro-section"><h3>Operacoes</h3>${ops || '<p style="color:#9ca3af;font-size:.8rem;">Nenhuma operacao registrada.</p>'}</div>
     <div class="ro-section"><h3>Equipe</h3>${equipe || '<p style="color:#9ca3af;font-size:.8rem;">Nenhum membro registrado.</p>'}</div>
     <div class="ro-section"><h3>HSE</h3>
@@ -1044,9 +1071,14 @@ function populateForm(rdo) {
     setToggle("#togglePerfuracao", true);
     $("#profInicial").value = rdo.profundidade_inicial || "";
     $("#profFinal").value = rdo.profundidade_final || "";
-    $("#formacao").value = rdo.formacao || "";
-    $("#topoForm").value = rdo.topo || "";
-    $("#baseForm").value = rdo.base || "";
+    // Estratigrafia
+    if (rdo.estratigrafia_mudou) {
+      setToggle("#toggleEstratigrafia", true);
+      $("#estProfundidade").value = rdo.estratigrafia_profundidade || "";
+      $("#estDescricao").value = rdo.estratigrafia_descricao || "";
+    } else {
+      setToggle("#toggleEstratigrafia", false);
+    }
 
     if (rdo.brocas) {
       const b = rdo.brocas;
@@ -1227,6 +1259,7 @@ function setupToggle(groupId, sectionId) {
 }
 setupToggle("#togglePerfuracao", "#sectionPerfuracao");
 setupToggle("#toggleFluido", "#sectionFluido");
+setupToggle("#toggleEstratigrafia", "#sectionEstratigrafia");
 
 // ============================================================
 // OPERATIONS TABLE
@@ -1456,9 +1489,11 @@ function buildPayload(status) {
   if (perfOn) {
     p.profundidade_inicial = parseFloat($("#profInicial").value) || null;
     p.profundidade_final = parseFloat($("#profFinal").value) || null;
-    p.formacao = $("#formacao").value || null;
-    p.topo = parseFloat($("#topoForm").value) || null;
-    p.base = parseFloat($("#baseForm").value) || null;
+    p.estratigrafia_mudou = getToggleState("#toggleEstratigrafia");
+    if (p.estratigrafia_mudou) {
+      p.estratigrafia_profundidade = parseFloat($("#estProfundidade").value) || null;
+      p.estratigrafia_descricao = $("#estDescricao").value || null;
+    }
     p.brocas = collectBrocas();
     p.parametros = collectParametros();
     p.coluna = collectColuna();
@@ -1554,6 +1589,7 @@ function resetForm() {
   $("#rdoTipoDia").value = "perfuracao";
   setToggle("#togglePerfuracao", false);
   setToggle("#toggleFluido", false);
+  setToggle("#toggleEstratigrafia", false);
   $$("input[type='text'], input[type='number'], textarea").forEach(el => {
     if (!["rdoData","rdoTipoDia","projectSelect"].includes(el.id)) el.value = "";
   });
@@ -1568,8 +1604,9 @@ function resetForm() {
   $("#existingPhotos").innerHTML = "";
   renderPhotoPreview();
 
-  // Clear pre-fill notes and inherited markers
+  // Clear pre-fill notes, inherited markers, and last stratigraphy
   $$(".prefill-note").forEach(n => n.classList.remove("show"));
+  $("#lastEstratigrafia").style.display = "none";
   yesterdayRDO = null;
   updatePrefillVisibility();
 }
