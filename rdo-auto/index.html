@@ -393,6 +393,7 @@ input.inherited, textarea.inherited {
           <tr><th>Item</th><th>Qty</th><th>ID (in)</th><th>OD (in)</th><th>Length (m)</th><th>Total (m)</th><th></th></tr>
         </table>
         <button class="btn btn-secondary btn-sm" id="btnAddColuna" type="button" style="margin-top:.3rem;">+ Adicionar item</button>
+        <div id="colunaTotal" style="font-size:.8rem;font-weight:700;color:#a04000;margin-top:.3rem;display:none;">Comprimento total da coluna: 0.00 m</div>
       </div>
     </div>
 
@@ -1292,10 +1293,27 @@ function addColunaRow(item, qty, idPol, odPol, lengthM, totalM) {
     <td><input type="number" step="0.01" value="${lengthM || ''}" class="col-length" style="min-width:70px"></td>
     <td><input type="number" step="0.01" value="${totalM || ''}" class="col-total" style="min-width:70px"></td>
     <td><button class="btn btn-danger btn-sm col-remove" type="button">&times;</button></td>`;
-  row.querySelector(".col-remove").addEventListener("click", () => row.remove());
+  row.querySelector(".col-remove").addEventListener("click", () => { row.remove(); updateColunaTotal(); });
+  // Update total on input
+  row.querySelectorAll("input").forEach(inp => inp.addEventListener("input", updateColunaTotal));
+  updateColunaTotal();
 }
 $("#btnAddColuna").addEventListener("click", () => addColunaRow("","","","","",""));
 addColunaRow("","","","","","");
+
+function updateColunaTotal() {
+  let total = 0;
+  for (let i = 1; i < $("#colunaTable").rows.length; i++) {
+    const row = $("#colunaTable").rows[i];
+    const qty = parseFloat(row.querySelector(".col-qty")?.value) || 0;
+    const len = parseFloat(row.querySelector(".col-length")?.value) || 0;
+    const rowTotal = parseFloat(row.querySelector(".col-total")?.value);
+    total += rowTotal || (qty * len);
+  }
+  const el = $("#colunaTotal");
+  el.textContent = `Comprimento total da coluna: ${total.toFixed(2)} m`;
+  el.style.display = total > 0 ? "block" : "none";
+}
 
 // ============================================================
 // EQUIPE TABLE
