@@ -376,18 +376,18 @@ input.inherited, textarea.inherited {
           <tr><td>Oper. (hs)</td><td><input type="number" step="0.1" id="brocaHsAtual"></td><td><input type="number" step="0.1" id="brocaHsAnt"></td></tr>
           <tr><td>ROP medio (m/h)</td><td><input type="number" step="0.1" id="brocaRopAtual"></td><td><input type="number" step="0.1" id="brocaRopAnt"></td></tr>
         </table>
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Parametros de Perfuracao</label>
-        <table class="ops-table" id="paramTable">
-          <tr><th>Campo</th><th>Medicao 1</th><th>Medicao 2</th><th>Medicao 3</th></tr>
-          <tr><td>Prof. (m)</td><td><input type="number" step="0.1" class="param-prof" data-med="1"></td><td><input type="number" step="0.1" class="param-prof" data-med="2"></td><td><input type="number" step="0.1" class="param-prof" data-med="3"></td></tr>
-          <tr><td>BBA</td><td><input type="text" class="param-bba" data-med="1"></td><td><input type="text" class="param-bba" data-med="2"></td><td><input type="text" class="param-bba" data-med="3"></td></tr>
-          <tr><td>Peso (ton)</td><td><input type="number" step="0.1" class="param-peso" data-med="1"></td><td><input type="number" step="0.1" class="param-peso" data-med="2"></td><td><input type="number" step="0.1" class="param-peso" data-med="3"></td></tr>
-          <tr><td>RPM</td><td><input type="number" class="param-rpm" data-med="1"></td><td><input type="number" class="param-rpm" data-med="2"></td><td><input type="number" class="param-rpm" data-med="3"></td></tr>
-          <tr><td>Torque</td><td><input type="number" step="0.1" class="param-torque" data-med="1"></td><td><input type="number" step="0.1" class="param-torque" data-med="2"></td><td><input type="number" step="0.1" class="param-torque" data-med="3"></td></tr>
-          <tr><td>SPM</td><td><input type="number" class="param-spm" data-med="1"></td><td><input type="number" class="param-spm" data-med="2"></td><td><input type="number" class="param-spm" data-med="3"></td></tr>
-          <tr><td>Pressao (psi)</td><td><input type="number" class="param-pressao" data-med="1"></td><td><input type="number" class="param-pressao" data-med="2"></td><td><input type="number" class="param-pressao" data-med="3"></td></tr>
-          <tr><td>Vazao (L/min)</td><td><input type="number" class="param-vazao" data-med="1"></td><td><input type="number" class="param-vazao" data-med="2"></td><td><input type="number" class="param-vazao" data-med="3"></td></tr>
-        </table>
+        <!-- Anomalias de Perfuracao (event-based) -->
+        <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve anomalia nos parametros de perfuracao?</p>
+        <div class="toggle-group" id="toggleAnomalia">
+          <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
+          <button class="toggle-btn" data-value="yes" type="button">Sim</button>
+        </div>
+        <div class="conditional" id="sectionAnomalia">
+          <table class="ops-table" id="anomaliaTable">
+            <tr><th>Parametro</th><th>Descricao da anomalia</th><th></th></tr>
+          </table>
+          <button class="btn btn-secondary btn-sm" id="btnAddAnomalia" type="button" style="margin-top:.3rem;">+ Adicionar anomalia</button>
+        </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Composicao de Coluna (BHA)</label>
         <table class="ops-table" id="colunaTable">
           <tr><th>Item</th><th>Qty</th><th>ID (in)</th><th>OD (in)</th><th>Length (m)</th><th>Total (m)</th><th></th></tr>
@@ -1100,6 +1100,7 @@ function populateForm(rdo) {
       $("#revObs").value = rdo.revestimento_obs || "";
     } else {
       setToggle("#toggleRevestimento", false);
+  setToggle("#toggleAnomalia", false);
     }
 
     if (rdo.brocas) {
@@ -1125,19 +1126,9 @@ function populateForm(rdo) {
         $("#brocaRopAnt").value = b.anterior.rop || "";
       }
     }
-    if (rdo.parametros) {
-      for (const med of [1,2,3]) {
-        const m = rdo.parametros[`med${med}`];
-        if (!m) continue;
-        const setParam = (cls, val) => {
-          const el = document.querySelector(`.${cls}[data-med="${med}"]`);
-          if (el && val != null) el.value = val;
-        };
-        setParam("param-prof", m.prof); setParam("param-bba", m.bba);
-        setParam("param-peso", m.peso); setParam("param-rpm", m.rpm);
-        setParam("param-torque", m.torque); setParam("param-spm", m.spm);
-        setParam("param-pressao", m.pressao); setParam("param-vazao", m.vazao);
-      }
+    if (rdo.parametros_anomalias && rdo.parametros_anomalias.length > 0) {
+      setToggle("#toggleAnomalia", true);
+      rdo.parametros_anomalias.forEach(a => addAnomaliaRow(a.parametro, a.descricao));
     }
     if (rdo.coluna) {
       clearTable("#colunaTable");
@@ -1283,6 +1274,7 @@ setupToggle("#togglePerfuracao", "#sectionPerfuracao");
 setupToggle("#toggleFluido", "#sectionFluido");
 setupToggle("#toggleEstratigrafia", "#sectionEstratigrafia");
 setupToggle("#toggleRevestimento", "#sectionRevestimento");
+setupToggle("#toggleAnomalia", "#sectionAnomalia");
 
 // ============================================================
 // OPERATIONS TABLE
@@ -1425,23 +1417,30 @@ function collectColuna() {
   }
   return items.length > 0 ? items : null;
 }
-function collectParametros() {
-  const result = {};
-  for (const med of [1,2,3]) {
-    const prof = parseFloat(document.querySelector(`.param-prof[data-med="${med}"]`)?.value);
-    if (!prof && prof !== 0) continue;
-    result[`med${med}`] = {
-      prof: prof || null,
-      bba: document.querySelector(`.param-bba[data-med="${med}"]`)?.value || null,
-      peso: parseFloat(document.querySelector(`.param-peso[data-med="${med}"]`)?.value) || null,
-      rpm: parseInt(document.querySelector(`.param-rpm[data-med="${med}"]`)?.value) || null,
-      torque: parseFloat(document.querySelector(`.param-torque[data-med="${med}"]`)?.value) || null,
-      spm: parseInt(document.querySelector(`.param-spm[data-med="${med}"]`)?.value) || null,
-      pressao: parseInt(document.querySelector(`.param-pressao[data-med="${med}"]`)?.value) || null,
-      vazao: parseInt(document.querySelector(`.param-vazao[data-med="${med}"]`)?.value) || null,
-    };
+// ── Anomalias de Perfuracao ──────────────────────────────────
+const PARAM_OPTIONS = ["Peso sobre Broca","RPM","Torque","SPM","Pressao","Vazao","ROP","Outro"];
+
+function addAnomaliaRow(parametro, descricao) {
+  const tbody = $("#anomaliaTable");
+  const row = tbody.insertRow(-1);
+  const opts = PARAM_OPTIONS.map(p => `<option value="${p}" ${p === parametro ? "selected" : ""}>${p}</option>`).join("");
+  row.innerHTML = `
+    <td><select class="anom-param" style="min-width:110px;">${opts}</select></td>
+    <td><input type="text" value="${descricao || ''}" class="anom-desc" placeholder="Descreva a anomalia observada..."></td>
+    <td><button class="btn btn-danger btn-sm anom-remove" type="button">&times;</button></td>`;
+  row.querySelector(".anom-remove").addEventListener("click", () => row.remove());
+}
+$("#btnAddAnomalia").addEventListener("click", () => addAnomaliaRow("",""));
+
+function collectParametrosAnomalias() {
+  const items = [];
+  for (let i = 1; i < $("#anomaliaTable").rows.length; i++) {
+    const row = $("#anomaliaTable").rows[i];
+    const parametro = row.querySelector(".anom-param")?.value || "";
+    const descricao = row.querySelector(".anom-desc")?.value || "";
+    if (descricao) items.push({ parametro: parametro || null, descricao });
   }
-  return Object.keys(result).length > 0 ? result : null;
+  return items.length > 0 ? items : null;
 }
 function collectBrocas() {
   const atual = { fabricante:$("#brocaFabAtual").value||null, serie:$("#brocaSerieAtual").value||null, diametro:$("#brocaDiamAtual").value||null, modelo:$("#brocaModAtual").value||null, jatos:$("#brocaJatosAtual").value||null, perfurado:parseFloat($("#brocaPerfAtual").value)||null, oper_hs:parseFloat($("#brocaHsAtual").value)||null, rop:parseFloat($("#brocaRopAtual").value)||null };
@@ -1540,7 +1539,7 @@ function buildPayload(status) {
       p.revestimento_obs = $("#revObs").value || null;
     }
     p.brocas = collectBrocas();
-    p.parametros = collectParametros();
+    p.parametros_anomalias = collectParametrosAnomalias();
     p.coluna = collectColuna();
   }
   if (fluOn) {
@@ -1643,6 +1642,7 @@ function resetForm() {
   $("#brocaTrocada").checked = false;
   $("#condClima").value = "Bom";
   clearTable("#opsTable"); addOpRow("","","","");
+  clearTable("#anomaliaTable");
   clearTable("#colunaTable"); addColunaRow("","","","","","");
   clearTable("#equipeTable"); DEFAULT_ROLES.forEach(r => addEquipeRow(r,""));
   selectedFiles = [];

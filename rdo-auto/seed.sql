@@ -61,7 +61,8 @@ CREATE TABLE IF NOT EXISTS rdos (
 
     -- JSONB complex sections (only include keys that are filled)
     brocas          JSONB,    -- { atual: { fabricante, serie, diametro, modelo, jatos, perfurado, oper_hs, rop }, anterior: {...} }
-    parametros      JSONB,    -- { med1: { peso, rpm, torque, rop, bba_ident, spm, pressao, vazao }, med2, med3 }
+    parametros_anomalias JSONB, -- [ { parametro, descricao } ] — event-based anomalies
+    parametros      JSONB,    -- { med1: { peso, rpm, torque, rop, bba_ident, spm, pressao, vazao }, med2, med3 } (legacy)
     coluna          JSONB,    -- [ { item, qty, id_pol, od_pol, length_m, total_m } ]
     operacoes       JSONB,    -- [ { inicio, termino, codigo, descritivo } ]
     equipe          JSONB,    -- [ { funcao, nome } ]
