@@ -359,26 +359,26 @@ input.inherited, textarea.inherited {
     <div class="card">
       <div class="card-header">Perfuração <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="perfuracao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
-      <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanco na perfuração?</p>
+      <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanço na perfuração?</p>
       <div class="toggle-group" id="toggleDrilling">
         <button class="toggle-btn" data-value="yes" type="button">Sim</button>
-        <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
+        <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
       </div>
       <div class="conditional" id="sectionDrilling">
         <div class="row">
           <div><label for="depthInitial">Prof. Inicial (m)</label><input type="number" step="0.01" id="depthInitial"></div>
           <div><label for="depthFinal">Prof. Final (m)</label><input type="number" step="0.01" id="depthFinal"></div>
         </div>
-        <p style="font-size:.82rem;color:#6b7280;margin:.4rem 0;">Houve mudanca estratigrafica relevante?</p>
+        <p style="font-size:.82rem;color:#6b7280;margin:.4rem 0;">Houve mudança estratigráfica relevante?</p>
         <div class="toggle-group" id="toggleStratigraphy">
-          <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
+          <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
           <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         </div>
         <div id="lastStratigraphy" style="font-size:.72rem;color:#6b7280;margin:.2rem 0 .4rem 0;display:none;"></div>
         <div class="conditional" id="sectionStratigraphy">
           <div class="row">
-            <div><label for="stratDepth">Profundidade da mudanca (m)</label><input type="number" step="0.01" id="stratDepth"></div>
-            <div><label for="stratDescription">Nova descrição estratigrafica</label><input type="text" id="stratDescription" placeholder="ex: Fm. Botucatu, arenito fino avermelhado"></div>
+            <div><label for="stratDepth">Profundidade da mudança (m)</label><input type="number" step="0.01" id="stratDepth"></div>
+            <div><label for="stratDescription">Nova descrição estratigráfica</label><input type="text" id="stratDescription" placeholder="ex: Fm. Botucatu, arenito fino avermelhado"></div>
           </div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Dados de Brocas</label>
@@ -389,7 +389,7 @@ input.inherited, textarea.inherited {
           <tr><th>Campo</th><th>Atual</th><th>Anterior</th></tr>
           <tr><td>Fabricante</td><td><input type="text" id="bitBrandCurrent"></td><td><input type="text" id="bitBrandPrev"></td></tr>
           <tr><td>Serie</td><td><input type="text" id="bitSerialCurrent"></td><td><input type="text" id="bitSerialPrev"></td></tr>
-          <tr><td>Diametro (pol)</td><td><input type="text" id="bitDiameterCurrent"></td><td><input type="text" id="bitDiameterPrev"></td></tr>
+          <tr><td>Diâmetro (pol)</td><td><input type="text" id="bitDiameterCurrent"></td><td><input type="text" id="bitDiameterPrev"></td></tr>
           <tr><td>Modelo IADC</td><td><input type="text" id="bitModelCurrent" placeholder="ex: 517"></td><td><input type="text" id="bitModelPrev"></td></tr>
           <tr><td>Jatos (pol)</td><td><input type="text" id="bitJetsCurrent" placeholder="16-16-16"></td><td><input type="text" id="bitJetsPrev"></td></tr>
           <tr><td>Perfurado (m)</td><td><input type="number" step="0.1" id="bitDrilledCurrent"></td><td><input type="number" step="0.1" id="bitDrilledPrev"></td></tr>
@@ -397,9 +397,9 @@ input.inherited, textarea.inherited {
           <tr><td>ROP medio (m/h)</td><td><input type="number" step="0.1" id="bitRopCurrent"></td><td><input type="number" step="0.1" id="bitRopPrev"></td></tr>
         </table>
         <!-- Anomalias de Perfuração (event-based) -->
-        <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve anomalia nos parametros de perfuração?</p>
+        <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve anomalia nos parâmetros de perfuração?</p>
         <div class="toggle-group" id="toggleAnomaly">
-          <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
+          <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
           <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         </div>
         <div class="conditional" id="sectionAnomaly">
@@ -410,7 +410,7 @@ input.inherited, textarea.inherited {
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Composição de Coluna (BHA)</label>
         <table class="ops-table" id="bhaTable">
-          <tr><th>Item</th><th>Qty</th><th>ID (in)</th><th>OD (in)</th><th>Length (m)</th><th>Total (m)</th><th></th></tr>
+          <tr><th>Item</th><th>Qty</th><th>ID (in)</th><th>OD (in)</th><th>Comprimento (m)</th><th>Total (m)</th><th></th></tr>
         </table>
         <button class="btn btn-secondary btn-sm" id="btnAddBHA" type="button" style="margin-top:.3rem;">+ Adicionar item</button>
         <div id="bhaTotal" style="font-size:.8rem;font-weight:700;color:#a04000;margin-top:.3rem;display:none;">Comprimento total da coluna: 0.00 m</div>
@@ -418,29 +418,29 @@ input.inherited, textarea.inherited {
         <!-- Revestimento (event-based) -->
         <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve descida de revestimento hoje?</p>
         <div class="toggle-group" id="toggleCasing">
-          <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
+          <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
           <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         </div>
         <div class="conditional" id="sectionCasing">
           <div class="row">
             <div><label for="casingMeters">Metros descidos</label><input type="number" step="0.01" id="casingMeters"></div>
           </div>
-          <div><label for="casingObs">Ocorrencias</label><textarea id="casingObs" rows="2" placeholder="Ex.: Rosca do 3º tubo fora de spec, substituido por reserva"></textarea></div>
+          <div><label for="casingObs">Ocorrências</label><textarea id="casingObs" rows="2" placeholder="Ex.: Rosca do 3º tubo fora de spec, substituido por reserva"></textarea></div>
         </div>
       </div>
     </div>
 
     <!-- Fluido toggle -->
     <div class="card">
-      <div class="card-header">Fluido e Quimicos <span class="prefill-link" data-section="fluido" title="Copiar dados de ontem">copiar de ontem</span></div>
+      <div class="card-header">Fluido e Químicos <span class="prefill-link" data-section="fluido" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="fluido">Preenchido com dados de ontem. Confira e edite se necessario.</div>
-      <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de quimicos/fluido?</p>
+      <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de químicos/fluido?</p>
       <div class="toggle-group" id="toggleFluid">
         <button class="toggle-btn" data-value="yes" type="button">Sim</button>
-        <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
+        <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
       </div>
       <div class="conditional" id="sectionFluid">
-        <label style="font-size:.82rem;color:#1e3a5f;">Parametros do Fluido</label>
+        <label style="font-size:.82rem;color:#1e3a5f;">Parâmetros do Fluido</label>
         <div class="row">
           <div><label for="fluidDensity">Densidade (lb/gal)</label><input type="number" step="0.1" id="fluidDensity"></div>
           <div><label for="fluidViscosity">Visc. Marsh (s/qt)</label><input type="number" step="0.1" id="fluidViscosity"></div>
@@ -453,17 +453,17 @@ input.inherited, textarea.inherited {
         <div class="row">
           <div><label for="fluidSand">Areia (%)</label><input type="number" step="0.1" id="fluidSand"></div>
           <div><label for="fluidApiCake">API Cake (1/32 in)</label><input type="number" step="0.1" id="fluidApiCake"></div>
-          <div><label for="fluidSolids">Solidos (%)</label><input type="number" step="0.1" id="fluidSolids"></div>
+          <div><label for="fluidSolids">Sólidos (%)</label><input type="number" step="0.1" id="fluidSolids"></div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Insumos</label>
         <div class="row">
-          <div><label for="supplyWater">Agua</label><input type="text" id="supplyWater" placeholder="-"></div>
+          <div><label for="supplyWater">Água</label><input type="text" id="supplyWater" placeholder="-"></div>
           <div><label for="supplySeptic">Limpa Fossa</label><input type="text" id="supplySeptic" placeholder="-"></div>
           <div><label for="supplyBathroom">Limpeza Banheiro</label><input type="text" id="supplyBathroom" placeholder="-"></div>
         </div>
         <div class="row">
           <div><label for="supplyPta">PTA</label><input type="text" id="supplyPta" placeholder="-"></div>
-          <div><label for="supplyMunck">Munck (diaria)</label><input type="text" id="supplyMunck" placeholder="-"></div>
+          <div><label for="supplyMunck">Munck (diária)</label><input type="text" id="supplyMunck" placeholder="-"></div>
           <div><label for="supplyCrane">Guindaste 70T</label><input type="text" id="supplyCrane" placeholder="-"></div>
           <div><label for="supplyDebrisRemoval">Rem. Cacamba</label><input type="text" id="supplyDebrisRemoval" placeholder="-"></div>
         </div>
@@ -477,7 +477,7 @@ input.inherited, textarea.inherited {
           <tr><td>Sal (Kg)</td><td><input type="number" step="0.1" class="chemConsumption" data-key="sal"></td><td><input type="number" step="0.1" class="chemStock" data-key="sal"></td><td><input type="checkbox" class="chemNA" data-key="sal" onchange="toggleNA(this)"></td></tr>
           <tr><td>Barrilha (Kg)</td><td><input type="number" step="0.1" class="chemConsumption" data-key="barrilha"></td><td><input type="number" step="0.1" class="chemStock" data-key="barrilha"></td><td><input type="checkbox" class="chemNA" data-key="barrilha" onchange="toggleNA(this)"></td></tr>
         </table>
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Combustivel</label>
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Combustível</label>
         <div class="row">
           <div><label for="fuelDieselConsumption">Diesel Consumo (L)</label><input type="number" step="0.1" id="fuelDieselConsumption"></div>
           <div><label for="fuelDieselStock">Diesel Estoque (L)</label><input type="number" step="0.1" id="fuelDieselStock"></div>
@@ -503,7 +503,7 @@ input.inherited, textarea.inherited {
         <span style="font-size:.75rem;color:#6b7280;">horas</span>
       </div>
       <table class="ops-table" id="opsTable">
-        <tr><th>Inicio</th><th>Termino</th><th>Tipo</th><th>Descritivo</th><th></th></tr>
+        <tr><th>Inicio</th><th>Término</th><th>Tipo</th><th>Descritivo</th><th></th></tr>
       </table>
       <button class="btn btn-secondary btn-sm" id="btnAddOp" type="button" style="margin-top:.3rem;">+ Adicionar atividade</button>
       <!-- Timeline -->
@@ -524,7 +524,7 @@ input.inherited, textarea.inherited {
 
     <!-- HSE -->
     <div class="card">
-      <div class="card-header">HSE / Seguranca</div>
+      <div class="card-header">HSE / Segurança</div>
       <div class="row">
         <div><label><input type="checkbox" id="hseDds"> DDS realizado</label></div>
         <div><label><input type="checkbox" id="hseEpi"> EPIs vistoriados</label></div>
@@ -536,7 +536,7 @@ input.inherited, textarea.inherited {
 
     <!-- Climaticas -->
     <div class="card">
-      <div class="card-header">Condicoes Climaticas</div>
+      <div class="card-header">Condições Climáticas</div>
       <div class="row">
         <div>
           <label for="weatherCondition">Condição</label>
@@ -554,23 +554,23 @@ input.inherited, textarea.inherited {
 
     <!-- Observacoes -->
     <div class="card">
-      <div class="card-header">Observacoes e Planejamento</div>
-      <label for="obsGeneral">Observacoes</label>
+      <div class="card-header">Observações e Planejamento</div>
+      <label for="obsGeneral">Observações</label>
       <textarea id="obsGeneral" rows="3" placeholder="Registre ocorrencias, decisoes, visitas..."></textarea>
-      <label for="planNextShift">Planejamento proximo turno</label>
-      <textarea id="planNextShift" rows="2" placeholder="Proximas 24h?"></textarea>
+      <label for="planNextShift">Planejamento próximo turno</label>
+      <textarea id="planNextShift" rows="2" placeholder="Próximas 24h?"></textarea>
     </div>
 
     <!-- Aprovação -->
     <div class="card">
       <div class="card-header">Aprovação <span class="prefill-link" data-section="aprovacao" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="aprovacao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
-      <div><label for="approvalGeologist">Geologo / Gestor</label><input type="text" id="approvalGeologist"></div>
+      <div><label for="approvalGeologist">Geólogo / Gestor</label><input type="text" id="approvalGeologist"></div>
     </div>
 
     <!-- Fotos -->
     <div class="card">
-      <div class="card-header">Fotos (ate 3)</div>
+      <div class="card-header">Fotos (até 3)</div>
       <input type="file" id="photoInput" accept="image/*" multiple>
       <div class="photo-grid" id="photoPreview"></div>
       <!-- Existing photo URLs for drafts -->
@@ -583,7 +583,7 @@ input.inherited, textarea.inherited {
       <button class="btn btn-primary" id="btnSubmit" type="button" style="flex:1;">Enviar RDO</button>
     </div>
     <div style="margin-bottom:2rem;">
-      <button class="btn btn-secondary btn-sm" id="btnClearForm" type="button">Limpar formulario</button>
+      <button class="btn btn-secondary btn-sm" id="btnClearForm" type="button">Limpar formulário</button>
     </div>
     </div><!-- #formBody -->
     </form>
@@ -610,7 +610,7 @@ input.inherited, textarea.inherited {
     <label for="newLocation">Localidade</label><input type="text" id="newLocation" placeholder="ex: Ribeirao Preto - SP">
     <label for="newRig">Sonda</label><input type="text" id="newRig">
     <div class="row">
-      <div><label for="newStartDate">Data Inicio</label><input type="date" id="newStartDate"></div>
+      <div><label for="newStartDate">Data Início</label><input type="date" id="newStartDate"></div>
       <div><label for="newShift">Turno</label><input type="text" id="newShift" value="07h x 17h"></div>
     </div>
     <div style="display:flex;gap:.5rem;margin-top:1rem;">
@@ -1541,7 +1541,7 @@ function toggleNA(checkbox) {
 }
 
 // ── Anomalias de Perfuracao ──────────────────────────────────
-const PARAM_OPTIONS = ["Peso sobre Broca","RPM","Torque","SPM","Pressao","Vazao","ROP","Outro"];
+const PARAM_OPTIONS = ["Peso sobre Broca","RPM","Torque","SPM","Pressão","Vazão","ROP","Outro"];
 
 function addAnomalyRow(parametro, descricao) {
   const tbody = $("#anomalyTable");
