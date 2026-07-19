@@ -698,6 +698,103 @@ $("#rdoDate").addEventListener("change", () => {
 });
 
 // ============================================================
+// AUTO-SAVE DRAFT (localStorage every 2 min)
+// ============================================================
+let draftTimer = null;
+let lastDraftTime = null;
+const DRAFT_KEY = "rdo_autosave_draft";
+
+function saveLocalDraft() {
+  if (!currentProjectId) return;
+  const payload = buildPayload("rascunho");
+  payload._projectId = currentProjectId;
+  payload._savedAt = Date.now();
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+  lastDraftTime = Date.now();
+}
+
+function startAutoDraft() {
+  stopAutoDraft();
+  lastDraftTime = null;
+  draftTimer = setInterval(saveLocalDraft, 120000); // every 2 min
+}
+
+function stopAutoDraft() {
+  if (draftTimer) { clearInterval(draftTimer); draftTimer = null; }
+  localStorage.removeItem(DRAFT_KEY);
+  lastDraftTime = null;
+}
+
+window.addEventListener("beforeunload", (e) => {
+  if (!draftTimer && !$("#formView").classList.contains("active")) return;
+  if (!lastDraftTime) return;
+  const secs = Math.floor((Date.now() - lastDraftTime) / 1000);
+  const msg = `Voce esta saindo da pagina. O ultimo rascunho foi salvo ha ${secs} segundos. Deseja continuar mesmo assim?`;
+  e.preventDefault();
+  e.returnValue = msg;
+  return msg;
+});
+
+// Check for saved draft on page load
+(function() {
+  const saved = localStorage.getItem(DRAFT_KEY);
+  if (!saved) return;
+  try {
+    const draft = JSON.parse(saved);
+    if (draft._projectId && draft._savedAt) {
+      const secs = Math.floor((Date.now() - draft._savedAt) / 1000);
+      const mins = Math.floor(secs / 60);
+      if (confirm(`Ha um rascunho nao salvo de ${mins > 0 ? mins + ' min' : secs + ' seg'} atras. Deseja restaura-lo?`)) {
+        currentProjectId = draft._projectId;
+        delete draft._projectId; delete draft._savedAt;
+        // Load project and open draft
+        setTimeout(async () => {
+          // Wait for splash dismiss then load
+          if ($("#splashView").classList.contains("active")) {
+            showView("homeView");
+          }
+          await loadProjects();
+          $("#projectSelect").value = currentProjectId;
+          currentProjectName = $("#projectSelect").selectedOptions[0]?.text || "";
+          $("#headerProjectName").textContent = currentProjectName;
+          showView("formView");
+          $("#rdoDate").value = draft.data || "";
+          $("#formBody").style.display = draft.data ? "block" : "none";
+          populateDraftFromPayload(draft);
+          startAutoDraft();
+          renderPhotoPreview();
+        }, 500);
+      } else {
+        localStorage.removeItem(DRAFT_KEY);
+      }
+    }
+  } catch(_) { localStorage.removeItem(DRAFT_KEY); }
+})();
+
+function populateDraftFromPayload(payload) {
+  if (payload.rdoDayType) $("#rdoDayType").value = payload.rdoDayType;
+  if (payload.depthInitial != null) { setToggle("#toggleDrilling", true); $("#depthInitial").value = payload.depthInitial || ""; }
+  if (payload.depthFinal != null) $("#depthFinal").value = payload.depthFinal || "";
+  if (payload.estratigrafia_mudou) { setToggle("#toggleStratigraphy", true); $("#stratDepth").value = payload.estratigrafia_profundidade || ""; $("#stratDescription").value = payload.estratigrafia_descricao || ""; }
+  if (payload.revestimento_mudou) { setToggle("#toggleCasing", true); $("#casingMeters").value = payload.revestimento_metros || ""; $("#casingObs").value = payload.revestimento_obs || ""; }
+  if (payload.parametros_anomalias && payload.parametros_anomalias.length > 0) {
+    setToggle("#toggleAnomaly", true);
+    payload.parametros_anomalias.forEach(a => addAnomalyRow(a.parametro, a.descricao));
+  }
+  if (payload.hseDds) $("#hseDds").checked = true;
+  if (payload.hseEpi) $("#hseEpi").checked = true;
+  if (payload.hseManHours) $("#hseManHours").value = payload.hseManHours;
+  if (payload.hseIncidents) $("#hseIncidents").value = payload.hseIncidents;
+  if (payload.hseNearMiss) $("#hseNearMiss").value = payload.hseNearMiss;
+  if (payload.weatherCondition) $("#weatherCondition").value = payload.weatherCondition;
+  if (payload.weatherRain) $("#weatherRain").checked = true;
+  if (payload.obsGeneral) $("#obsGeneral").value = payload.obsGeneral;
+  if (payload.planNextShift) $("#planNextShift").value = payload.planNextShift;
+  if (payload.approvalGeologist) $("#approvalGeologist").value = payload.approvalGeologist;
+  if (payload.turnoHoras) $("#shiftHours").value = payload.turnoHoras;
+}
+
+// ============================================================
 // TOAST
 // ============================================================
 let toastTimer;
@@ -929,6 +1026,7 @@ $("#btnNewRDO").addEventListener("click", async () => {
   showView("formView");
   // Hide form body until date is set
   $("#formBody").style.display = "none";
+  startAutoDraft();
   await loadLastRDO();
   await loadLastStratigraphy();
   renderPhotoPreview();
@@ -1110,6 +1208,7 @@ function openDraft(rdo) {
   $("#rdoId").value = rdo.id;
   populateForm(rdo);
   $("#formBody").style.display = "block";
+  startAutoDraft();
   renderPhotoPreview();
   showView("formView");
 }
@@ -1789,6 +1888,7 @@ $("#btnSaveDraft").addEventListener("click", async () => {
 // ============================================================
 $("#btnClearForm").addEventListener("click", () => {
   if (confirm("Tem certeza? Os dados nao salvos serao perdidos.")) {
+    stopAutoDraft();
     resetForm();
     showToast("Formulario limpo.", "success");
   }
@@ -1817,6 +1917,7 @@ $("#btnSubmit").addEventListener("click", async () => {
     }
     if (result.error) { showToast("Erro: "+result.error.message,"error"); return; }
     showToast("RDO enviado com sucesso!","success");
+    stopAutoDraft();
     resetForm();
     showView("homeView");
     $("#rdosList").style.display = "block";
