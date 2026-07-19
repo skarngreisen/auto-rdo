@@ -494,7 +494,7 @@ input.inherited, textarea.inherited {
         <span style="font-size:.75rem;color:#6b7280;">horas</span>
       </div>
       <table class="ops-table" id="opsTable">
-        <tr><th>Inicio</th><th>Término</th><th>Tipo</th><th>Descritivo</th><th></th></tr>
+        <tr><th>Início</th><th>Término</th><th>Tipo</th><th>Descritivo</th><th></th></tr>
       </table>
       <button class="btn btn-secondary btn-sm" id="btnAddOp" type="button" style="margin-top:.3rem;">+ Adicionar atividade</button>
       <!-- Timeline -->
@@ -1009,7 +1009,7 @@ async function loadLastStratigraphy() {
     .eq("estratigrafia_mudou", true)
     .order("data", { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
   const el = $("#lastStratigraphy");
   if (data && data.estratigrafia_descricao) {
     el.textContent = `Ultima descricao (${data.data}): "${data.estratigrafia_descricao}"`;
@@ -1547,7 +1547,7 @@ function addTeamMemberRow(funcao, nome) {
   row.querySelector(".teamRemove").addEventListener("click", () => row.remove());
 }
 $("#btnAddTeamMember").addEventListener("click", () => addTeamMemberRow("",""));
-const DEFAULT_ROLES = ["Sondador","Torrista","Plat. / Auxiliar 1","Plat. / Auxiliar 2","TST","Geologo","Coordenador"];
+const DEFAULT_ROLES = ["Sondador","Torrista","Plat. / Auxiliar 1","Plat. / Auxiliar 2","TST","Geólogo","Coordenador"];
 DEFAULT_ROLES.forEach(r => addTeamMemberRow(r,""));
 
 // ============================================================
