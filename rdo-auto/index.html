@@ -204,6 +204,24 @@ input.inherited, textarea.inherited {
 .ops-table input { font-size: .82rem; padding: .4rem .45rem; }
 
 /* ============================================================
+   TIMELINE
+   ============================================================ */
+.timeline-bar { position: relative; }
+.timeline-track {
+  position: relative; height: 22px; background: #e5e7eb;
+  border-radius: 4px; overflow: hidden; width: 100%;
+}
+.timeline-segment {
+  position: absolute; top: 0; height: 100%;
+  border-radius: 2px; cursor: default;
+  transition: opacity .15s;
+}
+.timeline-segment:hover { opacity: .85; }
+.timeline-seg-normal { background: #10b981; }
+.timeline-seg-nao-produtiva { background: #f59e0b; }
+.timeline-seg-parada { background: #ef4444; }
+
+/* ============================================================
    PHOTO PREVIEW
    ============================================================ */
 .photo-grid { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
@@ -476,11 +494,20 @@ input.inherited, textarea.inherited {
 
     <!-- Operacoes -->
     <div class="card">
-      <div class="card-header">Operacoes</div>
+      <div class="card-header">Registro de Atividades</div>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
+        <label style="margin:0;font-size:.75rem;">Duracao do turno:</label>
+        <input type="number" id="turnoHoras" value="12" min="1" max="24" step="0.5" style="width:60px;padding:.3rem .4rem;font-size:.8rem;">
+        <span style="font-size:.75rem;color:#6b7280;">horas</span>
+      </div>
       <table class="ops-table" id="opsTable">
-        <tr><th>Inicio</th><th>Termino</th><th>Codigo (opc.)</th><th>Descritivo</th><th></th></tr>
+        <tr><th>Inicio</th><th>Termino</th><th>Tipo</th><th>Descritivo</th><th></th></tr>
       </table>
-      <button class="btn btn-secondary btn-sm" id="btnAddOp" type="button" style="margin-top:.3rem;">+ Adicionar operacao</button>
+      <button class="btn btn-secondary btn-sm" id="btnAddOp" type="button" style="margin-top:.3rem;">+ Adicionar atividade</button>
+      <!-- Timeline -->
+      <div class="timeline-bar" id="timelineBar" style="margin-top:.6rem;">
+        <div class="timeline-track" id="timelineTrack"></div>
+      </div>
     </div>
 
     <!-- Equipe -->
@@ -1045,7 +1072,7 @@ function viewRDO(rdo) {
     ? `<div class="ro-row"><span class="ro-label">Profundidade</span><span class="ro-value">${rdo.profundidade_inicial || 0} → ${rdo.profundidade_final} m</span></div>`
     : "";
   const ops = rdo.operacoes ? rdo.operacoes.map(o =>
-    `<div class="ro-row"><span class="ro-label">${o.inicio}-${o.termino}</span><span class="ro-value">${o.codigo ? '['+o.codigo+'] ' : ''}${o.descritivo}</span></div>`
+    `<div class="ro-row"><span class="ro-label">${o.inicio}-${o.termino}</span><span class="ro-value">${o.descritivo} <span style="font-size:.7rem;color:${o.tipo==='Parada'?'#ef4444':o.tipo==='Nao Produtiva'?'#f59e0b':'#10b981'}">${o.tipo||'Normal'}</span></span></div>`
   ).join("") : "";
   const equipe = rdo.equipe ? rdo.equipe.map(e =>
     `<div class="ro-row"><span class="ro-label">${e.funcao || ''}</span><span class="ro-value">${e.nome || ''}</span></div>`
@@ -1188,7 +1215,7 @@ function populateForm(rdo) {
   // Operacoes
   if (rdo.operacoes && rdo.operacoes.length > 0) {
     clearTable("#opsTable");
-    rdo.operacoes.forEach(o => addOpRow(o.inicio, o.termino, o.codigo, o.descritivo));
+    rdo.operacoes.forEach(o => addOpRow(o.inicio, o.termino, o.tipo, o.descritivo));
   } else if (!hasOpsRows()) {
     addOpRow("","","","");
   }
@@ -1279,19 +1306,56 @@ setupToggle("#toggleAnomalia", "#sectionAnomalia");
 // ============================================================
 // OPERATIONS TABLE
 // ============================================================
-function addOpRow(inicio, termino, codigo, descritivo) {
+function addOpRow(inicio, termino, tipo, descritivo) {
   const tbody = $("#opsTable");
   const row = tbody.insertRow(-1);
+  const tipoOpts = ["Normal","Nao Produtiva","Parada"];
+  const opts = tipoOpts.map(t => `<option value="${t}" ${t === tipo ? "selected" : ""}>${t}</option>`).join("");
   row.innerHTML = `
     <td><input type="time" value="${inicio || ''}" class="op-inicio"></td>
     <td><input type="time" value="${termino || ''}" class="op-termino"></td>
-    <td><input type="text" value="${codigo || ''}" class="op-codigo" placeholder="PERF-01" style="min-width:70px"></td>
+    <td><select class="op-tipo" style="min-width:100px;font-size:.82rem;padding:.3rem;">${opts}</select></td>
     <td><input type="text" value="${descritivo || ''}" class="op-descritivo" placeholder="Descreva..."></td>
     <td><button class="btn btn-danger btn-sm op-remove" type="button">&times;</button></td>`;
-  row.querySelector(".op-remove").addEventListener("click", () => row.remove());
+  row.querySelector(".op-remove").addEventListener("click", () => { row.remove(); updateTimeline(); });
+  // Update timeline on input
+  row.querySelectorAll("input, select").forEach(el => el.addEventListener("input", updateTimeline));
+  row.querySelectorAll("input, select").forEach(el => el.addEventListener("change", updateTimeline));
+  updateTimeline();
 }
-$("#btnAddOp").addEventListener("click", () => addOpRow("","","",""));
-addOpRow("","","","");
+$("#btnAddOp").addEventListener("click", () => addOpRow("","","Normal",""));
+addOpRow("","","Normal","");
+
+function updateTimeline() {
+  const track = $("#timelineTrack");
+  const turnoH = parseFloat($("#turnoHoras").value) || 12;
+  track.innerHTML = "";
+  for (let i = 1; i < $("#opsTable").rows.length; i++) {
+    const row = $("#opsTable").rows[i];
+    const inicio = row.querySelector(".op-inicio")?.value;
+    const termino = row.querySelector(".op-termino")?.value;
+    const tipo = row.querySelector(".op-tipo")?.value || "Normal";
+    const desc = row.querySelector(".op-descritivo")?.value || "";
+    if (!inicio || !termino) continue;
+    const [ih, im] = inicio.split(":").map(Number);
+    const [th, tm] = termino.split(":").map(Number);
+    const startMin = ih * 60 + im;
+    const endMin = th * 60 + tm;
+    if (endMin <= startMin) continue;
+    const totalMin = turnoH * 60;
+    const leftPct = (startMin / totalMin) * 100;
+    const widthPct = ((endMin - startMin) / totalMin) * 100;
+    const cls = tipo === "Parada" ? "timeline-seg-parada" : tipo === "Nao Produtiva" ? "timeline-seg-nao-produtiva" : "timeline-seg-normal";
+    const seg = document.createElement("div");
+    seg.className = "timeline-segment " + cls;
+    seg.style.left = leftPct + "%";
+    seg.style.width = widthPct + "%";
+    seg.title = `${inicio}-${termino}: ${desc}`;
+    track.appendChild(seg);
+  }
+}
+// Update timeline when turno changes
+$("#turnoHoras").addEventListener("input", updateTimeline);
 
 // ============================================================
 // COLUNA TABLE
@@ -1394,9 +1458,9 @@ function collectOperacoes() {
     const row = $("#opsTable").rows[i];
     const inicio = row.querySelector(".op-inicio")?.value || "";
     const termino = row.querySelector(".op-termino")?.value || "";
-    const codigo = row.querySelector(".op-codigo")?.value || "";
+    const tipo = row.querySelector(".op-tipo")?.value || "Normal";
     const descritivo = row.querySelector(".op-descritivo")?.value || "";
-    if (inicio || termino || descritivo) ops.push({ inicio, termino, codigo: codigo || null, descritivo });
+    if (inicio || termino || descritivo) ops.push({ inicio, termino, tipo, descritivo });
   }
   return ops.length > 0 ? ops : null;
 }

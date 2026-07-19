@@ -336,7 +336,7 @@ async function viewRDO(id) {
   if (!data) return;
   const r = data;
   const c = $("#rdoDetailContent");
-  const ops = r.operacoes ? r.operacoes.map(o => `<div class="ro-row"><span class="ro-label">${o.inicio}-${o.termino}</span><span class="ro-value">${o.descritivo}</span></div>`).join("") : '<span style="color:#9ca3af;">—</span>';
+   const ops = r.operacoes ? r.operacoes.map(o => `<div class="ro-row"><span class="ro-label">${o.inicio}-${o.termino}</span><span class="ro-value">${o.descritivo} <span style="font-size:.7rem;color:${o.tipo==='Parada'?'#ef4444':o.tipo==='Nao Produtiva'?'#f59e0b':'#10b981'}">${o.tipo||'Normal'}</span></span></div>`).join("") : '<span style="color:#9ca3af;">—</span>';
   const equipe = r.equipe ? r.equipe.map(e => `<div class="ro-row"><span class="ro-label">${e.funcao||''}</span><span class="ro-value">${e.nome||''}</span></div>`).join("") : '<span style="color:#9ca3af;">—</span>';
   c.innerHTML = `
     <div class="ro-section"><h3>Geral</h3>
