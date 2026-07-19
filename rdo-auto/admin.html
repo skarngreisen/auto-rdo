@@ -344,6 +344,7 @@ async function viewRDO(id) {
       <div class="ro-row"><span class="ro-label">Data</span><span class="ro-value">${r.data} — ${r.tipo_dia||'-'}</span></div>
       <div class="ro-row"><span class="ro-label">Prof.</span><span class="ro-value">${r.profundidade_final!=null ? (r.profundidade_inicial||0)+' → '+r.profundidade_final+' m' : '-'}</span></div>
       ${r.estratigrafia_mudou ? `<div class="ro-row"><span class="ro-label">Estratigrafia</span><span class="ro-value">${r.estratigrafia_descricao||'-'} (${r.estratigrafia_profundidade||'?'} m)</span></div>` : ''}
+      ${r.revestimento_mudou ? `<div class="ro-row"><span class="ro-label">Revestimento</span><span class="ro-value">${r.revestimento_metros||'-'} m descidos${r.revestimento_obs ? ' — '+r.revestimento_obs : ''}</span></div>` : ''}
     </div>
     <div class="ro-section"><h3>Operações</h3>${ops}</div>
     <div class="ro-section"><h3>Equipe</h3>${equipe}</div>

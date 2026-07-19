@@ -30,6 +30,11 @@ CREATE TABLE IF NOT EXISTS rdos (
     estratigrafia_profundidade NUMERIC(10,2),               -- depth at which the change occurred
     estratigrafia_descricao   TEXT,                          -- description of new stratigraphy
 
+    -- Revestimento (event-based)
+    revestimento_mudou        BOOLEAN DEFAULT false,
+    revestimento_metros       NUMERIC(10,2),
+    revestimento_obs          TEXT,
+
     -- Legacy columns (kept for backward compatibility)
     formacao                  TEXT,
     topo                      NUMERIC(10,2),
