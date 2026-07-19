@@ -448,24 +448,12 @@ input.inherited, textarea.inherited {
         <div class="row">
           <div><label for="fluidFiltrate">Filtrado API (mL)</label><input type="number" step="0.1" id="fluidFiltrate"></div>
           <div><label for="fluidPh">pH</label><input type="number" step="0.1" id="fluidPh"></div>
-          <div><label for="fluidFreeWater">Agua Livre (%)</label><input type="number" step="0.1" id="fluidFreeWater"></div>
+          <div><label for="fluidFreeWater">Água Livre (%)</label><input type="number" step="0.1" id="fluidFreeWater"></div>
         </div>
         <div class="row">
           <div><label for="fluidSand">Areia (%)</label><input type="number" step="0.1" id="fluidSand"></div>
           <div><label for="fluidApiCake">API Cake (1/32 in)</label><input type="number" step="0.1" id="fluidApiCake"></div>
           <div><label for="fluidSolids">Sólidos (%)</label><input type="number" step="0.1" id="fluidSolids"></div>
-        </div>
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Insumos</label>
-        <div class="row">
-          <div><label for="supplyWater">Água</label><input type="text" id="supplyWater" placeholder="-"></div>
-          <div><label for="supplySeptic">Limpa Fossa</label><input type="text" id="supplySeptic" placeholder="-"></div>
-          <div><label for="supplyBathroom">Limpeza Banheiro</label><input type="text" id="supplyBathroom" placeholder="-"></div>
-        </div>
-        <div class="row">
-          <div><label for="supplyPta">PTA</label><input type="text" id="supplyPta" placeholder="-"></div>
-          <div><label for="supplyMunck">Munck (diária)</label><input type="text" id="supplyMunck" placeholder="-"></div>
-          <div><label for="supplyCrane">Guindaste 70T</label><input type="text" id="supplyCrane" placeholder="-"></div>
-          <div><label for="supplyDebrisRemoval">Rem. Cacamba</label><input type="text" id="supplyDebrisRemoval" placeholder="-"></div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Quimicos (consumo / estoque)</label>
         <table class="ops-table">
@@ -491,6 +479,18 @@ input.inherited, textarea.inherited {
           <tr><td>Oleo 40 - Motor (L)</td><td><input type="number" step="0.1" class="matConsumption" data-key="oleo_40"></td><td><input type="number" step="0.1" class="matStock" data-key="oleo_40"></td><td><input type="checkbox" class="matNA" data-key="oleo_40" onchange="toggleNA(this)"></td></tr>
           <tr><td>Hexa-T (Kg)</td><td><input type="number" step="0.1" class="matConsumption" data-key="hexa_t"></td><td><input type="number" step="0.1" class="matStock" data-key="hexa_t"></td><td><input type="checkbox" class="matNA" data-key="hexa_t" onchange="toggleNA(this)"></td></tr>
         </table>
+      </div>
+      <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Insumos</label>
+      <div class="row">
+        <div><label for="supplyWater">Água</label><input type="text" id="supplyWater" placeholder="-"></div>
+        <div><label for="supplySeptic">Limpa Fossa</label><input type="text" id="supplySeptic" placeholder="-"></div>
+        <div><label for="supplyBathroom">Limpeza Banheiro</label><input type="text" id="supplyBathroom" placeholder="-"></div>
+      </div>
+      <div class="row">
+        <div><label for="supplyPta">PTA</label><input type="text" id="supplyPta" placeholder="-"></div>
+        <div><label for="supplyMunck">Munck (diária)</label><input type="text" id="supplyMunck" placeholder="-"></div>
+        <div><label for="supplyCrane">Guindaste 70T</label><input type="text" id="supplyCrane" placeholder="-"></div>
+        <div><label for="supplyDebrisRemoval">Rem. Cacamba</label><input type="text" id="supplyDebrisRemoval" placeholder="-"></div>
       </div>
     </div>
 
@@ -1229,13 +1229,6 @@ function populateForm(rdo) {
       $("#fluidApiCake").value = f.api_cake || "";
       $("#fluidSolids").value = f.solidos || "";
     }
-    if (rdo.insumos) {
-      const i = rdo.insumos;
-      $("#supplyWater").value = i.agua || ""; $("#supplySeptic").value = i.limpa_fossa || "";
-      $("#supplyBathroom").value = i.limpeza_banheiro || ""; $("#supplyPta").value = i.pta || "";
-      $("#supplyMunck").value = i.munck || ""; $("#supplyCrane").value = i.guindaste || "";
-      $("#supplyDebrisRemoval").value = i.remocao_cacamba || "";
-    }
     if (rdo.quimicos) {
       for (const [key, val] of Object.entries(rdo.quimicos)) {
         const consEl = document.querySelector(`.chemConsumption[data-key="${key}"]`);
@@ -1256,6 +1249,15 @@ function populateForm(rdo) {
         if (estEl && val.estoque != null) estEl.value = val.estoque;
       }
     }
+  }
+
+  // Insumos (always populated, independent of Fluid toggle)
+  if (rdo.insumos) {
+    const i = rdo.insumos;
+    $("#supplyWater").value = i.agua || ""; $("#supplySeptic").value = i.limpa_fossa || "";
+    $("#supplyBathroom").value = i.limpeza_banheiro || ""; $("#supplyPta").value = i.pta || "";
+    $("#supplyMunck").value = i.munck || ""; $("#supplyCrane").value = i.guindaste || "";
+    $("#supplyDebrisRemoval").value = i.remocao_cacamba || "";
   }
 
   // Operacoes
@@ -1665,10 +1667,10 @@ function buildPayload(status) {
   if (fluOn) {
     p.fluido = collectFluid();
     p.quimicos = collectChemicals();
-    p.insumos = collectSupplies();
     p.outros_materiais = collectMaterials();
     p.combustivel = collectFuel();
   }
+  p.insumos = collectSupplies();  // always collected, outside Fluid toggle
   // Strip nulls
   Object.keys(p).forEach(k => { if (p[k]===null||p[k]===undefined) delete p[k]; });
   return p;
