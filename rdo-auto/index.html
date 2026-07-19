@@ -927,6 +927,7 @@ $("#btnNewRDO").addEventListener("click", async () => {
   resetForm();
   await loadLastRDO();
   await loadLastEstratigrafia();
+  renderPhotoPreview();
   showView("formView");
 });
 
@@ -1077,6 +1078,7 @@ function openDraft(rdo) {
   resetForm();
   $("#rdoId").value = rdo.id;
   populateForm(rdo);
+  renderPhotoPreview();
   showView("formView");
 }
 
@@ -1447,7 +1449,6 @@ function renderPhotoPreview() {
     pg.appendChild(div);
   }
 }
-renderPhotoPreview();
 
 async function uploadPhotos() {
   if (selectedFiles.length === 0) return [];
