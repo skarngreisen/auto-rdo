@@ -340,10 +340,10 @@ input.inherited, textarea.inherited {
     <div class="card">
       <div class="card-header">Identificação</div>
       <div class="row">
-        <div><label for="rdoData">Data do RDO <span style="color:#ef4444;">*</span></label><input type="date" id="rdoData" required></div>
+        <div><label for="rdoDate">Data do RDO <span style="color:#ef4444;">*</span></label><input type="date" id="rdoDate" required></div>
         <div>
-          <label for="rdoTipoDia">Tipo de dia</label>
-          <select id="rdoTipoDia">
+          <label for="rdoDayType">Tipo de dia</label>
+          <select id="rdoDayType">
             <option value="perfuracao">Perfuração</option>
             <option value="montagem">Montagem</option>
             <option value="teste">Teste</option>
@@ -360,72 +360,72 @@ input.inherited, textarea.inherited {
       <div class="card-header">Perfuração <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="perfuracao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
       <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanco na perfuração?</p>
-      <div class="toggle-group" id="togglePerfuracao">
+      <div class="toggle-group" id="toggleDrilling">
         <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
       </div>
-      <div class="conditional" id="sectionPerfuracao">
+      <div class="conditional" id="sectionDrilling">
         <div class="row">
-          <div><label for="profInicial">Prof. Inicial (m)</label><input type="number" step="0.01" id="profInicial"></div>
-          <div><label for="profFinal">Prof. Final (m)</label><input type="number" step="0.01" id="profFinal"></div>
+          <div><label for="depthInitial">Prof. Inicial (m)</label><input type="number" step="0.01" id="depthInitial"></div>
+          <div><label for="depthFinal">Prof. Final (m)</label><input type="number" step="0.01" id="depthFinal"></div>
         </div>
         <p style="font-size:.82rem;color:#6b7280;margin:.4rem 0;">Houve mudanca estratigrafica relevante?</p>
-        <div class="toggle-group" id="toggleEstratigrafia">
+        <div class="toggle-group" id="toggleStratigraphy">
           <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
           <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         </div>
-        <div id="lastEstratigrafia" style="font-size:.72rem;color:#6b7280;margin:.2rem 0 .4rem 0;display:none;"></div>
-        <div class="conditional" id="sectionEstratigrafia">
+        <div id="lastStratigraphy" style="font-size:.72rem;color:#6b7280;margin:.2rem 0 .4rem 0;display:none;"></div>
+        <div class="conditional" id="sectionStratigraphy">
           <div class="row">
-            <div><label for="estProfundidade">Profundidade da mudanca (m)</label><input type="number" step="0.01" id="estProfundidade"></div>
-            <div><label for="estDescricao">Nova descrição estratigrafica</label><input type="text" id="estDescricao" placeholder="ex: Fm. Botucatu, arenito fino avermelhado"></div>
+            <div><label for="stratDepth">Profundidade da mudanca (m)</label><input type="number" step="0.01" id="stratDepth"></div>
+            <div><label for="stratDescription">Nova descrição estratigrafica</label><input type="text" id="stratDescription" placeholder="ex: Fm. Botucatu, arenito fino avermelhado"></div>
           </div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Dados de Brocas</label>
         <div style="font-size:.75rem;color:#6b7280;margin-bottom:.3rem;">
-          <label><input type="checkbox" id="brocaTrocada" onchange="onBrocaToggle()"> Houve troca de broca? (move atual → anterior)</label>
+          <label><input type="checkbox" id="bitChanged" onchange="onBitToggle()"> Houve troca de broca? (move atual → anterior)</label>
         </div>
         <table class="ops-table">
           <tr><th>Campo</th><th>Atual</th><th>Anterior</th></tr>
-          <tr><td>Fabricante</td><td><input type="text" id="brocaFabAtual"></td><td><input type="text" id="brocaFabAnt"></td></tr>
-          <tr><td>Serie</td><td><input type="text" id="brocaSerieAtual"></td><td><input type="text" id="brocaSerieAnt"></td></tr>
-          <tr><td>Diametro (pol)</td><td><input type="text" id="brocaDiamAtual"></td><td><input type="text" id="brocaDiamAnt"></td></tr>
-          <tr><td>Modelo IADC</td><td><input type="text" id="brocaModAtual" placeholder="ex: 517"></td><td><input type="text" id="brocaModAnt"></td></tr>
-          <tr><td>Jatos (pol)</td><td><input type="text" id="brocaJatosAtual" placeholder="16-16-16"></td><td><input type="text" id="brocaJatosAnt"></td></tr>
-          <tr><td>Perfurado (m)</td><td><input type="number" step="0.1" id="brocaPerfAtual"></td><td><input type="number" step="0.1" id="brocaPerfAnt"></td></tr>
-          <tr><td>Oper. (hs)</td><td><input type="number" step="0.1" id="brocaHsAtual"></td><td><input type="number" step="0.1" id="brocaHsAnt"></td></tr>
-          <tr><td>ROP medio (m/h)</td><td><input type="number" step="0.1" id="brocaRopAtual"></td><td><input type="number" step="0.1" id="brocaRopAnt"></td></tr>
+          <tr><td>Fabricante</td><td><input type="text" id="bitBrandCurrent"></td><td><input type="text" id="bitBrandPrev"></td></tr>
+          <tr><td>Serie</td><td><input type="text" id="bitSerialCurrent"></td><td><input type="text" id="bitSerialPrev"></td></tr>
+          <tr><td>Diametro (pol)</td><td><input type="text" id="bitDiameterCurrent"></td><td><input type="text" id="bitDiameterPrev"></td></tr>
+          <tr><td>Modelo IADC</td><td><input type="text" id="bitModelCurrent" placeholder="ex: 517"></td><td><input type="text" id="bitModelPrev"></td></tr>
+          <tr><td>Jatos (pol)</td><td><input type="text" id="bitJetsCurrent" placeholder="16-16-16"></td><td><input type="text" id="bitJetsPrev"></td></tr>
+          <tr><td>Perfurado (m)</td><td><input type="number" step="0.1" id="bitDrilledCurrent"></td><td><input type="number" step="0.1" id="bitDrilledPrev"></td></tr>
+          <tr><td>Oper. (hs)</td><td><input type="number" step="0.1" id="bitHoursCurrent"></td><td><input type="number" step="0.1" id="bitHoursPrev"></td></tr>
+          <tr><td>ROP medio (m/h)</td><td><input type="number" step="0.1" id="bitRopCurrent"></td><td><input type="number" step="0.1" id="bitRopPrev"></td></tr>
         </table>
         <!-- Anomalias de Perfuração (event-based) -->
         <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve anomalia nos parametros de perfuração?</p>
-        <div class="toggle-group" id="toggleAnomalia">
+        <div class="toggle-group" id="toggleAnomaly">
           <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
           <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         </div>
-        <div class="conditional" id="sectionAnomalia">
-          <table class="ops-table" id="anomaliaTable">
+        <div class="conditional" id="sectionAnomaly">
+          <table class="ops-table" id="anomalyTable">
             <tr><th>Parametro</th><th>Descrição da anomalia</th><th></th></tr>
           </table>
-          <button class="btn btn-secondary btn-sm" id="btnAddAnomalia" type="button" style="margin-top:.3rem;">+ Adicionar anomalia</button>
+          <button class="btn btn-secondary btn-sm" id="btnAddAnomaly" type="button" style="margin-top:.3rem;">+ Adicionar anomalia</button>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Composição de Coluna (BHA)</label>
-        <table class="ops-table" id="colunaTable">
+        <table class="ops-table" id="bhaTable">
           <tr><th>Item</th><th>Qty</th><th>ID (in)</th><th>OD (in)</th><th>Length (m)</th><th>Total (m)</th><th></th></tr>
         </table>
-        <button class="btn btn-secondary btn-sm" id="btnAddColuna" type="button" style="margin-top:.3rem;">+ Adicionar item</button>
-        <div id="colunaTotal" style="font-size:.8rem;font-weight:700;color:#a04000;margin-top:.3rem;display:none;">Comprimento total da coluna: 0.00 m</div>
+        <button class="btn btn-secondary btn-sm" id="btnAddBHA" type="button" style="margin-top:.3rem;">+ Adicionar item</button>
+        <div id="bhaTotal" style="font-size:.8rem;font-weight:700;color:#a04000;margin-top:.3rem;display:none;">Comprimento total da coluna: 0.00 m</div>
 
         <!-- Revestimento (event-based) -->
         <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve descida de revestimento hoje?</p>
-        <div class="toggle-group" id="toggleRevestimento">
+        <div class="toggle-group" id="toggleCasing">
           <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
           <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         </div>
-        <div class="conditional" id="sectionRevestimento">
+        <div class="conditional" id="sectionCasing">
           <div class="row">
-            <div><label for="revMetros">Metros descidos</label><input type="number" step="0.01" id="revMetros"></div>
+            <div><label for="casingMeters">Metros descidos</label><input type="number" step="0.01" id="casingMeters"></div>
           </div>
-          <div><label for="revObs">Ocorrencias</label><textarea id="revObs" rows="2" placeholder="Ex.: Rosca do 3º tubo fora de spec, substituido por reserva"></textarea></div>
+          <div><label for="casingObs">Ocorrencias</label><textarea id="casingObs" rows="2" placeholder="Ex.: Rosca do 3º tubo fora de spec, substituido por reserva"></textarea></div>
         </div>
       </div>
     </div>
@@ -435,61 +435,61 @@ input.inherited, textarea.inherited {
       <div class="card-header">Fluido e Quimicos <span class="prefill-link" data-section="fluido" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="fluido">Preenchido com dados de ontem. Confira e edite se necessario.</div>
       <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de quimicos/fluido?</p>
-      <div class="toggle-group" id="toggleFluido">
+      <div class="toggle-group" id="toggleFluid">
         <button class="toggle-btn" data-value="yes" type="button">Sim</button>
         <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
       </div>
-      <div class="conditional" id="sectionFluido">
+      <div class="conditional" id="sectionFluid">
         <label style="font-size:.82rem;color:#1e3a5f;">Parametros do Fluido</label>
         <div class="row">
-          <div><label for="fluDensidade">Densidade (lb/gal)</label><input type="number" step="0.1" id="fluDensidade"></div>
-          <div><label for="fluViscosidade">Visc. Marsh (s/qt)</label><input type="number" step="0.1" id="fluViscosidade"></div>
+          <div><label for="fluidDensity">Densidade (lb/gal)</label><input type="number" step="0.1" id="fluidDensity"></div>
+          <div><label for="fluidViscosity">Visc. Marsh (s/qt)</label><input type="number" step="0.1" id="fluidViscosity"></div>
         </div>
         <div class="row">
-          <div><label for="fluFiltrado">Filtrado API (mL)</label><input type="number" step="0.1" id="fluFiltrado"></div>
-          <div><label for="fluPh">pH</label><input type="number" step="0.1" id="fluPh"></div>
-          <div><label for="fluAguaLivre">Agua Livre (%)</label><input type="number" step="0.1" id="fluAguaLivre"></div>
+          <div><label for="fluidFiltrate">Filtrado API (mL)</label><input type="number" step="0.1" id="fluidFiltrate"></div>
+          <div><label for="fluidPh">pH</label><input type="number" step="0.1" id="fluidPh"></div>
+          <div><label for="fluidFreeWater">Agua Livre (%)</label><input type="number" step="0.1" id="fluidFreeWater"></div>
         </div>
         <div class="row">
-          <div><label for="fluAreia">Areia (%)</label><input type="number" step="0.1" id="fluAreia"></div>
-          <div><label for="fluApiCake">API Cake (1/32 in)</label><input type="number" step="0.1" id="fluApiCake"></div>
-          <div><label for="fluSolidos">Solidos (%)</label><input type="number" step="0.1" id="fluSolidos"></div>
+          <div><label for="fluidSand">Areia (%)</label><input type="number" step="0.1" id="fluidSand"></div>
+          <div><label for="fluidApiCake">API Cake (1/32 in)</label><input type="number" step="0.1" id="fluidApiCake"></div>
+          <div><label for="fluidSolids">Solidos (%)</label><input type="number" step="0.1" id="fluidSolids"></div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Insumos</label>
         <div class="row">
-          <div><label for="insAgua">Agua</label><input type="text" id="insAgua" placeholder="-"></div>
-          <div><label for="insLimpaFossa">Limpa Fossa</label><input type="text" id="insLimpaFossa" placeholder="-"></div>
-          <div><label for="insLimpezaBanh">Limpeza Banheiro</label><input type="text" id="insLimpezaBanh" placeholder="-"></div>
+          <div><label for="supplyWater">Agua</label><input type="text" id="supplyWater" placeholder="-"></div>
+          <div><label for="supplySeptic">Limpa Fossa</label><input type="text" id="supplySeptic" placeholder="-"></div>
+          <div><label for="supplyBathroom">Limpeza Banheiro</label><input type="text" id="supplyBathroom" placeholder="-"></div>
         </div>
         <div class="row">
-          <div><label for="insPta">PTA</label><input type="text" id="insPta" placeholder="-"></div>
-          <div><label for="insMunck">Munck (diaria)</label><input type="text" id="insMunck" placeholder="-"></div>
-          <div><label for="insGuindaste">Guindaste 70T</label><input type="text" id="insGuindaste" placeholder="-"></div>
-          <div><label for="insRemCacamba">Rem. Cacamba</label><input type="text" id="insRemCacamba" placeholder="-"></div>
+          <div><label for="supplyPta">PTA</label><input type="text" id="supplyPta" placeholder="-"></div>
+          <div><label for="supplyMunck">Munck (diaria)</label><input type="text" id="supplyMunck" placeholder="-"></div>
+          <div><label for="supplyCrane">Guindaste 70T</label><input type="text" id="supplyCrane" placeholder="-"></div>
+          <div><label for="supplyDebrisRemoval">Rem. Cacamba</label><input type="text" id="supplyDebrisRemoval" placeholder="-"></div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Quimicos (consumo / estoque)</label>
         <table class="ops-table">
           <tr><th>Produto</th><th>Consumo</th><th>Estoque</th><th style="width:40px;">N/A</th></tr>
-          <tr><td>Bentonita (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="bentonita"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="bentonita"></td><td><input type="checkbox" class="quim-na" data-key="bentonita" onchange="toggleNA(this)"></td></tr>
-          <tr><td>CMC (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="cmc"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="cmc"></td><td><input type="checkbox" class="quim-na" data-key="cmc" onchange="toggleNA(this)"></td></tr>
-          <tr><td>Soda Caustica (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="soda_caustica"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="soda_caustica"></td><td><input type="checkbox" class="quim-na" data-key="soda_caustica" onchange="toggleNA(this)"></td></tr>
-          <tr><td>Goma Xantana (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="goma_xantana"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="goma_xantana"></td><td><input type="checkbox" class="quim-na" data-key="goma_xantana" onchange="toggleNA(this)"></td></tr>
-          <tr><td>Sal (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="sal"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="sal"></td><td><input type="checkbox" class="quim-na" data-key="sal" onchange="toggleNA(this)"></td></tr>
-          <tr><td>Barrilha (Kg)</td><td><input type="number" step="0.1" class="quim-consumo" data-key="barrilha"></td><td><input type="number" step="0.1" class="quim-estoque" data-key="barrilha"></td><td><input type="checkbox" class="quim-na" data-key="barrilha" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Bentonita (Kg)</td><td><input type="number" step="0.1" class="chemConsumption" data-key="bentonita"></td><td><input type="number" step="0.1" class="chemStock" data-key="bentonita"></td><td><input type="checkbox" class="chemNA" data-key="bentonita" onchange="toggleNA(this)"></td></tr>
+          <tr><td>CMC (Kg)</td><td><input type="number" step="0.1" class="chemConsumption" data-key="cmc"></td><td><input type="number" step="0.1" class="chemStock" data-key="cmc"></td><td><input type="checkbox" class="chemNA" data-key="cmc" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Soda Caustica (Kg)</td><td><input type="number" step="0.1" class="chemConsumption" data-key="soda_caustica"></td><td><input type="number" step="0.1" class="chemStock" data-key="soda_caustica"></td><td><input type="checkbox" class="chemNA" data-key="soda_caustica" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Goma Xantana (Kg)</td><td><input type="number" step="0.1" class="chemConsumption" data-key="goma_xantana"></td><td><input type="number" step="0.1" class="chemStock" data-key="goma_xantana"></td><td><input type="checkbox" class="chemNA" data-key="goma_xantana" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Sal (Kg)</td><td><input type="number" step="0.1" class="chemConsumption" data-key="sal"></td><td><input type="number" step="0.1" class="chemStock" data-key="sal"></td><td><input type="checkbox" class="chemNA" data-key="sal" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Barrilha (Kg)</td><td><input type="number" step="0.1" class="chemConsumption" data-key="barrilha"></td><td><input type="number" step="0.1" class="chemStock" data-key="barrilha"></td><td><input type="checkbox" class="chemNA" data-key="barrilha" onchange="toggleNA(this)"></td></tr>
         </table>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Combustivel</label>
         <div class="row">
-          <div><label for="combDieselCons">Diesel Consumo (L)</label><input type="number" step="0.1" id="combDieselCons"></div>
-          <div><label for="combDieselEst">Diesel Estoque (L)</label><input type="number" step="0.1" id="combDieselEst"></div>
+          <div><label for="fuelDieselConsumption">Diesel Consumo (L)</label><input type="number" step="0.1" id="fuelDieselConsumption"></div>
+          <div><label for="fuelDieselStock">Diesel Estoque (L)</label><input type="number" step="0.1" id="fuelDieselStock"></div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Outros Materiais</label>
         <table class="ops-table">
           <tr><th>Material</th><th>Consumo</th><th>Estoque</th><th style="width:40px;">N/A</th></tr>
-          <tr><td>Camisa Bomba</td><td><input type="number" step="0.1" class="mat-consumo" data-key="camisa_bomba"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="camisa_bomba"></td><td><input type="checkbox" class="mat-na" data-key="camisa_bomba" onchange="toggleNA(this)"></td></tr>
-          <tr><td>Valvula</td><td><input type="number" step="0.1" class="mat-consumo" data-key="valvula"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="valvula"></td><td><input type="checkbox" class="mat-na" data-key="valvula" onchange="toggleNA(this)"></td></tr>
-          <tr><td>Gaxeta de Swivel</td><td><input type="number" step="0.1" class="mat-consumo" data-key="gaxeta_swivel"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="gaxeta_swivel"></td><td><input type="checkbox" class="mat-na" data-key="gaxeta_swivel" onchange="toggleNA(this)"></td></tr>
-          <tr><td>Oleo 40 - Motor (L)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="oleo_40"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="oleo_40"></td><td><input type="checkbox" class="mat-na" data-key="oleo_40" onchange="toggleNA(this)"></td></tr>
-          <tr><td>Hexa-T (Kg)</td><td><input type="number" step="0.1" class="mat-consumo" data-key="hexa_t"></td><td><input type="number" step="0.1" class="mat-estoque" data-key="hexa_t"></td><td><input type="checkbox" class="mat-na" data-key="hexa_t" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Camisa Bomba</td><td><input type="number" step="0.1" class="matConsumption" data-key="camisa_bomba"></td><td><input type="number" step="0.1" class="matStock" data-key="camisa_bomba"></td><td><input type="checkbox" class="matNA" data-key="camisa_bomba" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Valvula</td><td><input type="number" step="0.1" class="matConsumption" data-key="valvula"></td><td><input type="number" step="0.1" class="matStock" data-key="valvula"></td><td><input type="checkbox" class="matNA" data-key="valvula" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Gaxeta de Swivel</td><td><input type="number" step="0.1" class="matConsumption" data-key="gaxeta_swivel"></td><td><input type="number" step="0.1" class="matStock" data-key="gaxeta_swivel"></td><td><input type="checkbox" class="matNA" data-key="gaxeta_swivel" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Oleo 40 - Motor (L)</td><td><input type="number" step="0.1" class="matConsumption" data-key="oleo_40"></td><td><input type="number" step="0.1" class="matStock" data-key="oleo_40"></td><td><input type="checkbox" class="matNA" data-key="oleo_40" onchange="toggleNA(this)"></td></tr>
+          <tr><td>Hexa-T (Kg)</td><td><input type="number" step="0.1" class="matConsumption" data-key="hexa_t"></td><td><input type="number" step="0.1" class="matStock" data-key="hexa_t"></td><td><input type="checkbox" class="matNA" data-key="hexa_t" onchange="toggleNA(this)"></td></tr>
         </table>
       </div>
     </div>
@@ -499,7 +499,7 @@ input.inherited, textarea.inherited {
       <div class="card-header">Registro de Atividades</div>
       <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
         <label style="margin:0;font-size:.75rem;">Duração do turno:</label>
-        <input type="number" id="turnoHoras" value="12" min="1" max="24" step="0.5" style="width:60px;padding:.3rem .4rem;font-size:.8rem;">
+        <input type="number" id="shiftHours" value="12" min="1" max="24" step="0.5" style="width:60px;padding:.3rem .4rem;font-size:.8rem;">
         <span style="font-size:.75rem;color:#6b7280;">horas</span>
       </div>
       <table class="ops-table" id="opsTable">
@@ -516,10 +516,10 @@ input.inherited, textarea.inherited {
     <div class="card">
       <div class="card-header">Equipe <span class="prefill-link" data-section="equipe" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="equipe">Preenchido com dados de ontem. Confira e edite se necessario.</div>
-      <table class="ops-table" id="equipeTable">
+      <table class="ops-table" id="teamTable">
         <tr><th>Função</th><th>Nome</th><th></th></tr>
       </table>
-      <button class="btn btn-secondary btn-sm" id="btnAddEquipe" type="button" style="margin-top:.3rem;">+ Adicionar pessoa</button>
+      <button class="btn btn-secondary btn-sm" id="btnAddTeamMember" type="button" style="margin-top:.3rem;">+ Adicionar pessoa</button>
     </div>
 
     <!-- HSE -->
@@ -527,11 +527,11 @@ input.inherited, textarea.inherited {
       <div class="card-header">HSE / Seguranca</div>
       <div class="row">
         <div><label><input type="checkbox" id="hseDds"> DDS realizado</label></div>
-        <div><label><input type="checkbox" id="hseEpis"> EPIs vistoriados</label></div>
+        <div><label><input type="checkbox" id="hseEpi"> EPIs vistoriados</label></div>
       </div>
-      <div><label for="hseHh">Horas-homem expostas</label><input type="number" step="0.1" id="hseHh"></div>
-      <div><label for="hseIncidentes">Incidentes</label><textarea id="hseIncidentes" rows="2" placeholder="Descreva incidentes..."></textarea></div>
-      <div><label for="hseQuase">Quase-acidentes</label><textarea id="hseQuase" rows="2" placeholder="Relate quase-acidentes..."></textarea></div>
+      <div><label for="hseManHours">Horas-homem expostas</label><input type="number" step="0.1" id="hseManHours"></div>
+      <div><label for="hseIncidents">Incidentes</label><textarea id="hseIncidents" rows="2" placeholder="Descreva incidentes..."></textarea></div>
+      <div><label for="hseNearMiss">Quase-acidentes</label><textarea id="hseNearMiss" rows="2" placeholder="Relate quase-acidentes..."></textarea></div>
     </div>
 
     <!-- Climaticas -->
@@ -539,15 +539,15 @@ input.inherited, textarea.inherited {
       <div class="card-header">Condicoes Climaticas</div>
       <div class="row">
         <div>
-          <label for="condClima">Condição</label>
-          <select id="condClima">
+          <label for="weatherCondition">Condição</label>
+          <select id="weatherCondition">
             <option value="Bom">Bom</option><option value="Nublado">Nublado</option>
             <option value="Chuva">Chuva</option><option value="Tempestade">Tempestade</option>
             <option value="Vento Forte">Vento Forte</option>
           </select>
         </div>
         <div style="display:flex;align-items:flex-end;padding-bottom:.1rem;">
-          <label><input type="checkbox" id="condChuva"> Choveu no dia?</label>
+          <label><input type="checkbox" id="weatherRain"> Choveu no dia?</label>
         </div>
       </div>
     </div>
@@ -555,23 +555,23 @@ input.inherited, textarea.inherited {
     <!-- Observacoes -->
     <div class="card">
       <div class="card-header">Observacoes e Planejamento</div>
-      <label for="obsGeral">Observacoes</label>
-      <textarea id="obsGeral" rows="3" placeholder="Registre ocorrencias, decisoes, visitas..."></textarea>
-      <label for="planProxTurno">Planejamento proximo turno</label>
-      <textarea id="planProxTurno" rows="2" placeholder="Proximas 24h?"></textarea>
+      <label for="obsGeneral">Observacoes</label>
+      <textarea id="obsGeneral" rows="3" placeholder="Registre ocorrencias, decisoes, visitas..."></textarea>
+      <label for="planNextShift">Planejamento proximo turno</label>
+      <textarea id="planNextShift" rows="2" placeholder="Proximas 24h?"></textarea>
     </div>
 
     <!-- Aprovação -->
     <div class="card">
       <div class="card-header">Aprovação <span class="prefill-link" data-section="aprovacao" title="Copiar dados de ontem">copiar de ontem</span></div>
       <div class="prefill-note" data-section="aprovacao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
-      <div><label for="aprGeologo">Geologo / Gestor</label><input type="text" id="aprGeologo"></div>
+      <div><label for="approvalGeologist">Geologo / Gestor</label><input type="text" id="approvalGeologist"></div>
     </div>
 
     <!-- Fotos -->
     <div class="card">
       <div class="card-header">Fotos (ate 3)</div>
-      <input type="file" id="fotoInput" accept="image/*" multiple>
+      <input type="file" id="photoInput" accept="image/*" multiple>
       <div class="photo-grid" id="photoPreview"></div>
       <!-- Existing photo URLs for drafts -->
       <div id="existingPhotos"></div>
@@ -606,12 +606,12 @@ input.inherited, textarea.inherited {
 <div class="modal-overlay" id="modalNewProject">
   <div class="modal">
     <h2>Novo Projeto</h2>
-    <label for="newCliente">Cliente</label><input type="text" id="newCliente">
-    <label for="newLocalidade">Localidade</label><input type="text" id="newLocalidade" placeholder="ex: Ribeirao Preto - SP">
-    <label for="newSonda">Sonda</label><input type="text" id="newSonda">
+    <label for="newClientName">Cliente</label><input type="text" id="newClientName">
+    <label for="newLocation">Localidade</label><input type="text" id="newLocation" placeholder="ex: Ribeirao Preto - SP">
+    <label for="newRig">Sonda</label><input type="text" id="newRig">
     <div class="row">
-      <div><label for="newDataInicio">Data Inicio</label><input type="date" id="newDataInicio"></div>
-      <div><label for="newTurno">Turno</label><input type="text" id="newTurno" value="07h x 17h"></div>
+      <div><label for="newStartDate">Data Inicio</label><input type="date" id="newStartDate"></div>
+      <div><label for="newShift">Turno</label><input type="text" id="newShift" value="07h x 17h"></div>
     </div>
     <div style="display:flex;gap:.5rem;margin-top:1rem;">
       <button class="btn btn-secondary" id="btnModalCancel" type="button" style="flex:1;">Cancelar</button>
@@ -697,12 +697,12 @@ $("#btnBackFromRO").addEventListener("click", () => {
 // ============================================================
 // DATE REQUIRED — show form body only when date is set
 // ============================================================
-$("#rdoData").addEventListener("input", () => {
-  const hasDate = !!$("#rdoData").value;
+$("#rdoDate").addEventListener("input", () => {
+  const hasDate = !!$("#rdoDate").value;
   $("#formBody").style.display = hasDate ? "block" : "none";
 });
-$("#rdoData").addEventListener("change", () => {
-  const hasDate = !!$("#rdoData").value;
+$("#rdoDate").addEventListener("change", () => {
+  const hasDate = !!$("#rdoDate").value;
   $("#formBody").style.display = hasDate ? "block" : "none";
 });
 
@@ -756,7 +756,7 @@ const btnNewProj = $("#btnNewProject");
 if (btnNewProj) {
   btnNewProj.addEventListener("click", () => {
     $("#modalNewProject").classList.add("show");
-    $("#newDataInicio").value = new Date().toISOString().split("T")[0];
+    $("#newStartDate").value = new Date().toISOString().split("T")[0];
   });
 }
 const btnModalCancel = $("#btnModalCancel");
@@ -768,11 +768,11 @@ if (modalNewProj) modalNewProj.addEventListener("click", (e) => {
 
 const btnModalSave = $("#btnModalSave");
 if (btnModalSave) btnModalSave.addEventListener("click", async () => {
-  const cliente = $("#newCliente").value.trim();
-  const localidade = $("#newLocalidade").value.trim();
-  const sonda = $("#newSonda").value.trim();
-  const dataInicio = $("#newDataInicio").value;
-  const turno = $("#newTurno").value.trim() || "07h x 17h";
+  const cliente = $("#newClientName").value.trim();
+  const localidade = $("#newLocation").value.trim();
+  const sonda = $("#newRig").value.trim();
+  const dataInicio = $("#newStartDate").value;
+  const turno = $("#newShift").value.trim() || "07h x 17h";
   if (!cliente || !localidade || !sonda || !dataInicio) {
     showToast("Preencha todos os campos.", "error"); return;
   }
@@ -782,7 +782,7 @@ if (btnModalSave) btnModalSave.addEventListener("click", async () => {
   if (error) { showToast("Erro: " + error.message, "error"); return; }
   showToast("Projeto criado!", "success");
   $("#modalNewProject").classList.remove("show");
-  ["#newCliente","#newLocalidade","#newSonda"].forEach(id => $(id).value = "");
+  ["#newClientName","#newLocation","#newRig"].forEach(id => $(id).value = "");
   await loadProjects();
   $("#projectSelect").value = data.id;
   currentProjectId = data.id;
@@ -860,7 +860,7 @@ let lastRDO = null;
 async function loadLastRDO() {
   lastRDO = null;
   if (!currentProjectId) { updatePrefillVisibility(); return; }
-  const rdoDate = $("#rdoData").value; // use the form date, not today
+  const rdoDate = $("#rdoDate").value; // use the form date, not today
   if (!rdoDate) { updatePrefillVisibility(); return; }
   const refDate = new Date(rdoDate + "T00:00:00");
   const prevDate = new Date(refDate);
@@ -913,7 +913,7 @@ function updatePrefillVisibility() {
   });
 }
 
-async function loadLastEstratigrafia() {
+async function loadLastStratigraphy() {
   if (!currentProjectId) return;
   const { data } = await sb.from("rdos")
     .select("estratigrafia_descricao, data")
@@ -922,7 +922,7 @@ async function loadLastEstratigrafia() {
     .order("data", { ascending: false })
     .limit(1)
     .single();
-  const el = $("#lastEstratigrafia");
+  const el = $("#lastStratigraphy");
   if (data && data.estratigrafia_descricao) {
     el.textContent = `Ultima descricao (${data.data}): "${data.estratigrafia_descricao}"`;
     el.style.display = "block";
@@ -939,7 +939,7 @@ $("#btnNewRDO").addEventListener("click", async () => {
   // Hide form body until date is set
   $("#formBody").style.display = "none";
   await loadLastRDO();
-  await loadLastEstratigrafia();
+  await loadLastStratigraphy();
   renderPhotoPreview();
 });
 
@@ -948,7 +948,7 @@ $("#btnNewRDO").addEventListener("click", async () => {
 // ============================================================
 function confirmStalePrefill() {
   if (!lastRDO) return true;
-  const rdoDate = $("#rdoData").value;
+  const rdoDate = $("#rdoDate").value;
   if (!rdoDate) return true;
   const refDate = new Date(rdoDate + "T00:00:00");
   const lastDate = new Date(lastRDO.data + "T00:00:00");
@@ -966,10 +966,10 @@ $$(".prefill-link").forEach(link => {
     if (!lastRDO) return;
     if (!confirmStalePrefill()) return;
     const section = link.dataset.section;
-    if (section === "perfuracao") prefillPerfuracao();
-    else if (section === "fluido") prefillFluido();
-    else if (section === "equipe") prefillEquipe();
-    else if (section === "aprovacao") prefillAprovacao();
+    if (section === "perfuracao") prefillDrilling();
+    else if (section === "fluido") prefillFluid();
+    else if (section === "equipe") prefillTeam();
+    else if (section === "aprovacao") prefillApproval();
     const note = document.querySelector(`.prefill-note[data-section="${section}"]`);
     if (note) note.classList.add("show");
   });
@@ -985,43 +985,43 @@ function markInherited(inputs) {
   });
 }
 
-function prefillPerfuracao() {
+function prefillDrilling() {
   const y = lastRDO;
   if (!y || y.profundidade_final == null) return;
-  setToggle("#togglePerfuracao", true);
-  const profIni = $("#profInicial");
+  setToggle("#toggleDrilling", true);
+  const profIni = $("#depthInitial");
   profIni.value = y.profundidade_final || "";
   markInherited([profIni]);
   // Copy broca to ATUAL (assume same broca unless user says otherwise)
   if (y.brocas) {
     const b = y.brocas;
     if (b.atual) {
-      $("#brocaFabAtual").value = b.atual.fabricante || ""; $("#brocaSerieAtual").value = b.atual.serie || "";
-      $("#brocaDiamAtual").value = b.atual.diametro || ""; $("#brocaModAtual").value = b.atual.modelo || "";
-      $("#brocaJatosAtual").value = b.atual.jatos || ""; $("#brocaPerfAtual").value = b.atual.perfurado || "";
-      $("#brocaHsAtual").value = b.atual.oper_hs || ""; $("#brocaRopAtual").value = b.atual.rop || "";
-      markInherited(["#brocaFabAtual","#brocaSerieAtual","#brocaDiamAtual","#brocaModAtual","#brocaJatosAtual","#brocaPerfAtual","#brocaHsAtual","#brocaRopAtual"].map(id => $(id)));
+      $("#bitBrandCurrent").value = b.atual.fabricante || ""; $("#bitSerialCurrent").value = b.atual.serie || "";
+      $("#bitDiameterCurrent").value = b.atual.diametro || ""; $("#bitModelCurrent").value = b.atual.modelo || "";
+      $("#bitJetsCurrent").value = b.atual.jatos || ""; $("#bitDrilledCurrent").value = b.atual.perfurado || "";
+      $("#bitHoursCurrent").value = b.atual.oper_hs || ""; $("#bitRopCurrent").value = b.atual.rop || "";
+      markInherited(["#bitBrandCurrent","#bitSerialCurrent","#bitDiameterCurrent","#bitModelCurrent","#bitJetsCurrent","#bitDrilledCurrent","#bitHoursCurrent","#bitRopCurrent"].map(id => $(id)));
     }
     // Also fill anterior if yesterday had one (so swap works correctly)
     if (b.anterior && Object.values(b.anterior).some(v => v !== null && v !== "")) {
-      $("#brocaFabAnt").value = b.anterior.fabricante || ""; $("#brocaSerieAnt").value = b.anterior.serie || "";
-      $("#brocaDiamAnt").value = b.anterior.diametro || ""; $("#brocaModAnt").value = b.anterior.modelo || "";
-      $("#brocaJatosAnt").value = b.anterior.jatos || "";
+      $("#bitBrandPrev").value = b.anterior.fabricante || ""; $("#bitSerialPrev").value = b.anterior.serie || "";
+      $("#bitDiameterPrev").value = b.anterior.diametro || ""; $("#bitModelPrev").value = b.anterior.modelo || "";
+      $("#bitJetsPrev").value = b.anterior.jatos || "";
     }
   }
-  $("#brocaTrocada").checked = false;
+  $("#bitChanged").checked = false;
   // Copy coluna
   if (y.coluna && y.coluna.length > 0) {
-    clearTable("#colunaTable");
+    clearTable("#bhaTable");
     y.coluna.forEach(item => {
-      addColunaRow(item.item, item.qty, item.id_pol, item.od_pol, item.length_m, item.total_m);
+      addBHARow(item.item, item.qty, item.id_pol, item.od_pol, item.length_m, item.total_m);
     });
-    $$("#colunaTable input").forEach(el => markInherited([el]));
+    $$("#bhaTable input").forEach(el => markInherited([el]));
   }
 }
 
-function onBrocaToggle() {
-  if ($("#brocaTrocada").checked) {
+function onBitToggle() {
+  if ($("#bitChanged").checked) {
     // Move atual → anterior, clear atual
     const fields = ["Fab","Serie","Diam","Mod","Jatos","Perf","Hs","Rop"];
     fields.forEach(f => {
@@ -1046,30 +1046,30 @@ function onBrocaToggle() {
   }
 }
 
-function prefillFluido() {
+function prefillFluid() {
   const y = lastRDO;
   if (!y) return;
-  setToggle("#toggleFluido", true);
+  setToggle("#toggleFluid", true);
   if (y.fluido) {
     const f = y.fluido;
-    $("#fluDensidade").value = f.densidade || ""; $("#fluViscosidade").value = f.viscosidade || "";
-    $("#fluFiltrado").value = f.filtrado || ""; $("#fluPh").value = f.ph || "";
-    $("#fluAguaLivre").value = f.agua_livre || ""; $("#fluAreia").value = f.areia || "";
-    $("#fluApiCake").value = f.api_cake || ""; $("#fluSolidos").value = f.solidos || "";
-    markInherited(["#fluDensidade","#fluViscosidade","#fluFiltrado","#fluPh","#fluAguaLivre","#fluAreia","#fluApiCake","#fluSolidos"].map(id => $(id)));
+    $("#fluidDensity").value = f.densidade || ""; $("#fluidViscosity").value = f.viscosidade || "";
+    $("#fluidFiltrate").value = f.filtrado || ""; $("#fluidPh").value = f.ph || "";
+    $("#fluidFreeWater").value = f.agua_livre || ""; $("#fluidSand").value = f.areia || "";
+    $("#fluidApiCake").value = f.api_cake || ""; $("#fluidSolids").value = f.solidos || "";
+    markInherited(["#fluidDensity","#fluidViscosity","#fluidFiltrate","#fluidPh","#fluidFreeWater","#fluidSand","#fluidApiCake","#fluidSolids"].map(id => $(id)));
   }
   if (y.insumos) {
     const i = y.insumos;
-    $("#insAgua").value = i.agua || ""; $("#insLimpaFossa").value = i.limpa_fossa || "";
-    $("#insLimpezaBanh").value = i.limpeza_banheiro || ""; $("#insPta").value = i.pta || "";
-    $("#insMunck").value = i.munck || ""; $("#insGuindaste").value = i.guindaste || "";
-    $("#insRemCacamba").value = i.remocao_cacamba || "";
-    markInherited(["#insAgua","#insLimpaFossa","#insLimpezaBanh","#insPta","#insMunck","#insGuindaste","#insRemCacamba"].map(id => $(id)));
+    $("#supplyWater").value = i.agua || ""; $("#supplySeptic").value = i.limpa_fossa || "";
+    $("#supplyBathroom").value = i.limpeza_banheiro || ""; $("#supplyPta").value = i.pta || "";
+    $("#supplyMunck").value = i.munck || ""; $("#supplyCrane").value = i.guindaste || "";
+    $("#supplyDebrisRemoval").value = i.remocao_cacamba || "";
+    markInherited(["#supplyWater","#supplySeptic","#supplyBathroom","#supplyPta","#supplyMunck","#supplyCrane","#supplyDebrisRemoval"].map(id => $(id)));
   }
   if (y.quimicos) {
     for (const [key, val] of Object.entries(y.quimicos)) {
-      const consEl = document.querySelector(`.quim-consumo[data-key="${key}"]`);
-      const estEl = document.querySelector(`.quim-estoque[data-key="${key}"]`);
+      const consEl = document.querySelector(`.chemConsumption[data-key="${key}"]`);
+      const estEl = document.querySelector(`.chemStock[data-key="${key}"]`);
       if (estEl && val.estoque != null) estEl.value = val.estoque;
       // Only copy estoque, not consumo (consumo resets daily)
       if (estEl) markInherited([estEl]);
@@ -1077,24 +1077,24 @@ function prefillFluido() {
   }
   if (y.outros_materiais) {
     for (const [key, val] of Object.entries(y.outros_materiais)) {
-      const estEl = document.querySelector(`.mat-estoque[data-key="${key}"]`);
+      const estEl = document.querySelector(`.matStock[data-key="${key}"]`);
       if (estEl && val.estoque != null) estEl.value = val.estoque;
       if (estEl) markInherited([estEl]);
     }
   }
 }
 
-function prefillEquipe() {
+function prefillTeam() {
   if (!lastRDO || !lastRDO.equipe || lastRDO.equipe.length === 0) return;
-  clearTable("#equipeTable");
-  lastRDO.equipe.forEach(e => addEquipeRow(e.funcao, e.nome));
-  $$("#equipeTable input").forEach(el => markInherited([el]));
+  clearTable("#teamTable");
+  lastRDO.equipe.forEach(e => addTeamMemberRow(e.funcao, e.nome));
+  $$("#teamTable input").forEach(el => markInherited([el]));
 }
 
-function prefillAprovacao() {
+function prefillApproval() {
   if (!lastRDO) return;
-  $("#aprGeologo").value = lastRDO.aprovacao_geologo || "";
-  markInherited([$("#aprGeologo")]);
+  $("#approvalGeologist").value = lastRDO.aprovacao_geologo || "";
+  markInherited([$("#approvalGeologist")]);
 }
 
 // ============================================================
@@ -1152,106 +1152,106 @@ function viewRDO(rdo) {
 // POPULATE FORM (for draft editing)
 // ============================================================
 function populateForm(rdo) {
-  $("#rdoData").value = rdo.data;
-  $("#rdoTipoDia").value = rdo.tipo_dia || "perfuracao";
+  $("#rdoDate").value = rdo.data;
+  $("#rdoDayType").value = rdo.tipo_dia || "perfuracao";
 
   if (rdo.profundidade_final != null) {
-    setToggle("#togglePerfuracao", true);
-    $("#profInicial").value = rdo.profundidade_inicial || "";
-    $("#profFinal").value = rdo.profundidade_final || "";
+    setToggle("#toggleDrilling", true);
+    $("#depthInitial").value = rdo.profundidade_inicial || "";
+    $("#depthFinal").value = rdo.profundidade_final || "";
     // Estratigrafia
     if (rdo.estratigrafia_mudou) {
-      setToggle("#toggleEstratigrafia", true);
-      $("#estProfundidade").value = rdo.estratigrafia_profundidade || "";
-      $("#estDescricao").value = rdo.estratigrafia_descricao || "";
+      setToggle("#toggleStratigraphy", true);
+      $("#stratDepth").value = rdo.estratigrafia_profundidade || "";
+      $("#stratDescription").value = rdo.estratigrafia_descricao || "";
     } else {
-      setToggle("#toggleEstratigrafia", false);
+      setToggle("#toggleStratigraphy", false);
     }
     if (rdo.revestimento_mudou) {
-      setToggle("#toggleRevestimento", true);
-      $("#revMetros").value = rdo.revestimento_metros || "";
-      $("#revObs").value = rdo.revestimento_obs || "";
+      setToggle("#toggleCasing", true);
+      $("#casingMeters").value = rdo.revestimento_metros || "";
+      $("#casingObs").value = rdo.revestimento_obs || "";
     } else {
-      setToggle("#toggleRevestimento", false);
-  setToggle("#toggleAnomalia", false);
+      setToggle("#toggleCasing", false);
+  setToggle("#toggleAnomaly", false);
     }
 
     if (rdo.brocas) {
       const b = rdo.brocas;
       if (b.atual) {
-        $("#brocaFabAtual").value = b.atual.fabricante || "";
-        $("#brocaSerieAtual").value = b.atual.serie || "";
-        $("#brocaDiamAtual").value = b.atual.diametro || "";
-        $("#brocaModAtual").value = b.atual.modelo || "";
-        $("#brocaJatosAtual").value = b.atual.jatos || "";
-        $("#brocaPerfAtual").value = b.atual.perfurado || "";
-        $("#brocaHsAtual").value = b.atual.oper_hs || "";
-        $("#brocaRopAtual").value = b.atual.rop || "";
+        $("#bitBrandCurrent").value = b.atual.fabricante || "";
+        $("#bitSerialCurrent").value = b.atual.serie || "";
+        $("#bitDiameterCurrent").value = b.atual.diametro || "";
+        $("#bitModelCurrent").value = b.atual.modelo || "";
+        $("#bitJetsCurrent").value = b.atual.jatos || "";
+        $("#bitDrilledCurrent").value = b.atual.perfurado || "";
+        $("#bitHoursCurrent").value = b.atual.oper_hs || "";
+        $("#bitRopCurrent").value = b.atual.rop || "";
       }
       if (b.anterior) {
-        $("#brocaFabAnt").value = b.anterior.fabricante || "";
-        $("#brocaSerieAnt").value = b.anterior.serie || "";
-        $("#brocaDiamAnt").value = b.anterior.diametro || "";
-        $("#brocaModAnt").value = b.anterior.modelo || "";
-        $("#brocaJatosAnt").value = b.anterior.jatos || "";
-        $("#brocaPerfAnt").value = b.anterior.perfurado || "";
-        $("#brocaHsAnt").value = b.anterior.oper_hs || "";
-        $("#brocaRopAnt").value = b.anterior.rop || "";
+        $("#bitBrandPrev").value = b.anterior.fabricante || "";
+        $("#bitSerialPrev").value = b.anterior.serie || "";
+        $("#bitDiameterPrev").value = b.anterior.diametro || "";
+        $("#bitModelPrev").value = b.anterior.modelo || "";
+        $("#bitJetsPrev").value = b.anterior.jatos || "";
+        $("#bitDrilledPrev").value = b.anterior.perfurado || "";
+        $("#bitHoursPrev").value = b.anterior.oper_hs || "";
+        $("#bitRopPrev").value = b.anterior.rop || "";
       }
     }
     if (rdo.parametros_anomalias && rdo.parametros_anomalias.length > 0) {
-      setToggle("#toggleAnomalia", true);
-      rdo.parametros_anomalias.forEach(a => addAnomaliaRow(a.parametro, a.descricao));
+      setToggle("#toggleAnomaly", true);
+      rdo.parametros_anomalias.forEach(a => addAnomalyRow(a.parametro, a.descricao));
     }
     if (rdo.coluna) {
-      clearTable("#colunaTable");
+      clearTable("#bhaTable");
       rdo.coluna.forEach(item => {
-        addColunaRow(item.item, item.qty, item.id_pol, item.od_pol, item.length_m, item.total_m);
+        addBHARow(item.item, item.qty, item.id_pol, item.od_pol, item.length_m, item.total_m);
       });
-    } else { addColunaRow("","","","","",""); }
+    } else { addBHARow("","","","","",""); }
   } else {
-    setToggle("#togglePerfuracao", false);
-    if (!hasColunaRows()) addColunaRow("","","","","","");
+    setToggle("#toggleDrilling", false);
+    if (!hasColunaRows()) addBHARow("","","","","","");
   }
 
   // Fluido
   const hasFluido = rdo.fluido || rdo.quimicos || rdo.insumos;
   if (hasFluido) {
-    setToggle("#toggleFluido", true);
+    setToggle("#toggleFluid", true);
     if (rdo.fluido) {
       const f = rdo.fluido;
-      $("#fluDensidade").value = f.densidade || "";
-      $("#fluViscosidade").value = f.viscosidade || "";
-      $("#fluFiltrado").value = f.filtrado || "";
-      $("#fluPh").value = f.ph || "";
-      $("#fluAguaLivre").value = f.agua_livre || "";
-      $("#fluAreia").value = f.areia || "";
-      $("#fluApiCake").value = f.api_cake || "";
-      $("#fluSolidos").value = f.solidos || "";
+      $("#fluidDensity").value = f.densidade || "";
+      $("#fluidViscosity").value = f.viscosidade || "";
+      $("#fluidFiltrate").value = f.filtrado || "";
+      $("#fluidPh").value = f.ph || "";
+      $("#fluidFreeWater").value = f.agua_livre || "";
+      $("#fluidSand").value = f.areia || "";
+      $("#fluidApiCake").value = f.api_cake || "";
+      $("#fluidSolids").value = f.solidos || "";
     }
     if (rdo.insumos) {
       const i = rdo.insumos;
-      $("#insAgua").value = i.agua || ""; $("#insLimpaFossa").value = i.limpa_fossa || "";
-      $("#insLimpezaBanh").value = i.limpeza_banheiro || ""; $("#insPta").value = i.pta || "";
-      $("#insMunck").value = i.munck || ""; $("#insGuindaste").value = i.guindaste || "";
-      $("#insRemCacamba").value = i.remocao_cacamba || "";
+      $("#supplyWater").value = i.agua || ""; $("#supplySeptic").value = i.limpa_fossa || "";
+      $("#supplyBathroom").value = i.limpeza_banheiro || ""; $("#supplyPta").value = i.pta || "";
+      $("#supplyMunck").value = i.munck || ""; $("#supplyCrane").value = i.guindaste || "";
+      $("#supplyDebrisRemoval").value = i.remocao_cacamba || "";
     }
     if (rdo.quimicos) {
       for (const [key, val] of Object.entries(rdo.quimicos)) {
-        const consEl = document.querySelector(`.quim-consumo[data-key="${key}"]`);
-        const estEl = document.querySelector(`.quim-estoque[data-key="${key}"]`);
+        const consEl = document.querySelector(`.chemConsumption[data-key="${key}"]`);
+        const estEl = document.querySelector(`.chemStock[data-key="${key}"]`);
         if (consEl && val.consumo != null) consEl.value = val.consumo;
         if (estEl && val.estoque != null) estEl.value = val.estoque;
       }
     }
     if (rdo.combustivel?.diesel) {
-      $("#combDieselCons").value = rdo.combustivel.diesel.consumo || "";
-      $("#combDieselEst").value = rdo.combustivel.diesel.estoque || "";
+      $("#fuelDieselConsumption").value = rdo.combustivel.diesel.consumo || "";
+      $("#fuelDieselStock").value = rdo.combustivel.diesel.estoque || "";
     }
     if (rdo.outros_materiais) {
       for (const [key, val] of Object.entries(rdo.outros_materiais)) {
-        const consEl = document.querySelector(`.mat-consumo[data-key="${key}"]`);
-        const estEl = document.querySelector(`.mat-estoque[data-key="${key}"]`);
+        const consEl = document.querySelector(`.matConsumption[data-key="${key}"]`);
+        const estEl = document.querySelector(`.matStock[data-key="${key}"]`);
         if (consEl && val.consumo != null) consEl.value = val.consumo;
         if (estEl && val.estoque != null) estEl.value = val.estoque;
       }
@@ -1268,31 +1268,31 @@ function populateForm(rdo) {
 
   // Equipe
   if (rdo.equipe && rdo.equipe.length > 0) {
-    clearTable("#equipeTable");
-    rdo.equipe.forEach(e => addEquipeRow(e.funcao, e.nome));
+    clearTable("#teamTable");
+    rdo.equipe.forEach(e => addTeamMemberRow(e.funcao, e.nome));
   }
 
   // HSE
   $("#hseDds").checked = !!rdo.hse_dds;
-  $("#hseEpis").checked = !!rdo.hse_epis_vistoriados;
-  $("#hseHh").value = rdo.hse_hh_expostas || "";
-  $("#hseIncidentes").value = rdo.hse_incidentes || "";
-  $("#hseQuase").value = rdo.hse_quase_acidentes || "";
+  $("#hseEpi").checked = !!rdo.hse_epis_vistoriados;
+  $("#hseManHours").value = rdo.hse_hh_expostas || "";
+  $("#hseIncidents").value = rdo.hse_incidentes || "";
+  $("#hseNearMiss").value = rdo.hse_quase_acidentes || "";
 
   // Clima
-  $("#condClima").value = rdo.condicoes_climaticas || "Bom";
-  $("#condChuva").checked = !!rdo.chuva;
+  $("#weatherCondition").value = rdo.condicoes_climaticas || "Bom";
+  $("#weatherRain").checked = !!rdo.chuva;
 
   // Obs
-  $("#obsGeral").value = rdo.observacoes || "";
-  $("#planProxTurno").value = rdo.planejamento_proximo_turno || "";
+  $("#obsGeneral").value = rdo.observacoes || "";
+  $("#planNextShift").value = rdo.planejamento_proximo_turno || "";
 
   // Aprovacao
-  $("#aprGeologo").value = rdo.aprovacao_geologo || "";
+  $("#approvalGeologist").value = rdo.aprovacao_geologo || "";
 
   // Existing photos
   selectedFiles = [];
-  fotoInput.value = "";
+  photoInput.value = "";
   if (rdo.fotos && rdo.fotos.length > 0) {
     $("#existingPhotos").innerHTML = `<p style="font-size:.78rem;color:#6b7280;margin-top:.5rem;">Fotos existentes (serao mantidas):</p><div class="photo-grid">${rdo.fotos.map(url => `<img src="${url}" class="photo-thumb">`).join("")}</div>`;
   } else {
@@ -1320,7 +1320,7 @@ function clearTable(tableId) {
   while (tbody.rows.length > 1) tbody.deleteRow(1);
 }
 function hasOpsRows() { return $("#opsTable").rows.length > 1; }
-function hasColunaRows() { return $("#colunaTable").rows.length > 1; }
+function hasColunaRows() { return $("#bhaTable").rows.length > 1; }
 
 // ============================================================
 // TOGGLE BUTTONS
@@ -1340,11 +1340,11 @@ function setupToggle(groupId, sectionId) {
     }
   });
 }
-setupToggle("#togglePerfuracao", "#sectionPerfuracao");
-setupToggle("#toggleFluido", "#sectionFluido");
-setupToggle("#toggleEstratigrafia", "#sectionEstratigrafia");
-setupToggle("#toggleRevestimento", "#sectionRevestimento");
-setupToggle("#toggleAnomalia", "#sectionAnomalia");
+setupToggle("#toggleDrilling", "#sectionDrilling");
+setupToggle("#toggleFluid", "#sectionFluid");
+setupToggle("#toggleStratigraphy", "#sectionStratigraphy");
+setupToggle("#toggleCasing", "#sectionCasing");
+setupToggle("#toggleAnomaly", "#sectionAnomaly");
 
 // ============================================================
 // OPERATIONS TABLE
@@ -1355,12 +1355,12 @@ function addOpRow(inicio, termino, tipo, descritivo) {
   const tipoOpts = ["Normal","Nao Produtiva","Parada"];
   const opts = tipoOpts.map(t => `<option value="${t}" ${t === tipo ? "selected" : ""}>${t}</option>`).join("");
   row.innerHTML = `
-    <td><input type="time" value="${inicio || ''}" class="op-inicio"></td>
-    <td><input type="time" value="${termino || ''}" class="op-termino"></td>
-    <td><select class="op-tipo" style="min-width:100px;font-size:.82rem;padding:.3rem;">${opts}</select></td>
-    <td><input type="text" value="${descritivo || ''}" class="op-descritivo" placeholder="Descreva..."></td>
-    <td><button class="btn btn-danger btn-sm op-remove" type="button">&times;</button></td>`;
-  row.querySelector(".op-remove").addEventListener("click", () => { row.remove(); updateTimeline(); });
+    <td><input type="time" value="${inicio || ''}" class="opStart"></td>
+    <td><input type="time" value="${termino || ''}" class="opEnd"></td>
+    <td><select class="opType" style="min-width:100px;font-size:.82rem;padding:.3rem;">${opts}</select></td>
+    <td><input type="text" value="${descritivo || ''}" class="opDescription" placeholder="Descreva..."></td>
+    <td><button class="btn btn-danger btn-sm opRemove" type="button">&times;</button></td>`;
+  row.querySelector(".opRemove").addEventListener("click", () => { row.remove(); updateTimeline(); });
   // Update timeline on input
   row.querySelectorAll("input, select").forEach(el => el.addEventListener("input", updateTimeline));
   row.querySelectorAll("input, select").forEach(el => el.addEventListener("change", updateTimeline));
@@ -1371,14 +1371,14 @@ addOpRow("","","Normal","");
 
 function updateTimeline() {
   const track = $("#timelineTrack");
-  const turnoH = parseFloat($("#turnoHoras").value) || 12;
+  const turnoH = parseFloat($("#shiftHours").value) || 12;
   track.innerHTML = "";
   for (let i = 1; i < $("#opsTable").rows.length; i++) {
     const row = $("#opsTable").rows[i];
-    const inicio = row.querySelector(".op-inicio")?.value;
-    const termino = row.querySelector(".op-termino")?.value;
-    const tipo = row.querySelector(".op-tipo")?.value || "Normal";
-    const desc = row.querySelector(".op-descritivo")?.value || "";
+    const inicio = row.querySelector(".opStart")?.value;
+    const termino = row.querySelector(".opEnd")?.value;
+    const tipo = row.querySelector(".opType")?.value || "Normal";
+    const desc = row.querySelector(".opDescription")?.value || "";
     if (!inicio || !termino) continue;
     const [ih, im] = inicio.split(":").map(Number);
     const [th, tm] = termino.split(":").map(Number);
@@ -1398,40 +1398,40 @@ function updateTimeline() {
   }
 }
 // Update timeline when turno changes
-$("#turnoHoras").addEventListener("input", updateTimeline);
+$("#shiftHours").addEventListener("input", updateTimeline);
 
 // ============================================================
 // COLUNA TABLE
 // ============================================================
-function addColunaRow(item, qty, idPol, odPol, lengthM, totalM) {
-  const tbody = $("#colunaTable");
+function addBHARow(item, qty, idPol, odPol, lengthM, totalM) {
+  const tbody = $("#bhaTable");
   const row = tbody.insertRow(-1);
   row.innerHTML = `
-    <td><input type="text" value="${item || ''}" class="col-item" placeholder="DP 3 1/2" style="min-width:80px"></td>
-    <td><input type="number" value="${qty || ''}" class="col-qty" style="min-width:50px"></td>
-    <td><input type="number" step="0.01" value="${idPol || ''}" class="col-id" style="min-width:60px"></td>
-    <td><input type="number" step="0.01" value="${odPol || ''}" class="col-od" style="min-width:60px"></td>
-    <td><input type="number" step="0.01" value="${lengthM || ''}" class="col-length" style="min-width:70px"></td>
-    <td><input type="number" step="0.01" value="${totalM || ''}" class="col-total" style="min-width:70px"></td>
-    <td><button class="btn btn-danger btn-sm col-remove" type="button">&times;</button></td>`;
-  row.querySelector(".col-remove").addEventListener("click", () => { row.remove(); updateColunaTotal(); });
+    <td><input type="text" value="${item || ''}" class="bhaItem" placeholder="DP 3 1/2" style="min-width:80px"></td>
+    <td><input type="number" value="${qty || ''}" class="bhaQty" style="min-width:50px"></td>
+    <td><input type="number" step="0.01" value="${idPol || ''}" class="bhaId" style="min-width:60px"></td>
+    <td><input type="number" step="0.01" value="${odPol || ''}" class="bhaOd" style="min-width:60px"></td>
+    <td><input type="number" step="0.01" value="${lengthM || ''}" class="bhaLength" style="min-width:70px"></td>
+    <td><input type="number" step="0.01" value="${totalM || ''}" class="bhaRowTotal" style="min-width:70px"></td>
+    <td><button class="btn btn-danger btn-sm bhaRemove" type="button">&times;</button></td>`;
+  row.querySelector(".bhaRemove").addEventListener("click", () => { row.remove(); updateBHATotal(); });
   // Update total on input
-  row.querySelectorAll("input").forEach(inp => inp.addEventListener("input", updateColunaTotal));
-  updateColunaTotal();
+  row.querySelectorAll("input").forEach(inp => inp.addEventListener("input", updateBHATotal));
+  updateBHATotal();
 }
-$("#btnAddColuna").addEventListener("click", () => addColunaRow("","","","","",""));
-addColunaRow("","","","","","");
+$("#btnAddBHA").addEventListener("click", () => addBHARow("","","","","",""));
+addBHARow("","","","","","");
 
-function updateColunaTotal() {
+function updateBHATotal() {
   let total = 0;
-  for (let i = 1; i < $("#colunaTable").rows.length; i++) {
-    const row = $("#colunaTable").rows[i];
-    const qty = parseFloat(row.querySelector(".col-qty")?.value) || 0;
-    const len = parseFloat(row.querySelector(".col-length")?.value) || 0;
-    const rowTotal = parseFloat(row.querySelector(".col-total")?.value);
+  for (let i = 1; i < $("#bhaTable").rows.length; i++) {
+    const row = $("#bhaTable").rows[i];
+    const qty = parseFloat(row.querySelector(".bhaQty")?.value) || 0;
+    const len = parseFloat(row.querySelector(".bhaLength")?.value) || 0;
+    const rowTotal = parseFloat(row.querySelector(".bhaRowTotal")?.value);
     total += rowTotal || (qty * len);
   }
-  const el = $("#colunaTotal");
+  const el = $("#bhaTotal");
   el.textContent = `Comprimento total da coluna: ${total.toFixed(2)} m`;
   el.style.display = total > 0 ? "block" : "none";
 }
@@ -1439,25 +1439,25 @@ function updateColunaTotal() {
 // ============================================================
 // EQUIPE TABLE
 // ============================================================
-function addEquipeRow(funcao, nome) {
-  const tbody = $("#equipeTable");
+function addTeamMemberRow(funcao, nome) {
+  const tbody = $("#teamTable");
   const row = tbody.insertRow(-1);
   row.innerHTML = `
-    <td><input type="text" value="${funcao || ''}" class="eq-funcao" placeholder="ex: Sondador" style="min-width:100px"></td>
-    <td><input type="text" value="${nome || ''}" class="eq-nome" placeholder="Nome"></td>
-    <td><button class="btn btn-danger btn-sm eq-remove" type="button">&times;</button></td>`;
-  row.querySelector(".eq-remove").addEventListener("click", () => row.remove());
+    <td><input type="text" value="${funcao || ''}" class="teamRole" placeholder="ex: Sondador" style="min-width:100px"></td>
+    <td><input type="text" value="${nome || ''}" class="teamName" placeholder="Nome"></td>
+    <td><button class="btn btn-danger btn-sm teamRemove" type="button">&times;</button></td>`;
+  row.querySelector(".teamRemove").addEventListener("click", () => row.remove());
 }
-$("#btnAddEquipe").addEventListener("click", () => addEquipeRow("",""));
+$("#btnAddTeamMember").addEventListener("click", () => addTeamMemberRow("",""));
 const DEFAULT_ROLES = ["Sondador","Torrista","Plat. / Auxiliar 1","Plat. / Auxiliar 2","TST","Geologo","Coordenador"];
-DEFAULT_ROLES.forEach(r => addEquipeRow(r,""));
+DEFAULT_ROLES.forEach(r => addTeamMemberRow(r,""));
 
 // ============================================================
 // PHOTOS
 // ============================================================
 let selectedFiles = [];
-$("#fotoInput").addEventListener("change", () => {
-  selectedFiles = Array.from($("#fotoInput").files).slice(0, 3);
+$("#photoInput").addEventListener("change", () => {
+  selectedFiles = Array.from($("#photoInput").files).slice(0, 3);
   renderPhotoPreview();
 });
 function renderPhotoPreview() {
@@ -1494,31 +1494,31 @@ async function uploadPhotos() {
 // DATA COLLECTION
 // ============================================================
 function getToggleState(groupId) { return !!$(groupId).querySelector(".active-yes"); }
-function collectOperacoes() {
+function collectOps() {
   const ops = [];
   for (let i = 1; i < $("#opsTable").rows.length; i++) {
     const row = $("#opsTable").rows[i];
-    const inicio = row.querySelector(".op-inicio")?.value || "";
-    const termino = row.querySelector(".op-termino")?.value || "";
-    const tipo = row.querySelector(".op-tipo")?.value || "Normal";
-    const descritivo = row.querySelector(".op-descritivo")?.value || "";
+    const inicio = row.querySelector(".opStart")?.value || "";
+    const termino = row.querySelector(".opEnd")?.value || "";
+    const tipo = row.querySelector(".opType")?.value || "Normal";
+    const descritivo = row.querySelector(".opDescription")?.value || "";
     if (inicio || termino || descritivo) ops.push({ inicio, termino, tipo, descritivo });
   }
   return ops.length > 0 ? ops : null;
 }
-function collectColuna() {
+function collectBHA() {
   const items = [];
-  for (let i = 1; i < $("#colunaTable").rows.length; i++) {
-    const row = $("#colunaTable").rows[i];
-    const item = row.querySelector(".col-item")?.value || "";
+  for (let i = 1; i < $("#bhaTable").rows.length; i++) {
+    const row = $("#bhaTable").rows[i];
+    const item = row.querySelector(".bhaItem")?.value || "";
     if (!item) continue;
     items.push({
       item,
-      qty: parseInt(row.querySelector(".col-qty")?.value) || null,
-      id_pol: parseFloat(row.querySelector(".col-id")?.value) || null,
-      od_pol: parseFloat(row.querySelector(".col-od")?.value) || null,
-      length_m: parseFloat(row.querySelector(".col-length")?.value) || null,
-      total_m: parseFloat(row.querySelector(".col-total")?.value) || null,
+      qty: parseInt(row.querySelector(".bhaQty")?.value) || null,
+      id_pol: parseFloat(row.querySelector(".bhaId")?.value) || null,
+      od_pol: parseFloat(row.querySelector(".bhaOd")?.value) || null,
+      length_m: parseFloat(row.querySelector(".bhaLength")?.value) || null,
+      total_m: parseFloat(row.querySelector(".bhaRowTotal")?.value) || null,
     });
   }
   return items.length > 0 ? items : null;
@@ -1529,8 +1529,8 @@ function toggleNA(checkbox) {
   const isNA = checkbox.checked;
   // Find related consumo/estoque inputs in the same row
   const row = checkbox.closest("tr");
-  const consumo = row.querySelector(".quim-consumo, .mat-consumo");
-  const estoque = row.querySelector(".quim-estoque, .mat-estoque");
+  const consumo = row.querySelector(".chemConsumption, .matConsumption");
+  const estoque = row.querySelector(".chemStock, .matStock");
   if (isNA) {
     if (consumo) { consumo.dataset.prev = consumo.value; consumo.value = "N/A"; consumo.disabled = true; }
     if (estoque) { estoque.dataset.prev = estoque.value; estoque.value = "N/A"; estoque.disabled = true; }
@@ -1543,31 +1543,31 @@ function toggleNA(checkbox) {
 // ── Anomalias de Perfuracao ──────────────────────────────────
 const PARAM_OPTIONS = ["Peso sobre Broca","RPM","Torque","SPM","Pressao","Vazao","ROP","Outro"];
 
-function addAnomaliaRow(parametro, descricao) {
-  const tbody = $("#anomaliaTable");
+function addAnomalyRow(parametro, descricao) {
+  const tbody = $("#anomalyTable");
   const row = tbody.insertRow(-1);
   const opts = PARAM_OPTIONS.map(p => `<option value="${p}" ${p === parametro ? "selected" : ""}>${p}</option>`).join("");
   row.innerHTML = `
-    <td><select class="anom-param" style="min-width:110px;">${opts}</select></td>
-    <td><input type="text" value="${descricao || ''}" class="anom-desc" placeholder="Descreva a anomalia observada..."></td>
-    <td><button class="btn btn-danger btn-sm anom-remove" type="button">&times;</button></td>`;
-  row.querySelector(".anom-remove").addEventListener("click", () => row.remove());
+    <td><select class="anomalyParam" style="min-width:110px;">${opts}</select></td>
+    <td><input type="text" value="${descricao || ''}" class="anomalyDesc" placeholder="Descreva a anomalia observada..."></td>
+    <td><button class="btn btn-danger btn-sm anomalyRemove" type="button">&times;</button></td>`;
+  row.querySelector(".anomalyRemove").addEventListener("click", () => row.remove());
 }
-$("#btnAddAnomalia").addEventListener("click", () => addAnomaliaRow("",""));
+$("#btnAddAnomaly").addEventListener("click", () => addAnomalyRow("",""));
 
-function collectParametrosAnomalias() {
+function collectAnomalies() {
   const items = [];
-  for (let i = 1; i < $("#anomaliaTable").rows.length; i++) {
-    const row = $("#anomaliaTable").rows[i];
-    const parametro = row.querySelector(".anom-param")?.value || "";
-    const descricao = row.querySelector(".anom-desc")?.value || "";
+  for (let i = 1; i < $("#anomalyTable").rows.length; i++) {
+    const row = $("#anomalyTable").rows[i];
+    const parametro = row.querySelector(".anomalyParam")?.value || "";
+    const descricao = row.querySelector(".anomalyDesc")?.value || "";
     if (descricao) items.push({ parametro: parametro || null, descricao });
   }
   return items.length > 0 ? items : null;
 }
-function collectBrocas() {
-  const atual = { fabricante:$("#brocaFabAtual").value||null, serie:$("#brocaSerieAtual").value||null, diametro:$("#brocaDiamAtual").value||null, modelo:$("#brocaModAtual").value||null, jatos:$("#brocaJatosAtual").value||null, perfurado:parseFloat($("#brocaPerfAtual").value)||null, oper_hs:parseFloat($("#brocaHsAtual").value)||null, rop:parseFloat($("#brocaRopAtual").value)||null };
-  const anterior = { fabricante:$("#brocaFabAnt").value||null, serie:$("#brocaSerieAnt").value||null, diametro:$("#brocaDiamAnt").value||null, modelo:$("#brocaModAnt").value||null, jatos:$("#brocaJatosAnt").value||null, perfurado:parseFloat($("#brocaPerfAnt").value)||null, oper_hs:parseFloat($("#brocaHsAnt").value)||null, rop:parseFloat($("#brocaRopAnt").value)||null };
+function collectBits() {
+  const atual = { fabricante:$("#bitBrandCurrent").value||null, serie:$("#bitSerialCurrent").value||null, diametro:$("#bitDiameterCurrent").value||null, modelo:$("#bitModelCurrent").value||null, jatos:$("#bitJetsCurrent").value||null, perfurado:parseFloat($("#bitDrilledCurrent").value)||null, oper_hs:parseFloat($("#bitHoursCurrent").value)||null, rop:parseFloat($("#bitRopCurrent").value)||null };
+  const anterior = { fabricante:$("#bitBrandPrev").value||null, serie:$("#bitSerialPrev").value||null, diametro:$("#bitDiameterPrev").value||null, modelo:$("#bitModelPrev").value||null, jatos:$("#bitJetsPrev").value||null, perfurado:parseFloat($("#bitDrilledPrev").value)||null, oper_hs:parseFloat($("#bitHoursPrev").value)||null, rop:parseFloat($("#bitRopPrev").value)||null };
   const ha = Object.values(atual).some(v=>v!==null&&v!=="");
   const han = Object.values(anterior).some(v=>v!==null&&v!=="");
   if (!ha && !han) return null;
@@ -1576,46 +1576,46 @@ function collectBrocas() {
   if (han) r.anterior = anterior;
   return r;
 }
-function collectFluido() {
-  const f = { densidade:parseFloat($("#fluDensidade").value)||null, viscosidade:parseFloat($("#fluViscosidade").value)||null, filtrado:parseFloat($("#fluFiltrado").value)||null, ph:parseFloat($("#fluPh").value)||null, agua_livre:parseFloat($("#fluAguaLivre").value)||null, areia:parseFloat($("#fluAreia").value)||null, api_cake:parseFloat($("#fluApiCake").value)||null, solidos:parseFloat($("#fluSolidos").value)||null };
+function collectFluid() {
+  const f = { densidade:parseFloat($("#fluidDensity").value)||null, viscosidade:parseFloat($("#fluidViscosity").value)||null, filtrado:parseFloat($("#fluidFiltrate").value)||null, ph:parseFloat($("#fluidPh").value)||null, agua_livre:parseFloat($("#fluidFreeWater").value)||null, areia:parseFloat($("#fluidSand").value)||null, api_cake:parseFloat($("#fluidApiCake").value)||null, solidos:parseFloat($("#fluidSolids").value)||null };
   return Object.values(f).some(v=>v!==null) ? f : null;
 }
-function collectQuimicos() {
+function collectChemicals() {
   const r = {};
-  $$(".quim-consumo").forEach(el => {
+  $$(".chemConsumption").forEach(el => {
     const k = el.dataset.key;
     const cons = parseFloat(el.value);
-    const est = parseFloat(document.querySelector(`.quim-estoque[data-key="${k}"]`)?.value);
+    const est = parseFloat(document.querySelector(`.chemStock[data-key="${k}"]`)?.value);
     if (!isNaN(cons) || !isNaN(est)) r[k] = { consumo:isNaN(cons)?null:cons, estoque:isNaN(est)?null:est };
   });
   return Object.keys(r).length>0 ? r : null;
 }
-function collectInsumos() {
-  const i = { agua:$("#insAgua").value||null, limpa_fossa:$("#insLimpaFossa").value||null, limpeza_banheiro:$("#insLimpezaBanh").value||null, pta:$("#insPta").value||null, munck:$("#insMunck").value||null, guindaste:$("#insGuindaste").value||null, remocao_cacamba:$("#insRemCacamba").value||null };
+function collectSupplies() {
+  const i = { agua:$("#supplyWater").value||null, limpa_fossa:$("#supplySeptic").value||null, limpeza_banheiro:$("#supplyBathroom").value||null, pta:$("#supplyPta").value||null, munck:$("#supplyMunck").value||null, guindaste:$("#supplyCrane").value||null, remocao_cacamba:$("#supplyDebrisRemoval").value||null };
   return Object.values(i).some(v=>v!==null&&v!=="") ? i : null;
 }
-function collectOutrosMateriais() {
+function collectMaterials() {
   const r = {};
-  $$(".mat-consumo").forEach(el => {
+  $$(".matConsumption").forEach(el => {
     const k = el.dataset.key;
     const cons = parseFloat(el.value);
-    const est = parseFloat(document.querySelector(`.mat-estoque[data-key="${k}"]`)?.value);
+    const est = parseFloat(document.querySelector(`.matStock[data-key="${k}"]`)?.value);
     if (!isNaN(cons) || !isNaN(est)) r[k] = { consumo:isNaN(cons)?null:cons, estoque:isNaN(est)?null:est };
   });
   return Object.keys(r).length>0 ? r : null;
 }
-function collectCombustivel() {
-  const cons = parseFloat($("#combDieselCons").value);
-  const est = parseFloat($("#combDieselEst").value);
+function collectFuel() {
+  const cons = parseFloat($("#fuelDieselConsumption").value);
+  const est = parseFloat($("#fuelDieselStock").value);
   if (isNaN(cons) && isNaN(est)) return null;
   return { diesel: { consumo:isNaN(cons)?null:cons, estoque:isNaN(est)?null:est } };
 }
-function collectEquipe() {
+function collectTeam() {
   const m = [];
-  for (let i = 1; i < $("#equipeTable").rows.length; i++) {
-    const row = $("#equipeTable").rows[i];
-    const funcao = row.querySelector(".eq-funcao")?.value || "";
-    const nome = row.querySelector(".eq-nome")?.value || "";
+  for (let i = 1; i < $("#teamTable").rows.length; i++) {
+    const row = $("#teamTable").rows[i];
+    const funcao = row.querySelector(".teamRole")?.value || "";
+    const nome = row.querySelector(".teamName")?.value || "";
     if (funcao || nome) m.push({ funcao:funcao||null, nome:nome||null });
   }
   return m.length>0 ? m : null;
@@ -1625,49 +1625,49 @@ function collectEquipe() {
 // BUILD PAYLOAD
 // ============================================================
 function buildPayload(status) {
-  const perfOn = getToggleState("#togglePerfuracao");
-  const fluOn = getToggleState("#toggleFluido");
+  const perfOn = getToggleState("#toggleDrilling");
+  const fluOn = getToggleState("#toggleFluid");
   const p = {
     projeto_id: currentProjectId,
-    data: $("#rdoData").value || new Date().toISOString().split("T")[0],
-    tipo_dia: $("#rdoTipoDia").value || null,
+    data: $("#rdoDate").value || new Date().toISOString().split("T")[0],
+    tipo_dia: $("#rdoDayType").value || null,
     hse_dds: $("#hseDds").checked,
-    hse_incidentes: $("#hseIncidentes").value || null,
-    hse_quase_acidentes: $("#hseQuase").value || null,
-    hse_hh_expostas: parseFloat($("#hseHh").value) || null,
-    hse_epis_vistoriados: $("#hseEpis").checked,
-    observacoes: $("#obsGeral").value || null,
-    planejamento_proximo_turno: $("#planProxTurno").value || null,
-    condicoes_climaticas: $("#condClima").value,
-    chuva: $("#condChuva").checked,
-    aprovacao_geologo: $("#aprGeologo").value || null,
-    operacoes: collectOperacoes(),
-    equipe: collectEquipe(),
+    hse_incidentes: $("#hseIncidents").value || null,
+    hse_quase_acidentes: $("#hseNearMiss").value || null,
+    hse_hh_expostas: parseFloat($("#hseManHours").value) || null,
+    hse_epis_vistoriados: $("#hseEpi").checked,
+    observacoes: $("#obsGeneral").value || null,
+    planejamento_proximo_turno: $("#planNextShift").value || null,
+    condicoes_climaticas: $("#weatherCondition").value,
+    chuva: $("#weatherRain").checked,
+    aprovacao_geologo: $("#approvalGeologist").value || null,
+    operacoes: collectOps(),
+    equipe: collectTeam(),
     status: status,
   };
   if (perfOn) {
-    p.profundidade_inicial = parseFloat($("#profInicial").value) || null;
-    p.profundidade_final = parseFloat($("#profFinal").value) || null;
-    p.estratigrafia_mudou = getToggleState("#toggleEstratigrafia");
+    p.profundidade_inicial = parseFloat($("#depthInitial").value) || null;
+    p.profundidade_final = parseFloat($("#depthFinal").value) || null;
+    p.estratigrafia_mudou = getToggleState("#toggleStratigraphy");
     if (p.estratigrafia_mudou) {
-      p.estratigrafia_profundidade = parseFloat($("#estProfundidade").value) || null;
-      p.estratigrafia_descricao = $("#estDescricao").value || null;
+      p.estratigrafia_profundidade = parseFloat($("#stratDepth").value) || null;
+      p.estratigrafia_descricao = $("#stratDescription").value || null;
     }
-    p.revestimento_mudou = getToggleState("#toggleRevestimento");
+    p.revestimento_mudou = getToggleState("#toggleCasing");
     if (p.revestimento_mudou) {
-      p.revestimento_metros = parseFloat($("#revMetros").value) || null;
-      p.revestimento_obs = $("#revObs").value || null;
+      p.revestimento_metros = parseFloat($("#casingMeters").value) || null;
+      p.revestimento_obs = $("#casingObs").value || null;
     }
-    p.brocas = collectBrocas();
-    p.parametros_anomalias = collectParametrosAnomalias();
-    p.coluna = collectColuna();
+    p.brocas = collectBits();
+    p.parametros_anomalias = collectAnomalies();
+    p.coluna = collectBHA();
   }
   if (fluOn) {
-    p.fluido = collectFluido();
-    p.quimicos = collectQuimicos();
-    p.insumos = collectInsumos();
-    p.outros_materiais = collectOutrosMateriais();
-    p.combustivel = collectCombustivel();
+    p.fluido = collectFluid();
+    p.quimicos = collectChemicals();
+    p.insumos = collectSupplies();
+    p.outros_materiais = collectMaterials();
+    p.combustivel = collectFuel();
   }
   // Strip nulls
   Object.keys(p).forEach(k => { if (p[k]===null||p[k]===undefined) delete p[k]; });
@@ -1748,32 +1748,32 @@ $("#btnSubmit").addEventListener("click", async () => {
 // ============================================================
 function resetForm() {
   const today = new Date().toISOString().split("T")[0];
-  $("#rdoData").value = "";
-  $("#rdoData").max = today;
+  $("#rdoDate").value = "";
+  $("#rdoDate").max = today;
   $("#formBody").style.display = "none";
-  $("#rdoTipoDia").value = "perfuracao";
-  setToggle("#togglePerfuracao", false);
-  setToggle("#toggleFluido", false);
-  setToggle("#toggleEstratigrafia", false);
-  setToggle("#toggleRevestimento", false);
+  $("#rdoDayType").value = "perfuracao";
+  setToggle("#toggleDrilling", false);
+  setToggle("#toggleFluid", false);
+  setToggle("#toggleStratigraphy", false);
+  setToggle("#toggleCasing", false);
   $$("input[type='text'], input[type='number'], textarea").forEach(el => {
-    if (!["rdoData","rdoTipoDia","projectSelect"].includes(el.id)) el.value = "";
+    if (!["rdoDate","rdoDayType","projectSelect"].includes(el.id)) el.value = "";
   });
   $$("input[type='checkbox']").forEach(el => { el.checked = false; if (el.dataset.key) toggleNA(el); });
-  $("#brocaTrocada").checked = false;
-  $("#condClima").value = "Bom";
+  $("#bitChanged").checked = false;
+  $("#weatherCondition").value = "Bom";
   clearTable("#opsTable"); addOpRow("","","","");
-  clearTable("#anomaliaTable");
-  clearTable("#colunaTable"); addColunaRow("","","","","","");
-  clearTable("#equipeTable"); DEFAULT_ROLES.forEach(r => addEquipeRow(r,""));
+  clearTable("#anomalyTable");
+  clearTable("#bhaTable"); addBHARow("","","","","","");
+  clearTable("#teamTable"); DEFAULT_ROLES.forEach(r => addTeamMemberRow(r,""));
   selectedFiles = [];
-  $("#fotoInput").value = "";
+  $("#photoInput").value = "";
   $("#existingPhotos").innerHTML = "";
   renderPhotoPreview();
 
   // Clear pre-fill notes, inherited markers, and last stratigraphy
   $$(".prefill-note").forEach(n => n.classList.remove("show"));
-  $("#lastEstratigrafia").style.display = "none";
+  $("#lastStratigraphy").style.display = "none";
   lastRDO = null;
   updatePrefillVisibility();
 }
