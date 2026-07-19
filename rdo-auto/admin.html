@@ -336,7 +336,7 @@ async function viewRDO(id) {
   if (!data) return;
   const r = data;
   const c = $("#rdoDetailContent");
-   const ops = r.operacoes ? r.operacoes.map(o => `<div class="ro-row"><span class="ro-label">${o.inicio}-${o.termino}</span><span class="ro-value">${o.descritivo} <span style="font-size:.7rem;color:${o.tipo==='Parada'?'#ef4444':o.tipo==='Nao Produtiva'?'#f59e0b':'#10b981'}">${o.tipo||'Normal'}</span></span></div>`).join("") : '<span style="color:#9ca3af;">—</span>';
+   const ops = r.operações ? r.operações.map(o => `<div class="ro-row"><span class="ro-label">${o.inicio}-${o.termino}</span><span class="ro-value">${o.descritivo} <span style="font-size:.7rem;color:${o.tipo==='Parada'?'#ef4444':o.tipo==='Nao Produtiva'?'#f59e0b':'#10b981'}">${o.tipo||'Normal'}</span></span></div>`).join("") : '<span style="color:#9ca3af;">—</span>';
   const equipe = r.equipe ? r.equipe.map(e => `<div class="ro-row"><span class="ro-label">${e.funcao||''}</span><span class="ro-value">${e.nome||''}</span></div>`).join("") : '<span style="color:#9ca3af;">—</span>';
   c.innerHTML = `
     <div class="ro-section"><h3>Geral</h3>
@@ -355,9 +355,9 @@ async function viewRDO(id) {
       ${r.hse_incidentes ? `<div class="ro-row"><span class="ro-label">Incidentes</span><span class="ro-value">${r.hse_incidentes}</span></div>` : ''}
       ${r.hse_quase_acidentes ? `<div class="ro-row"><span class="ro-label">Quase-acid.</span><span class="ro-value">${r.hse_quase_acidentes}</span></div>` : ''}
     </div>
-    <div class="ro-section"><h3>Clima</h3><div class="ro-row"><span class="ro-label">Condição</span><span class="ro-value">${r.condicoes_climaticas||'-'}${r.chuva?' (choveu)':''}</span></div></div>
-    ${r.observacoes ? `<div class="ro-section"><h3>Observações</h3><p style="font-size:.8rem;">${r.observacoes}</p></div>` : ''}
-    ${r.planejamento_proximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.8rem;">${r.planejamento_proximo_turno}</p></div>` : ''}
+    <div class="ro-section"><h3>Clima</h3><div class="ro-row"><span class="ro-label">Condição</span><span class="ro-value">${r.condições_climaticas||'-'}${r.chuva?' (choveu)':''}</span></div></div>
+    ${r.observações ? `<div class="ro-section"><h3>Observações</h3><p style="font-size:.8rem;">${r.observações}</p></div>` : ''}
+    ${r.planejamento_próximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.8rem;">${r.planejamento_próximo_turno}</p></div>` : ''}
   `;
   $("#rdoDetail").style.display = "block";
   $("#rdoDetail").scrollIntoView({ behavior: "smooth" });
@@ -408,19 +408,19 @@ $("#btnExportCSV").addEventListener("click", async () => {
   const de = $("#filtroDe").value;
   const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
-  let query = sb.from("rdos").select("data,tipo_dia,profundidade_inicial,profundidade_final,formacao,status,observacoes,condicoes_climaticas,chuva,hse_dds,hse_hh_expostas,projetos(cliente,sonda)").order("data").limit(500);
+  let query = sb.from("rdos").select("data,tipo_dia,profundidade_inicial,profundidade_final,formação,status,observações,condições_climaticas,chuva,hse_dds,hse_hh_expostas,projetos(cliente,sonda)").order("data").limit(500);
   if (projetoId) query = query.eq("projeto_id", projetoId);
   if (de) query = query.gte("data", de);
   if (ate) query = query.lte("data", ate);
   if (status) query = query.eq("status", status);
   const { data } = await query;
   if (!data || data.length === 0) { toast("Nenhum dado para exportar.", "error"); return; }
-  const headers = ["data","tipo","cliente","sonda","prof_inicial","prof_final","formacao","hse_dds","hh_expostas","cond_clima","choveu","status","observacoes"];
+  const headers = ["data","tipo","cliente","sonda","prof_inicial","prof_final","formação","hse_dds","hh_expostas","cond_clima","choveu","status","observações"];
   const rows = data.map(r => [
     r.data, r.tipo_dia, r.projetos?.cliente||"", r.projetos?.sonda||"",
-    r.profundidade_inicial||"", r.profundidade_final||"", r.formacao||"",
-    r.hse_dds?"Sim":"Não", r.hse_hh_expostas||"", r.condicoes_climaticas||"",
-    r.chuva?"Sim":"Não", r.status, (r.observacoes||"").replace(/"/g,'""')
+    r.profundidade_inicial||"", r.profundidade_final||"", r.formação||"",
+    r.hse_dds?"Sim":"Não", r.hse_hh_expostas||"", r.condições_climaticas||"",
+    r.chuva?"Sim":"Não", r.status, (r.observações||"").replace(/"/g,'""')
   ]);
   const csv = [headers.join(","), ...rows.map(r => '"' + r.join('","') + '"')].join("\n");
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
