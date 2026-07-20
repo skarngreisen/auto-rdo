@@ -461,9 +461,19 @@ input.inherited, textarea.inherited {
         </table>
         <button class="btn btn-secondary btn-sm" id="btnAddChem" type="button" style="margin-top:.3rem;">+ Adicionar quimico</button>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Combustivel</label>
-        <div class="row">
-          <div><label for="fuelDieselConsumption">Diesel Consumo (L)</label><input type="number" step="0.1" id="fuelDieselConsumption"></div>
-          <div><label for="fuelDieselStock">Diesel Estoque (L)</label><input type="number" step="0.1" id="fuelDieselStock"></div>
+        <table class="ops-table" id="fuelTable">
+          <tr><th>Equipamento</th><th>Tipo</th><th>Litros</th><th></th></tr>
+        </table>
+        <button class="btn btn-secondary btn-sm" id="btnAddFuel" type="button" style="margin-top:.3rem;">+ Adicionar consumo</button>
+        <div id="fuelTotals" style="font-size:.78rem;margin-top:.4rem;color:#374151;display:none;">
+          <div class="row">
+            <div><strong>Consumo S10:</strong> <span id="fuelS10Total">0.0</span> L</div>
+            <div><label for="fuelS10Stock" style="display:inline;margin:0;font-size:.75rem;">Estoque S10 (L)</label> <input type="number" step="0.1" id="fuelS10Stock" style="width:80px;display:inline;padding:.25rem .35rem;font-size:.78rem;"></div>
+          </div>
+          <div class="row" style="margin-top:.2rem;">
+            <div><strong>Consumo S500:</strong> <span id="fuelS500Total">0.0</span> L</div>
+            <div><label for="fuelS500Stock" style="display:inline;margin:0;font-size:.75rem;">Estoque S500 (L)</label> <input type="number" step="0.1" id="fuelS500Stock" style="width:80px;display:inline;padding:.25rem .35rem;font-size:.78rem;"></div>
+          </div>
         </div>
         <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Outros Materiais</label>
         <table class="ops-table" id="matTable">
@@ -1344,9 +1354,13 @@ function populateForm(rdo) {
       clearTable("#chemTable");
       rdo.quimicos.forEach(c => addChemicalRow(c.name, c.consumo, c.estoque));
     }
-    if (rdo.combustivel?.diesel) {
-      $("#fuelDieselConsumption").value = rdo.combustivel.diesel.consumo || "";
-      $("#fuelDieselStock").value = rdo.combustivel.diesel.estoque || "";
+    if (rdo.combustivel) {
+      if (rdo.combustivel.consumos && Array.isArray(rdo.combustivel.consumos)) {
+        clearTable("#fuelTable");
+        rdo.combustivel.consumos.forEach(f => addFuelRow(f.equipamento, f.tipo, f.litros));
+      }
+      if (rdo.combustivel.estoque_s10 != null) $("#fuelS10Stock").value = rdo.combustivel.estoque_s10;
+      if (rdo.combustivel.estoque_s500 != null) $("#fuelS500Stock").value = rdo.combustivel.estoque_s500;
     }
     if (rdo.outros_materiais && Array.isArray(rdo.outros_materiais)) {
       clearTable("#matTable");
@@ -1797,11 +1811,55 @@ function collectSupplies() {
   const i = { agua:$("#supplyWater").value||null, limpa_fossa:$("#supplySeptic").value||null, limpeza_banheiro:$("#supplyBathroom").value||null, pta:$("#supplyPta").value||null, munck:$("#supplyMunck").value||null, guindaste:$("#supplyCrane").value||null, remocao_cacamba:$("#supplyDebrisRemoval").value||null };
   return Object.values(i).some(v=>v!==null&&v!=="") ? i : null;
 }
+// ── Combustivel (dynamic) ───────────────────────────────────
+const FUEL_EQUIP = ["Gerador","Compressor","Sonda","Bomba","Outro"];
+const FUEL_TYPES = ["S10","S500"];
+
+function addFuelRow(equip, tipo, litros) {
+  const tbody = $("#fuelTable");
+  const row = tbody.insertRow(-1);
+  const eqOpts = FUEL_EQUIP.map(e => `<option value="${e}" ${e===equip?"selected":""}>${e}</option>`).join("");
+  const tpOpts = FUEL_TYPES.map(t => `<option value="${t}" ${t===tipo?"selected":""}>${t}</option>`).join("");
+  row.innerHTML = `
+    <td><select class="fuelEquip" style="min-width:90px;font-size:.82rem;">${eqOpts}</select></td>
+    <td><select class="fuelType" style="min-width:70px;font-size:.82rem;">${tpOpts}</select></td>
+    <td><input type="number" step="0.1" class="fuelLiters" value="${litros||''}" style="min-width:60px;"></td>
+    <td><button class="btn btn-danger btn-sm fuelRemove" type="button">&times;</button></td>`;
+  row.querySelector(".fuelRemove").addEventListener("click", () => { row.remove(); updateFuelTotals(); });
+  row.querySelectorAll("input, select").forEach(el => el.addEventListener("input", updateFuelTotals));
+  row.querySelectorAll("input, select").forEach(el => el.addEventListener("change", updateFuelTotals));
+  updateFuelTotals();
+}
+$("#btnAddFuel").addEventListener("click", () => addFuelRow("Gerador","S10",""));
+addFuelRow("Sonda","S10","");
+
+function updateFuelTotals() {
+  let s10 = 0, s500 = 0;
+  for (let i = 1; i < $("#fuelTable").rows.length; i++) {
+    const row = $("#fuelTable").rows[i];
+    const tipo = row.querySelector(".fuelType")?.value;
+    const litros = parseFloat(row.querySelector(".fuelLiters")?.value) || 0;
+    if (tipo === "S10") s10 += litros;
+    else if (tipo === "S500") s500 += litros;
+  }
+  $("#fuelS10Total").textContent = s10.toFixed(1);
+  $("#fuelS500Total").textContent = s500.toFixed(1);
+  $("#fuelTotals").style.display = (s10 > 0 || s500 > 0) ? "block" : "none";
+}
+
 function collectFuel() {
-  const cons = parseFloat($("#fuelDieselConsumption").value);
-  const est = parseFloat($("#fuelDieselStock").value);
-  if (isNaN(cons) && isNaN(est)) return null;
-  return { diesel: { consumo:isNaN(cons)?null:cons, estoque:isNaN(est)?null:est } };
+  const items = [];
+  for (let i = 1; i < $("#fuelTable").rows.length; i++) {
+    const row = $("#fuelTable").rows[i];
+    const equip = row.querySelector(".fuelEquip")?.value || "";
+    const tipo = row.querySelector(".fuelType")?.value || "";
+    const litros = parseFloat(row.querySelector(".fuelLiters")?.value) || 0;
+    if (equip && litros > 0) items.push({ equipamento: equip, tipo, litros });
+  }
+  const s10Stock = parseFloat($("#fuelS10Stock").value) || null;
+  const s500Stock = parseFloat($("#fuelS500Stock").value) || null;
+  if (items.length === 0 && !s10Stock && !s500Stock) return null;
+  return { consumos: items.length > 0 ? items : null, estoque_s10: s10Stock, estoque_s500: s500Stock };
 }
 function collectTeam() {
   const m = [];
@@ -1961,6 +2019,9 @@ function resetForm() {
   clearTable("#anomalyTable");
   clearTable("#chemTable"); CHEM_OPTIONS.filter(c => c !== "Outro").forEach(c => addChemicalRow(c,"",""));
   clearTable("#matTable"); MAT_OPTIONS.filter(m => m !== "Outro").forEach(m => addMaterialRow(m,"",""));
+  clearTable("#fuelTable"); addFuelRow("Sonda","S10","");
+  $("#fuelS10Stock").value = ""; $("#fuelS500Stock").value = "";
+  $("#fuelTotals").style.display = "none";
   clearTable("#bhaTable"); addBHARow("","","","","","");
   clearTable("#teamTable"); DEFAULT_ROLES.forEach(r => addTeamMemberRow(r,""));
   selectedFiles = [];
