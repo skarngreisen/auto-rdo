@@ -575,6 +575,7 @@ input.inherited, textarea.inherited {
     </div>
     <div style="margin-bottom:2rem;">
       <button class="btn btn-secondary btn-sm" id="btnClearForm" type="button">Limpar formulário</button>
+      <span id="autoSaveIndicator" style="float:right;font-size:.7rem;color:#10b981;opacity:0;transition:opacity .3s;line-height:2;">Rascunho salvo</span>
     </div>
     </div><!-- #formBody -->
     </form>
@@ -711,6 +712,14 @@ function saveLocalDraft() {
   payload._savedAt = Date.now();
   localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
   lastDraftTime = Date.now();
+  // Visual feedback
+  const ind = $("#autoSaveIndicator");
+  if (ind) {
+    ind.textContent = "Rascunho salvo";
+    ind.style.opacity = "1";
+    clearTimeout(ind._timeout);
+    ind._timeout = setTimeout(() => { ind.style.opacity = "0"; }, 2000);
+  }
 }
 
 function startAutoDraft() {
@@ -726,13 +735,11 @@ function stopAutoDraft() {
 }
 
 window.addEventListener("beforeunload", (e) => {
-  if (!draftTimer && !$("#formView").classList.contains("active")) return;
-  if (!lastDraftTime) return;
-  const secs = Math.floor((Date.now() - lastDraftTime) / 1000);
-  const msg = `Voce esta saindo da pagina. O ultimo rascunho foi salvo ha ${secs} segundos. Deseja continuar mesmo assim?`;
+  if (!$("#formView").classList.contains("active")) return;
+  const secs = lastDraftTime ? Math.floor((Date.now() - lastDraftTime) / 1000) : 120;
   e.preventDefault();
-  e.returnValue = msg;
-  return msg;
+  e.returnValue = "";
+  return "";
 });
 
 // Check for saved draft on page load
