@@ -408,19 +408,19 @@ $("#btnExportCSV").addEventListener("click", async () => {
   const de = $("#filtroDe").value;
   const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
-  let query = sb.from("rdos").select("data,tipo_dia,profundidade_inicial,profundidade_final,formação,status,observações,condições_climaticas,chuva,hse_dds,hse_hh_expostas,projetos(cliente,sonda)").order("data").limit(500);
+  let query = sb.from("rdos").select("data,tipo_dia,profundidade_inicial,profundidade_final,estratigrafia_descricao,status,observacoes,condicoes_climaticas,chuva,hse_dds,hse_hh_expostas,projetos(cliente,sonda)").order("data").limit(500);
   if (projetoId) query = query.eq("projeto_id", projetoId);
   if (de) query = query.gte("data", de);
   if (ate) query = query.lte("data", ate);
   if (status) query = query.eq("status", status);
   const { data } = await query;
   if (!data || data.length === 0) { toast("Nenhum dado para exportar.", "error"); return; }
-  const headers = ["data","tipo","cliente","sonda","prof_inicial","prof_final","formação","hse_dds","hh_expostas","cond_clima","choveu","status","observações"];
+  const headers = ["data","tipo","cliente","sonda","prof_inicial","prof_final","estratigrafia","hse_dds","hh_expostas","cond_clima","choveu","status","observacoes"];
   const rows = data.map(r => [
     r.data, r.tipo_dia, r.projetos?.cliente||"", r.projetos?.sonda||"",
-    r.profundidade_inicial||"", r.profundidade_final||"", r.formação||"",
-    r.hse_dds?"Sim":"Não", r.hse_hh_expostas||"", r.condições_climaticas||"",
-    r.chuva?"Sim":"Não", r.status, (r.observações||"").replace(/"/g,'""')
+    r.profundidade_inicial||"", r.profundidade_final||"", r.estratigrafia_descricao||"",
+    r.hse_dds?"Sim":"Nao", r.hse_hh_expostas||"", r.condicoes_climaticas||"",
+    r.chuva?"Sim":"Nao", r.status, (r.observacoes||"").replace(/"/g,'""')
   ]);
   const csv = [headers.join(","), ...rows.map(r => '"' + r.join('","') + '"')].join("\n");
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
