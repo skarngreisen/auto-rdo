@@ -5,7 +5,20 @@
 
 -- 1. Create tables -----------------------------------------------------------
 
+-- Profiles (extends auth.users)
+CREATE TABLE IF NOT EXISTS profiles (
+    user_id   UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name      TEXT NOT NULL,
+    role      TEXT NOT NULL DEFAULT 'supervisor' CHECK (role IN ('admin','supervisor','geologo')),
+    phone     TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Profiles: all authenticated can read" ON profiles FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Profiles: update own" ON profiles FOR UPDATE TO authenticated USING (user_id = auth.uid());
+
 CREATE TABLE IF NOT EXISTS projetos (
+    user_id     UUID REFERENCES auth.users(id),
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     cliente     TEXT NOT NULL,
     localidade  TEXT NOT NULL,
@@ -17,6 +30,7 @@ CREATE TABLE IF NOT EXISTS projetos (
 
 CREATE TABLE IF NOT EXISTS rdos (
     id                        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id                   UUID REFERENCES auth.users(id),
     projeto_id                UUID NOT NULL REFERENCES projetos(id) ON DELETE CASCADE,
     data                      DATE NOT NULL DEFAULT CURRENT_DATE,
     tipo_dia                  TEXT,                          -- e.g. 'perfuracao', 'montagem', 'teste', 'parado'

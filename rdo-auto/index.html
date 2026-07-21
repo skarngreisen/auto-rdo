@@ -289,9 +289,30 @@ input.inherited, textarea.inherited {
 <body>
 
 <!-- ============================================================
+     AUTH (login / signup)
+     ============================================================ -->
+<div class="view active" id="authView">
+  <div style="max-width:360px;margin:10vh auto 0;padding:2rem;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);text-align:center;">
+    <img src="logo_DH.png" alt="DH" style="width:140px;margin-bottom:1rem;">
+    <h2 id="authTitle" style="font-size:1rem;color:#1e3a5f;margin-bottom:1rem;">Entrar</h2>
+    <input type="email" id="authEmail" placeholder="Email" style="margin-bottom:.5rem;font-size:.9rem;">
+    <input type="password" id="authPassword" placeholder="Senha" style="margin-bottom:.5rem;font-size:.9rem;">
+    <input type="text" id="authName" placeholder="Nome completo" style="display:none;margin-bottom:.5rem;font-size:.9rem;">
+    <input type="text" id="authPhone" placeholder="Telefone (opcional)" style="display:none;margin-bottom:.5rem;font-size:.9rem;">
+    <div id="authError" style="color:#ef4444;font-size:.78rem;margin-bottom:.5rem;display:none;"></div>
+    <button class="btn btn-primary" id="btnAuth" style="margin-bottom:.5rem;">Entrar</button>
+    <div style="font-size:.78rem;color:#6b7280;">
+      <span id="authToggleText">Não tem conta?</span>
+      <a href="#" id="authToggle" style="color:#3b82f6;">Cadastre-se</a>
+    </div>
+    <button id="btnLogout" class="btn btn-secondary btn-sm" style="display:none;margin-top:.5rem;">Sair</button>
+  </div>
+</div>
+
+<!-- ============================================================
      SPLASH
      ============================================================ -->
-<div class="view active" id="splashView">
+<div class="view" id="splashView">
   <img src="logo_DH.png" alt="DH Perfuração">
   <div class="tagline">Relatorio Diario de Obras</div>
 </div>
@@ -654,9 +675,87 @@ const SUPABASE_URL = "https://fecskilrtsaeavoznwgi.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_VjwnlFeGz7zJkZx_KPxukA_GCTRxcgi";
 const STORAGE_BUCKET = "fotos";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
+
+// ============================================================
+// AUTH
+// ============================================================
+let currentUser = null;
+let currentProfile = null;
+let isLoginMode = true;
+
+$("#btnAuth").addEventListener("click", async () => {
+  const email = $("#authEmail").value.trim();
+  const password = $("#authPassword").value.trim();
+  const name = $("#authName").value.trim();
+  const phone = $("#authPhone").value.trim();
+  const errEl = $("#authError");
+  errEl.style.display = "none";
+  if (!email || !password) { errEl.textContent = "Preencha email e senha."; errEl.style.display = "block"; return; }
+
+  if (isLoginMode) {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { errEl.textContent = error.message; errEl.style.display = "block"; return; }
+    currentUser = data.user;
+  } else {
+    if (!name) { errEl.textContent = "Preencha o nome completo."; errEl.style.display = "block"; return; }
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if (error) { errEl.textContent = error.message; errEl.style.display = "block"; return; }
+    currentUser = data.user;
+    // Create profile
+    if (currentUser) {
+      await sb.from("profiles").upsert({ user_id: currentUser.id, name, role: "supervisor", phone: phone || null });
+    }
+  }
+  if (currentUser) await loadProfile();
+});
+
+$("#authToggle").addEventListener("click", (e) => {
+  e.preventDefault();
+  isLoginMode = !isLoginMode;
+  $("#authTitle").textContent = isLoginMode ? "Entrar" : "Cadastro";
+  $("#btnAuth").textContent = isLoginMode ? "Entrar" : "Cadastrar";
+  $("#authName").style.display = isLoginMode ? "none" : "block";
+  $("#authPhone").style.display = isLoginMode ? "none" : "block";
+  $("#authToggleText").textContent = isLoginMode ? "Nao tem conta?" : "Ja tem conta?";
+  $("#authToggle").textContent = isLoginMode ? "Cadastre-se" : "Entrar";
+});
+
+$("#btnLogout").addEventListener("click", async () => {
+  await sb.auth.signOut();
+  currentUser = null; currentProfile = null;
+  showView("authView");
+  $("#btnLogout").style.display = "none";
+});
+
+async function loadProfile() {
+  const { data } = await sb.from("profiles").select("*").eq("user_id", currentUser.id).maybeSingle();
+  currentProfile = data;
+  if (!data) {
+    // Auto-create profile for existing auth users
+    await sb.from("profiles").upsert({ user_id: currentUser.id, name: currentUser.email, role: "supervisor" });
+    currentProfile = { role: "supervisor" };
+  }
+  showView("splashView");
+  if (currentProfile.role === "admin" || currentProfile.role === "geologo") {
+    window.location.href = "admin.html";
+    return;
+  }
+  setTimeout(() => {
+    showView("homeView");
+    loadProjects();
+  }, 2500);
+}
+
+// Check existing session
+(async function initAuth() {
+  const { data } = await sb.auth.getSession();
+  if (data?.session?.user) {
+    currentUser = data.session.user;
+    await loadProfile();
+  }
+})();
 
 // ============================================================
 // VIEW NAVIGATION
