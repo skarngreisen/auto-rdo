@@ -794,7 +794,7 @@ function showView(viewId) {
 
   // Header: show only after splash
   const header = $("#mainHeader");
-  if (viewId === "splashView") {
+  if (viewId === "splashView" || viewId === "authView") {
     header.style.display = "none";
   } else {
     header.style.display = "flex";
