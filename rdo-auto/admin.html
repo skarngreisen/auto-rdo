@@ -294,7 +294,7 @@ async function loadRDOs() {
   const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
 
-  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,projeto_id,projetos(cliente,sonda)").order("data", { ascending: false }).limit(200);
+  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,projeto_id,version,projetos(cliente,sonda)").eq("latest", true).order("data", { ascending: false }).limit(200);
   if (projetoId) query = query.eq("projeto_id", projetoId);
   if (de) query = query.gte("data", de);
   if (ate) query = query.lte("data", ate);
@@ -319,6 +319,7 @@ async function loadRDOs() {
       <td>${r.profundidade_final != null ? (r.profundidade_inicial||0) + ' → ' + r.profundidade_final : '-'}</td>
       <td><span class="badge badge-${r.status}">${r.status}</span></td>
       <td class="actions">
+        <button class="btn btn-secondary btn-sm" onclick="editRDO('${r.id}')">Editar</button>
         <button class="btn btn-secondary btn-sm" onclick="viewRDO('${r.id}')">Ver</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDeleteRDO('${r.id}','${r.data}')">Excluir</button>
       </td>
@@ -364,6 +365,28 @@ async function viewRDO(id) {
 }
 
 $("#btnCloseDetail").addEventListener("click", () => $("#rdoDetail").style.display = "none");
+
+// ============================================================
+// EDIT RDO (versioned — marks old as latest=false, creates copy)
+// ============================================================
+async function editRDO(id) {
+  if (!confirm("Isso criara uma nova versao editavel do RDO. A versao original sera preservada. Continuar?")) return;
+  const { data: original } = await sb.from("rdos").select("*").eq("id", id).single();
+  if (!original) { toast("RDO nao encontrado.", "error"); return; }
+  // Mark original as not latest
+  await sb.from("rdos").update({ latest: false }).eq("id", id);
+  // Create copy with version+1
+  const copy = { ...original };
+  delete copy.id; delete copy.created_at;
+  copy.version = (original.version || 1) + 1;
+  copy.latest = true;
+  const { data: newRDO, error } = await sb.from("rdos").insert(copy).select().single();
+  if (error) { toast("Erro ao criar copia: " + error.message, "error"); return; }
+  toast(`Nova versao (v${copy.version}) criada. Redirecionando para o formulario...`, "success");
+  // Open in field app for editing
+  window.open(`index.html?edit=${newRDO.id}`, "_blank");
+  loadRDOs();
+}
 
 // ============================================================
 // PDF GENERATION (jsPDF + autotable)

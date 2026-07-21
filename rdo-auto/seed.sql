@@ -75,6 +75,8 @@ CREATE TABLE IF NOT EXISTS rdos (
     -- Photos
     fotos           JSONB,    -- [ "url1", "url2", "url3" ]
 
+    version         INT NOT NULL DEFAULT 1,
+    latest          BOOLEAN NOT NULL DEFAULT true,
     status          TEXT NOT NULL DEFAULT 'enviado' CHECK (status IN ('rascunho','enviado')),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -82,6 +84,7 @@ CREATE TABLE IF NOT EXISTS rdos (
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_rdos_projeto_id ON rdos(projeto_id);
 CREATE INDEX IF NOT EXISTS idx_rdos_data ON rdos(data DESC);
+CREATE INDEX IF NOT EXISTS idx_rdos_latest ON rdos(projeto_id, latest);
 
 -- 2. Disable RLS for testing (REMOVE IN PRODUCTION) -------------------------
 

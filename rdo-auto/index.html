@@ -2069,7 +2069,28 @@ function resetForm() {
 // ============================================================
 // INIT
 // ============================================================
-// Splash is already visible via .active class
+// ============================================================
+// URL PARAM: edit=<id> — open RDO for editing
+// ============================================================
+(function initEditMode() {
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get("edit");
+  if (!editId) return;
+  // Wait for splash to dismiss, then load
+  setTimeout(async () => {
+    if ($("#splashView").classList.contains("active")) showView("homeView");
+    await loadProjects();
+    const { data } = await sb.from("rdos").select("*,projetos(id)").eq("id", editId).single();
+    if (!data || !data.projeto_id) return;
+    currentProjectId = data.projeto_id;
+    $("#projectSelect").value = currentProjectId;
+    currentProjectName = $("#projectSelect").selectedOptions[0]?.text || "";
+    $("#headerProjectName").textContent = currentProjectName;
+    openDraft(data);
+    // Clean URL
+    window.history.replaceState({}, "", window.location.pathname);
+  }, 1000);
+})();
 </script>
 </body>
 </html>
