@@ -692,7 +692,8 @@ let currentProfile = null;
 let isLoginMode = true;
 
 function phoneToEmail(phone) {
-  const digits = phone.replace(/\D/g, "");
+  let digits = phone.replace(/\D/g, "");
+  if (digits.length === 11) digits = "55" + digits; // normalize to full format
   return digits + "@rdo.local";
 }
 
