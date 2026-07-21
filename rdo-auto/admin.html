@@ -108,9 +108,10 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
         <div><label>Até</label><input type="date" id="filtroAté"></div>
         <div><label>Status</label><select id="filtroStatus"><option value="">Todos</option><option value="enviado">Enviado</option><option value="rascunho">Rascunho</option></select></div>
       </div>
-      <div style="margin-top:.5rem;display:flex;gap:.5rem;">
+      <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;">
         <button class="btn btn-primary btn-sm" id="btnFiltrar">Filtrar</button>
         <button class="btn btn-secondary btn-sm" id="btnExportCSV">Exportar CSV</button>
+        <label style="margin:0;font-size:.78rem;"><input type="checkbox" id="filtroAllVersions" onchange="loadRDOs()"> Mostrar todas as versões</label>
       </div>
     </div>
     <div class="card">
@@ -294,7 +295,8 @@ async function loadRDOs() {
   const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
 
-  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,projeto_id,version,projetos(cliente,sonda)").eq("latest", true).order("data", { ascending: false }).limit(200);
+  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,projeto_id,version,projetos(cliente,sonda)").order("data", { ascending: false }).limit(200);
+  if (!$("#filtroAllVersions").checked) query = query.eq("latest", true);
   if (projetoId) query = query.eq("projeto_id", projetoId);
   if (de) query = query.gte("data", de);
   if (ate) query = query.lte("data", ate);
@@ -315,7 +317,7 @@ async function loadRDOs() {
     const proj = r.projetos || {};
     return `
     <tr>
-      <td>${r.data}</td><td>${proj.cliente || '-'} (${proj.sonda || '-'})</td><td>${r.tipo_dia || '-'}</td>
+      <td>${r.data}${r.version > 1 ? ` <span style="font-size:.65rem;color:#a04000;">v${r.version}</span>` : ''}</td><td>${proj.cliente || '-'} (${proj.sonda || '-'})</td><td>${r.tipo_dia || '-'}</td>
       <td>${r.profundidade_final != null ? (r.profundidade_inicial||0) + ' → ' + r.profundidade_final : '-'}</td>
       <td><span class="badge badge-${r.status}">${r.status}</span></td>
       <td class="actions">
