@@ -323,9 +323,16 @@ input.inherited, textarea.inherited {
 <header id="mainHeader" style="display:none;">
   <button class="back-btn" id="btnBack" title="Voltar">&larr;</button>
   <img src="logo_DH.png" alt="DH">
-  <div>
+  <div style="flex:1;">
     <h1>RDO Auto</h1>
     <div class="sub" id="headerProjectName"></div>
+  </div>
+  <div style="position:relative;">
+    <span id="headerUserName" style="font-size:.75rem;cursor:pointer;padding:.2rem .5rem;border-radius:4px;" onclick="toggleUserMenu()">&#9660;</span>
+    <div id="userMenu" style="display:none;position:absolute;right:0;top:100%;background:#fff;color:#1a1a2e;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.15);padding:.3rem 0;min-width:140px;z-index:150;">
+      <div style="padding:.3rem .8rem;font-size:.75rem;color:#6b7280;border-bottom:1px solid #e5e7eb;" id="userMenuEmail"></div>
+      <button onclick="doLogout()" style="display:block;width:100%;text-align:left;padding:.4rem .8rem;font-size:.78rem;border:none;background:none;cursor:pointer;">Sair</button>
+    </div>
   </div>
 </header>
 
@@ -722,12 +729,24 @@ $("#authToggle").addEventListener("click", (e) => {
   $("#authToggle").textContent = isLoginMode ? "Cadastre-se" : "Entrar";
 });
 
-$("#btnLogout").addEventListener("click", async () => {
+$("#btnLogout").addEventListener("click", async () => { doLogout(); });
+
+function toggleUserMenu() {
+  const menu = $("#userMenu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#userMenu") && e.target.id !== "headerUserName") {
+    $("#userMenu").style.display = "none";
+  }
+});
+
+async function doLogout() {
   await sb.auth.signOut();
   currentUser = null; currentProfile = null;
   showView("authView");
-  $("#btnLogout").style.display = "none";
-});
+  $("#userMenu").style.display = "none";
+}
 
 async function loadProfile() {
   const { data } = await sb.from("profiles").select("*").eq("user_id", currentUser.id).maybeSingle();
@@ -737,6 +756,9 @@ async function loadProfile() {
     await sb.from("profiles").upsert({ user_id: currentUser.id, name: currentUser.email, role: "supervisor" });
     currentProfile = { role: "supervisor" };
   }
+  // Update header user info
+  $("#headerUserName").textContent = currentProfile.name || currentUser.email;
+  $("#userMenuEmail").textContent = currentUser.email;
   showView("splashView");
   if (currentProfile.role === "admin" || currentProfile.role === "geologo") {
     window.location.href = "admin.html";
