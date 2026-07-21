@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS profiles (
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Profiles: all authenticated can read" ON profiles FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Profiles: update own" ON profiles FOR UPDATE TO authenticated USING (user_id = auth.uid());
+CREATE POLICY "Profiles: insert own" ON profiles FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS projetos (
     user_id     UUID REFERENCES auth.users(id),
