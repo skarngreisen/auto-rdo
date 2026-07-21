@@ -324,7 +324,7 @@ async function loadRDOs() {
       <td class="actions">
         <button class="btn btn-secondary btn-sm" onclick="editRDO('${r.id}')">Editar</button>
         <button class="btn btn-secondary btn-sm" onclick="viewRDO('${r.id}')">Ver</button>
-        <button class="btn btn-secondary btn-sm" onclick="generatePDF('${r.id}')">PDF</button>
+        ${r.status !== "rascunho" ? `<button class="btn btn-secondary btn-sm" onclick="generatePDF('${r.id}')">PDF</button>` : ""}
         <button class="btn btn-danger btn-sm" onclick="confirmDeleteRDO('${r.id}','${r.data}')">Excluir</button>
       </td>
     </tr>`;
