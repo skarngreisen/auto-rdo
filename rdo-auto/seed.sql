@@ -101,7 +101,12 @@ CREATE INDEX IF NOT EXISTS idx_rdos_projeto_id ON rdos(projeto_id);
 CREATE INDEX IF NOT EXISTS idx_rdos_data ON rdos(data DESC);
 CREATE INDEX IF NOT EXISTS idx_rdos_latest ON rdos(projeto_id, latest);
 
--- 2. Disable RLS for testing (REMOVE IN PRODUCTION) -------------------------
+-- 2. Grants (table-level permissions) ---------------------------------------
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.projetos TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.rdos TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.profiles TO authenticated;
+
+-- 3. Disable RLS for testing (REMOVE IN PRODUCTION) -------------------------
 
 ALTER TABLE projetos DISABLE ROW LEVEL SECURITY;
 ALTER TABLE rdos DISABLE ROW LEVEL SECURITY;
