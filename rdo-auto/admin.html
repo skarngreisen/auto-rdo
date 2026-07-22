@@ -81,6 +81,14 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <button class="active" data-tab="projetos">Projetos</button>
     <button data-tab="rdos">RDOs</button>
   </nav>
+  <div style="flex:1;"></div>
+  <div style="position:relative;">
+    <span id="headerUserName" style="font-size:.75rem;cursor:pointer;padding:.2rem .5rem;border-radius:4px;" onclick="toggleUserMenu()">&#9660;</span>
+    <div id="userMenu" style="display:none;position:absolute;right:0;top:100%;background:#fff;color:#1a1a2e;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.15);padding:.3rem 0;min-width:140px;z-index:150;">
+      <div style="padding:.3rem .8rem;font-size:.75rem;color:#6b7280;border-bottom:1px solid #e5e7eb;" id="userMenuPhone"></div>
+      <button onclick="doLogout()" style="display:block;width:100%;text-align:left;padding:.4rem .8rem;font-size:.78rem;border:none;background:none;cursor:pointer;">Sair</button>
+    </div>
+  </div>
 </header>
 
 <div class="container">
@@ -181,18 +189,38 @@ const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
 // ── Auth guard (admin/geologo only) ──
+let currentUser = null, currentProfile = null;
 (async function adminAuth() {
   const { data } = await sb.auth.getSession();
   if (!data?.session?.user) {
     window.location.href = "index.html";
     return;
   }
-  const { data: profile } = await sb.from("profiles").select("role").eq("user_id", data.session.user.id).maybeSingle();
+  currentUser = data.session.user;
+  const { data: profile } = await sb.from("profiles").select("*").eq("user_id", currentUser.id).maybeSingle();
   if (!profile || (profile.role !== "admin" && profile.role !== "geologo")) {
     window.location.href = "index.html";
     return;
   }
+  currentProfile = profile;
+  $("#headerUserName").textContent = profile.name || profile.phone || currentUser.email;
+  $("#userMenuPhone").textContent = profile.phone || "-";
 })();
+
+function toggleUserMenu() {
+  const menu = $("#userMenu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#userMenu") && e.target.id !== "headerUserName") {
+    $("#userMenu").style.display = "none";
+  }
+});
+
+async function doLogout() {
+  await sb.auth.signOut();
+  window.location.href = "index.html";
+}
 
 let toastTimer;
 function toast(msg, type) {
