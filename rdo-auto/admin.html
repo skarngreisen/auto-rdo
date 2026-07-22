@@ -340,7 +340,7 @@ async function loadRDOs() {
   const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
 
-  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,projeto_id,version,projetos(cliente,sonda)").eq("deleted", false).order("data", { ascending: false }).limit(200);
+  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,reopen_requested,projeto_id,version,projetos(cliente,sonda)").eq("deleted", false).order("data", { ascending: false }).limit(200);
   if (!$("#filtroAllVersions").checked) query = query.eq("latest", true);
   if (projetoId) query = query.eq("projeto_id", projetoId);
   if (de) query = query.gte("data", de);
@@ -362,7 +362,7 @@ async function loadRDOs() {
     const proj = r.projetos || {};
     return `
     <tr>
-      <td>${r.data}${r.version > 1 ? ` <span style="font-size:.65rem;color:#a04000;">v${r.version}</span>` : ''}</td><td>${proj.cliente || '-'} (${proj.sonda || '-'})</td><td>${r.tipo_dia || '-'}</td>
+      <td>${r.data}${r.version > 1 ? ` <span style="font-size:.65rem;color:#a04000;">v${r.version}</span>` : ''}${r.reopen_requested ? ` <span style="font-size:.65rem;color:#f59e0b;">⟳</span>` : ''}</td><td>${proj.cliente || '-'} (${proj.sonda || '-'})</td><td>${r.tipo_dia || '-'}</td>
       <td>${r.profundidade_final != null ? (r.profundidade_inicial||0) + ' → ' + r.profundidade_final : '-'}</td>
       <td><span class="badge badge-${r.status}">${{rascunho:"Rascunho",em_revisao:"Em Revisão",aprovado:"Aprovado"}[r.status]||r.status}</span></td>
       <td class="actions">
@@ -387,9 +387,16 @@ async function viewRDO(id) {
   const btnApprove = $("#btnApprove");
   if (r.status === "em_revisao") {
     btnApprove.style.display = "inline-block";
+    btnApprove.textContent = "Aprovar";
     btnApprove.onclick = () => approveRDO(id);
+  } else if (r.reopen_requested) {
+    btnApprove.style.display = "inline-block";
+    btnApprove.textContent = "Aprovar Reabertura";
+    btnApprove.style.background = "#f59e0b";
+    btnApprove.onclick = () => approveReopen(id);
   } else {
     btnApprove.style.display = "none";
+    btnApprove.style.background = "#10b981";
   }
   const { data } = await sb.from("rdos").select("*,projetos(cliente,sonda)").eq("id", id).single();
   let authorName = "-";
@@ -434,10 +441,23 @@ async function approveRDO(id) {
   const { error } = await sb.from("rdos").update({ status: "aprovado" }).eq("id", id);
   if (error) { toast("Erro: " + error.message, "error"); return; }
   toast("RDO aprovado!", "success");
+  closeDetail();
+  loadRDOs();
+}
+
+async function approveReopen(id) {
+  const { error } = await sb.from("rdos").update({ reopen_requested: false, status: "rascunho" }).eq("id", id);
+  if (error) { toast("Erro: " + error.message, "error"); return; }
+  toast("RDO reaberto para edicao!", "success");
+  closeDetail();
+  loadRDOs();
+}
+
+function closeDetail() {
   $("#rdoDetail").style.display = "none";
   $("#btnPDFDetail").style.display = "none";
   $("#btnApprove").style.display = "none";
-  loadRDOs();
+  $("#btnApprove").style.background = "#10b981";
 }
 
 // ============================================================

@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS rdos (
     fotos           JSONB,    -- [ "url1", "url2", "url3" ]
 
     version         INT NOT NULL DEFAULT 1,
+    reopen_requested BOOLEAN NOT NULL DEFAULT false,
     deleted         BOOLEAN NOT NULL DEFAULT false,
     latest          BOOLEAN NOT NULL DEFAULT true,
     status          TEXT NOT NULL DEFAULT 'rascunho' CHECK (status IN ('rascunho','em_revisao','aprovado')),

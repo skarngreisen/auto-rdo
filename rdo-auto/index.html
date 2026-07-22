@@ -1415,8 +1415,19 @@ function viewRDO(rdo) {
     ${rdo.observacoes ? `<div class="ro-section"><h3>Observacoes</h3><p style="font-size:.82rem;">${rdo.observacoes}</p></div>` : ''}
     ${rdo.planejamento_proximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.82rem;">${rdo.planejamento_proximo_turno}</p></div>` : ''}
     <div class="ro-section"><h3>Fotos</h3><div class="photo-grid">${fotos}</div></div>
+    ${rdo.status === 'aprovado' && !rdo.reopen_requested && currentProfile && currentProfile.role === 'colaborador'
+      ? `<button class="btn btn-secondary" onclick="requestReopen('${rdo.id}')" style="margin-top:.5rem;">Solicitar Reabertura</button>`
+      : (rdo.reopen_requested ? `<p style="color:#f59e0b;font-size:.78rem;margin-top:.5rem;">Reabertura solicitada — aguardando supervisor</p>` : '')}
   `;
   showView("readonlyView");
+}
+
+async function requestReopen(id) {
+  const { error } = await sb.from("rdos").update({ reopen_requested: true }).eq("id", id);
+  if (error) { showToast("Erro: " + error.message, "error"); return; }
+  showToast("Reabertura solicitada!", "success");
+  showView("homeView");
+  loadRDOs();
 }
 
 // ============================================================
