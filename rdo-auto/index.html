@@ -763,10 +763,6 @@ async function loadProfile() {
   $("#headerUserName").textContent = currentProfile.name || (currentProfile.phone || currentUser.email);
   $("#userMenuPhone").textContent = currentProfile.phone || "-";
   showView("splashView");
-  if (currentProfile.role === "admin" || currentProfile.role === "geologo") {
-    window.location.href = "admin.html";
-    return;
-  }
   setTimeout(() => {
     showView("homeView");
     loadProjects();
