@@ -424,6 +424,14 @@ input.inherited, textarea.inherited {
           <tr><td>Oper. (hs)</td><td><input type="number" step="0.1" id="bitHoursCurrent"></td><td><input type="number" step="0.1" id="bitHoursPrev"></td></tr>
           <tr><td>ROP medio (m/h)</td><td><input type="number" step="0.1" id="bitRopCurrent"></td><td><input type="number" step="0.1" id="bitRopPrev"></td></tr>
         </table>
+        <!-- Striplog: meter-by-meter depth × time -->
+        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Striplog (marcaçao metro a metro)</label>
+        <table class="ops-table" id="striplogTable">
+          <tr><th>Prof. (m)</th><th>Horario</th><th>Observaçao</th><th></th></tr>
+        </table>
+        <button class="btn btn-secondary btn-sm" id="btnAddStriplog" type="button" style="margin-top:.3rem;">+ Marcar metro</button>
+        <div id="striplogROP" style="font-size:.75rem;color:#6b7280;margin-top:.2rem;display:none;"></div>
+
         <!-- Anomalias de Perfuração (event-based) -->
         <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve anomalia nos parâmetros de perfuração?</p>
         <div class="toggle-group" id="toggleAnomaly">
@@ -1485,6 +1493,10 @@ function populateForm(rdo) {
       setToggle("#toggleAnomaly", true);
       rdo.parametros_anomalias.forEach(a => addAnomalyRow(a.parametro, a.descricao));
     }
+    if (rdo.striplog && rdo.striplog.length > 0) {
+      clearTable("#striplogTable");
+      rdo.striplog.forEach(s => addStriplogRow(s.profundidade, s.horario, s.obs));
+    }
     if (rdo.coluna) {
       clearTable("#bhaTable");
       rdo.coluna.forEach(item => {
@@ -1714,6 +1726,71 @@ function onBHAItemChange(sel) {
   const custom = row.querySelector(".bhaItemCustom");
   custom.style.display = sel.value === "Outro" ? "block" : "none";
   updateBHATotal();
+}
+
+// ── Striplog ─────────────────────────────────────────────────
+function addStriplogRow(depth, time, obs) {
+  const tbody = $("#striplogTable");
+  const prevDepth = getLastStriplogDepth();
+  const nextDepth = prevDepth > 0 ? Math.ceil(prevDepth) : "";
+  const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  const row = tbody.insertRow(-1);
+  row.innerHTML = `
+    <td><input type="number" step="0.01" value="${depth || nextDepth || ''}" class="slDepth" style="min-width:60px;"></td>
+    <td><input type="time" value="${time || ''}" class="slTime" style="min-width:80px;"></td>
+    <td><input type="text" value="${obs || ''}" class="slObs" placeholder="Ex.: parada para manutencao"></td>
+    <td><button class="btn btn-danger btn-sm slRemove" type="button">&times;</button></td>`;
+  // Auto-set time if not provided
+  const timeInput = row.querySelector(".slTime");
+  if (!time) timeInput.value = now;
+  row.querySelector(".slRemove").addEventListener("click", () => { row.remove(); updateStriplogROP(); });
+  row.querySelectorAll("input").forEach(el => el.addEventListener("input", updateStriplogROP));
+  updateStriplogROP();
+}
+
+function getLastStriplogDepth() {
+  const rows = $("#striplogTable").rows;
+  if (rows.length <= 1) return 0;
+  const lastInput = rows[rows.length - 1].querySelector(".slDepth");
+  return parseFloat(lastInput?.value) || 0;
+}
+
+function updateStriplogROP() {
+  const rows = $("#striplogTable").rows;
+  if (rows.length <= 1) { $("#striplogROP").style.display = "none"; return; }
+  let firstDepth = null, lastDepth = null, firstTime = null, lastTime = null;
+  for (let i = 1; i < rows.length; i++) {
+    const d = parseFloat(rows[i].querySelector(".slDepth")?.value);
+    const t = rows[i].querySelector(".slTime")?.value;
+    if (!isNaN(d) && t) {
+      if (firstDepth === null) { firstDepth = d; firstTime = t; }
+      lastDepth = d; lastTime = t;
+    }
+  }
+  if (firstDepth === null || lastDepth === null) { $("#striplogROP").style.display = "none"; return; }
+  const meters = lastDepth - firstDepth;
+  const [fh, fm] = firstTime.split(":").map(Number);
+  const [lh, lm] = lastTime.split(":").map(Number);
+  const totalMin = (lh * 60 + lm) - (fh * 60 + fm);
+  if (totalMin <= 0 || meters <= 0) { $("#striplogROP").style.display = "none"; return; }
+  const rop = (meters / (totalMin / 60)).toFixed(1);
+  $("#striplogROP").textContent = `${meters.toFixed(1)} m em ${totalMin} min | ROP medio: ${rop} m/h`;
+  $("#striplogROP").style.display = "block";
+}
+
+$("#btnAddStriplog").addEventListener("click", () => addStriplogRow("","",""));
+addStriplogRow("","","");
+
+function collectStriplog() {
+  const items = [];
+  for (let i = 1; i < $("#striplogTable").rows.length; i++) {
+    const row = $("#striplogTable").rows[i];
+    const depth = parseFloat(row.querySelector(".slDepth")?.value);
+    const time = row.querySelector(".slTime")?.value;
+    const obs = row.querySelector(".slObs")?.value || "";
+    if (!isNaN(depth) && time) items.push({ profundidade: depth, horario: time, obs: obs || null });
+  }
+  return items.length > 0 ? items : null;
 }
 
 function updateBHATotal() {
@@ -2090,6 +2167,7 @@ function buildPayload(status) {
     }
     p.brocas = collectBits();
     p.parametros_anomalias = collectAnomalies();
+    p.striplog = collectStriplog();
     p.coluna = collectBHA();
   }
   if (fluOn) {
@@ -2201,6 +2279,7 @@ function resetForm() {
   $("#weatherCondition").value = "Bom";
   clearTable("#opsTable"); addOpRow("","","","");
   clearTable("#anomalyTable");
+  clearTable("#striplogTable"); addStriplogRow("","","");
   clearTable("#chemTable"); CHEM_OPTIONS.filter(c => c !== "Outro").forEach(c => addChemicalRow(c,"",""));
   clearTable("#matTable"); MAT_OPTIONS.filter(m => m !== "Outro").forEach(m => addMaterialRow(m,"",""));
   clearTable("#fuelTable"); addFuelRow("Sonda","S10","");
