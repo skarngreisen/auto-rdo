@@ -9,7 +9,7 @@
 CREATE TABLE IF NOT EXISTS profiles (
     user_id   UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     name      TEXT NOT NULL,
-    role      TEXT NOT NULL DEFAULT 'supervisor' CHECK (role IN ('admin','supervisor','geologo')),
+      role      TEXT NOT NULL DEFAULT 'colaborador' CHECK (role IN ('colaborador','supervisor','admin')),
     phone     TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS rdos (
     fotos           JSONB,    -- [ "url1", "url2", "url3" ]
 
     version         INT NOT NULL DEFAULT 1,
+    deleted         BOOLEAN NOT NULL DEFAULT false,
     latest          BOOLEAN NOT NULL DEFAULT true,
     status          TEXT NOT NULL DEFAULT 'rascunho' CHECK (status IN ('rascunho','em_revisao','aprovado')),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()

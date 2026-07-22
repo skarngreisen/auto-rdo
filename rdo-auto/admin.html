@@ -200,7 +200,7 @@ let currentUser = null, currentProfile = null;
   }
   currentUser = data.session.user;
   const { data: profile } = await sb.from("profiles").select("*").eq("user_id", currentUser.id).maybeSingle();
-  if (!profile || (profile.role !== "admin" && profile.role !== "geologo")) {
+  if (!profile || (profile.role !== "admin" && profile.role !== "supervisor")) {
     window.location.href = "index.html";
     return;
   }
@@ -340,7 +340,7 @@ async function loadRDOs() {
   const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
 
-  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,projeto_id,version,projetos(cliente,sonda)").order("data", { ascending: false }).limit(200);
+  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,projeto_id,version,projetos(cliente,sonda)").eq("deleted", false).order("data", { ascending: false }).limit(200);
   if (!$("#filtroAllVersions").checked) query = query.eq("latest", true);
   if (projetoId) query = query.eq("projeto_id", projetoId);
   if (de) query = query.gte("data", de);
@@ -369,7 +369,7 @@ async function loadRDOs() {
         <button class="btn btn-secondary btn-sm" onclick="editRDO('${r.id}')">Editar</button>
         <button class="btn btn-secondary btn-sm" onclick="viewRDO('${r.id}')">Ver</button>
         ${r.status !== "rascunho" ? `<button class="btn btn-secondary btn-sm" onclick="generatePDF('${r.id}')">PDF</button>` : ""}
-        <button class="btn btn-danger btn-sm" onclick="confirmDeleteRDO('${r.id}','${r.data}')">Excluir</button>
+        ${currentProfile && currentProfile.role === "admin" ? `<button class="btn btn-danger btn-sm" onclick="confirmDeleteRDO('${r.id}','${r.data}')">Excluir</button>` : ""}
       </td>
     </tr>`;
   }).join("");
@@ -564,7 +564,7 @@ $("#btnConfirmOk").addEventListener("click", async () => {
   if (deleteTarget.type === "project") {
     ({ error } = await sb.from("projetos").delete().eq("id", deleteTarget.id));
   } else {
-    ({ error } = await sb.from("rdos").delete().eq("id", deleteTarget.id));
+    ({ error } = await sb.from("rdos").update({ deleted: true }).eq("id", deleteTarget.id));
   }
   if (error) { toast("Erro: " + error.message, "error"); }
   else { toast(deleteTarget.type === "project" ? "Projeto excluído!" : "RDO excluído!", "success"); }

@@ -717,7 +717,7 @@ $("#btnAuth").addEventListener("click", async () => {
     if (error) { errEl.textContent = error.message; errEl.style.display = "block"; return; }
     currentUser = data.user;
     if (currentUser) {
-      await sb.from("profiles").upsert({ user_id: currentUser.id, name, role: "supervisor", phone: phone.replace(/\D/g, "") });
+      await sb.from("profiles").upsert({ user_id: currentUser.id, name, role: "colaborador", phone: phone.replace(/\D/g, "") });
     }
   }
   if (currentUser) await loadProfile();
@@ -757,8 +757,8 @@ async function loadProfile() {
   currentProfile = data;
   if (!data) {
     // Auto-create profile for existing auth users
-    await sb.from("profiles").upsert({ user_id: currentUser.id, name: currentUser.email, role: "supervisor" });
-    currentProfile = { role: "supervisor" };
+    await sb.from("profiles").upsert({ user_id: currentUser.id, name: currentUser.email, role: "colaborador" });
+    currentProfile = { role: "colaborador" };
   }
   // Update header user info
   $("#headerUserName").textContent = currentProfile.name || (currentProfile.phone || currentUser.email);
