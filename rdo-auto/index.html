@@ -1136,6 +1136,7 @@ async function loadLastRDO() {
     // Search same day (other shift) OR previous day — most recent first
     let { data } = await sb.from("rdos")
       .select("*")
+      .eq("deleted", false)
       .eq("projeto_id", currentProjectId)
       .in("data", [refStr, prevStr])
       .order("created_at", { ascending: false })
@@ -1148,8 +1149,9 @@ async function loadLastRDO() {
       }
     } else {
       // Fallback: long stoppage — find most recent RDO ever for this project
-      const { data: fallback } = await sb.from("rdos")
+        const { data: fallback } = await sb.from("rdos")
         .select("data")
+        .eq("deleted", false)
         .eq("projeto_id", currentProjectId)
         .order("data", { ascending: false })
         .limit(1);
