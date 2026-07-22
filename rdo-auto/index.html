@@ -854,9 +854,10 @@ $("#rdoDate").addEventListener("input", () => {
   const hasDate = !!$("#rdoDate").value;
   $("#formBody").style.display = hasDate ? "block" : "none";
 });
-$("#rdoDate").addEventListener("change", () => {
+$("#rdoDate").addEventListener("change", async () => {
   const hasDate = !!$("#rdoDate").value;
   $("#formBody").style.display = hasDate ? "block" : "none";
+  if (hasDate) { await loadLastRDO(); await loadLastStratigraphy(); }
 });
 
 // ============================================================
@@ -1201,8 +1202,6 @@ $("#btnNewRDO").addEventListener("click", async () => {
   // Hide form body until date is set
   $("#formBody").style.display = "none";
   startAutoDraft();
-  await loadLastRDO();
-  await loadLastStratigraphy();
   renderPhotoPreview();
 });
 
