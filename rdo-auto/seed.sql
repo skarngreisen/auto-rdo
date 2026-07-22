@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS rdos (
 
     version         INT NOT NULL DEFAULT 1,
     latest          BOOLEAN NOT NULL DEFAULT true,
-    status          TEXT NOT NULL DEFAULT 'enviado' CHECK (status IN ('rascunho','enviado')),
+    status          TEXT NOT NULL DEFAULT 'rascunho' CHECK (status IN ('rascunho','em_revisao','aprovado')),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

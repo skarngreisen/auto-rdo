@@ -97,8 +97,9 @@ header .back-btn {
   font-size: .7rem; font-weight: 700; padding: .2rem .5rem; border-radius: 12px;
   text-transform: uppercase;
 }
-.badge-enviado { background: #d1fae5; color: #065f46; }
-.badge-rascunho { background: #fef3c7; color: #92400e; }
+.badge-rascunho { background: #e5e7eb; color: #374151; }
+.badge-em_revisao { background: #fef3c7; color: #92400e; }
+.badge-aprovado { background: #d1fae5; color: #065f46; }
 
 .rdo-actions { display: flex; gap: .5rem; margin-top: .75rem; }
 .rdo-actions .btn { flex: 1; }
@@ -1068,8 +1069,9 @@ async function loadRDOs() {
   }
 
   container.innerHTML = data.map(r => {
-    const badgeClass = r.status === 'rascunho' ? 'badge-rascunho' : 'badge-enviado';
-    const badgeText = r.status === 'rascunho' ? 'Rascunho' : 'Enviado';
+    const badgeClass = 'badge-' + r.status;
+    const statusLabels = { rascunho: "Rascunho", em_revisao: "Em Revisão", aprovado: "Aprovado" };
+    const badgeText = statusLabels[r.status] || r.status;
     const depthInfo = r.profundidade_final != null
       ? `${r.profundidade_inicial || 0} → ${r.profundidade_final} m`
       : 'Sem perfuração';
@@ -2130,7 +2132,7 @@ $("#btnSubmit").addEventListener("click", async () => {
   $("#btnSubmit").innerHTML = '<span class="spinner"></span> Enviando...';
   try {
     const photoUrls = await uploadPhotos();
-    const payload = buildPayload("enviado");
+    const payload = buildPayload("em_revisao");
     // Merge new photos with existing ones
     const existingUrls = [];
     $("#existingPhotos img").each(img => existingUrls.push(img.src));

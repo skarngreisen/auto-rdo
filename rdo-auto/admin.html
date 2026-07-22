@@ -44,8 +44,9 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
 .actions { display: flex; gap: .3rem; }
 
 .badge { font-size: .7rem; font-weight: 700; padding: .15rem .45rem; border-radius: 10px; text-transform: uppercase; white-space: nowrap; }
-.badge-enviado { background: #d1fae5; color: #065f46; }
-.badge-rascunho { background: #fef3c7; color: #92400e; }
+.badge-rascunho { background: #e5e7eb; color: #374151; }
+.badge-em_revisao { background: #fef3c7; color: #92400e; }
+.badge-aprovado { background: #d1fae5; color: #065f46; }
 
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
 .modal-overlay.show { display: flex; }
@@ -114,7 +115,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
         <div><label>Projeto</label><select id="filtroProjeto"><option value="">Todos</option></select></div>
         <div><label>De</label><input type="date" id="filtroDe"></div>
         <div><label>Até</label><input type="date" id="filtroAté"></div>
-        <div><label>Status</label><select id="filtroStatus"><option value="">Todos</option><option value="enviado">Enviado</option><option value="rascunho">Rascunho</option></select></div>
+        <div><label>Status</label><select id="filtroStatus"><option value="">Todos</option><option value="rascunho">Rascunho</option><option value="em_revisao">Em Revisão</option><option value="aprovado">Aprovado</option></select></div>
       </div>
       <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;">
         <button class="btn btn-primary btn-sm" id="btnFiltrar">Filtrar</button>
@@ -136,6 +137,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
         <span>Detalhes do RDO</span>
         <button class="btn btn-secondary btn-sm" id="btnCloseDetail">Fechar</button>
       <button class="btn btn-primary btn-sm" id="btnPDFDetail" onclick="generatePDF(currentDetailId)" style="display:none;">Exportar PDF</button>
+      <button class="btn btn-primary btn-sm" id="btnApprove" style="display:none;background:#10b981;">Aprovar</button>
       </div>
       <div id="rdoDetailContent"></div>
     </div>
@@ -362,7 +364,7 @@ async function loadRDOs() {
     <tr>
       <td>${r.data}${r.version > 1 ? ` <span style="font-size:.65rem;color:#a04000;">v${r.version}</span>` : ''}</td><td>${proj.cliente || '-'} (${proj.sonda || '-'})</td><td>${r.tipo_dia || '-'}</td>
       <td>${r.profundidade_final != null ? (r.profundidade_inicial||0) + ' → ' + r.profundidade_final : '-'}</td>
-      <td><span class="badge badge-${r.status}">${r.status}</span></td>
+      <td><span class="badge badge-${r.status}">${{rascunho:"Rascunho",em_revisao:"Em Revisão",aprovado:"Aprovado"}[r.status]||r.status}</span></td>
       <td class="actions">
         <button class="btn btn-secondary btn-sm" onclick="editRDO('${r.id}')">Editar</button>
         <button class="btn btn-secondary btn-sm" onclick="viewRDO('${r.id}')">Ver</button>
@@ -381,7 +383,14 @@ $("#btnFiltrar").addEventListener("click", loadRDOs);
 let currentDetailId = null;
 async function viewRDO(id) {
   currentDetailId = id;
-  $("#btnPDFDetail").style.display = "inline-block";
+  $("#btnPDFDetail").style.display = (r.status !== "rascunho") ? "inline-block" : "none";
+  const btnApprove = $("#btnApprove");
+  if (r.status === "em_revisao") {
+    btnApprove.style.display = "inline-block";
+    btnApprove.onclick = () => approveRDO(id);
+  } else {
+    btnApprove.style.display = "none";
+  }
   const { data } = await sb.from("rdos").select("*,projetos(cliente,sonda),profiles!rdos_user_id_fkey(name)").eq("id", id).single();
   if (!data) return;
   const r = data;
@@ -414,7 +423,17 @@ async function viewRDO(id) {
   $("#rdoDetail").scrollIntoView({ behavior: "smooth" });
 }
 
-$("#btnCloseDetail").addEventListener("click", () => { $("#rdoDetail").style.display = "none"; $("#btnPDFDetail").style.display = "none"; });
+$("#btnCloseDetail").addEventListener("click", () => { $("#rdoDetail").style.display = "none"; $("#btnPDFDetail").style.display = "none"; $("#btnApprove").style.display = "none"; });
+
+async function approveRDO(id) {
+  const { error } = await sb.from("rdos").update({ status: "aprovado" }).eq("id", id);
+  if (error) { toast("Erro: " + error.message, "error"); return; }
+  toast("RDO aprovado!", "success");
+  $("#rdoDetail").style.display = "none";
+  $("#btnPDFDetail").style.display = "none";
+  $("#btnApprove").style.display = "none";
+  loadRDOs();
+}
 
 // ============================================================
 // EDIT RDO (versioned — marks old as latest=false, creates copy)
