@@ -1088,7 +1088,7 @@ async function loadRDOs() {
     card.addEventListener("click", async () => {
       const id = card.dataset.id;
       const status = card.dataset.status;
-      const { data } = await sb.from("rdos").select("*").eq("id", id).single();
+      const { data } = await sb.from("rdos").select("*,profiles!rdos_user_id_fkey(name)").eq("id", id).single();
       if (!data) return;
       if (status === "rascunho") {
         openDraft(data);
@@ -1392,6 +1392,7 @@ function viewRDO(rdo) {
 
   c.innerHTML = `
     <div class="card-header">RDO ${rdo.data} — ${rdo.tipo_dia || 'N/D'} <span class="rdo-badge badge-enviado" style="margin-left:.5rem;">Enviado</span></div>
+    <div class="ro-row" style="margin-bottom:.4rem;"><span class="ro-label">Autor</span><span class="ro-value">${rdo.profiles?.name || '-'}</span></div>
     <div class="ro-section"><h3>Perfuracao</h3>${depthInfo || '<p style="color:#9ca3af;font-size:.8rem;">Sem perfuracao neste dia.</p>'}</div>
     ${rdo.estratigrafia_mudou ? `<div class="ro-section"><h3>Estratigrafia</h3><div class="ro-row"><span class="ro-label">Mudanca</span><span class="ro-value">${rdo.estratigrafia_descricao || '-'} (${rdo.estratigrafia_profundidade || '?'} m)</span></div></div>` : ''}
     ${rdo.revestimento_mudou ? `<div class="ro-section"><h3>Revestimento</h3><div class="ro-row"><span class="ro-label">Metros</span><span class="ro-value">${rdo.revestimento_metros || '-'} m descidos</span></div>${rdo.revestimento_obs ? `<div class="ro-row"><span class="ro-label">Obs.</span><span class="ro-value">${rdo.revestimento_obs}</span></div>` : ''}</div>` : ''}
@@ -2038,6 +2039,7 @@ function buildPayload(status) {
   const perfOn = getToggleState("#toggleDrilling");
   const fluOn = getToggleState("#toggleFluid");
   const p = {
+    user_id: (currentUser && currentUser.id) || null,
     projeto_id: currentProjectId,
     data: $("#rdoDate").value || new Date().toISOString().split("T")[0],
     tipo_dia: $("#rdoDayType").value || null,

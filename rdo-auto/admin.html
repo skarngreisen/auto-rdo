@@ -382,7 +382,7 @@ let currentDetailId = null;
 async function viewRDO(id) {
   currentDetailId = id;
   $("#btnPDFDetail").style.display = "inline-block";
-  const { data } = await sb.from("rdos").select("*,projetos(cliente,sonda)").eq("id", id).single();
+  const { data } = await sb.from("rdos").select("*,projetos(cliente,sonda),profiles!rdos_user_id_fkey(name)").eq("id", id).single();
   if (!data) return;
   const r = data;
   const c = $("#rdoDetailContent");
@@ -391,6 +391,7 @@ async function viewRDO(id) {
   c.innerHTML = `
     <div class="ro-section"><h3>Geral</h3>
       <div class="ro-row"><span class="ro-label">Projeto</span><span class="ro-value">${r.projetos?.cliente || '-'} (${r.projetos?.sonda || '-'})</span></div>
+      <div class="ro-row"><span class="ro-label">Autor</span><span class="ro-value">${r.profiles?.name || '-'}</span></div>
       <div class="ro-row"><span class="ro-label">Data</span><span class="ro-value">${r.data} — ${r.tipo_dia||'-'}</span></div>
       <div class="ro-row"><span class="ro-label">Prof.</span><span class="ro-value">${r.profundidade_final!=null ? (r.profundidade_inicial||0)+' → '+r.profundidade_final+' m' : '-'}</span></div>
       ${r.estratigrafia_mudou ? `<div class="ro-row"><span class="ro-label">Estratigrafia</span><span class="ro-value">${r.estratigrafia_descricao||'-'} (${r.estratigrafia_profundidade||'?'} m)</span></div>` : ''}
