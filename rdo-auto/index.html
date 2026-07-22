@@ -1671,11 +1671,15 @@ $("#shiftHours").addEventListener("input", updateTimeline);
 // ============================================================
 // COLUNA TABLE
 // ============================================================
+const BHA_OPTIONS = ["BR: Broca","NB: Nearbit","DC: Drill Collar","STB: Estabilizador","HW: Heavy Weight","DP: Drill Pipe","RED: Reducao","UR: Underreamer","Outro"];
+
 function addBHARow(item, qty, idPol, odPol, lengthM, totalM) {
   const tbody = $("#bhaTable");
   const row = tbody.insertRow(-1);
+  const opts = BHA_OPTIONS.map(o => `<option value="${o}" ${o===item||o.startsWith(item)?"selected":""}>${o}</option>`).join("");
+  const customVal = BHA_OPTIONS.some(o => o.startsWith(item)) ? "" : (item || "");
   row.innerHTML = `
-    <td><input type="text" value="${item || ''}" class="bhaItem" placeholder="DP 3 1/2" style="min-width:80px"></td>
+    <td><select class="bhaItem" style="min-width:100px;font-size:.82rem;" onchange="onBHAItemChange(this)">${opts}</select><input type="text" class="bhaItemCustom" placeholder="Nome da peca" style="display:none;margin-top:2px;min-width:100px;font-size:.8rem;" value="${customVal}"></td>
     <td><input type="number" value="${qty || ''}" class="bhaQty" style="min-width:50px"></td>
     <td><input type="number" step="0.01" value="${idPol || ''}" class="bhaId" style="min-width:60px"></td>
     <td><input type="number" step="0.01" value="${odPol || ''}" class="bhaOd" style="min-width:60px"></td>
@@ -1689,6 +1693,13 @@ function addBHARow(item, qty, idPol, odPol, lengthM, totalM) {
 }
 $("#btnAddBHA").addEventListener("click", () => addBHARow("","","","","",""));
 addBHARow("","","","","","");
+
+function onBHAItemChange(sel) {
+  const row = sel.closest("tr");
+  const custom = row.querySelector(".bhaItemCustom");
+  custom.style.display = sel.value === "Outro" ? "block" : "none";
+  updateBHATotal();
+}
 
 function updateBHATotal() {
   let total = 0;
@@ -1778,7 +1789,10 @@ function collectBHA() {
   const items = [];
   for (let i = 1; i < $("#bhaTable").rows.length; i++) {
     const row = $("#bhaTable").rows[i];
-    const item = row.querySelector(".bhaItem")?.value || "";
+    const sel = row.querySelector(".bhaItem");
+    const custom = row.querySelector(".bhaItemCustom");
+    let item = sel?.value || "";
+    if (item === "Outro") item = custom?.value || "";
     if (!item) continue;
     items.push({
       item,
