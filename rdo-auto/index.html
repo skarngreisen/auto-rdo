@@ -913,13 +913,17 @@ async function saveLocalDraft() {
   payload._savedAt = Date.now();
   localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
 
-  // Also save to Supabase
-  const rdoId = $("#rdoId").value;
-  if (rdoId) {
-    await sb.from("rdos").update(payload).eq("id", rdoId);
-  } else {
-    const { data } = await sb.from("rdos").insert(payload).select("id").single();
-    if (data) $("#rdoId").value = data.id;
+  // Also save to Supabase (silent fail if offline)
+  try {
+    const rdoId = $("#rdoId").value;
+    if (rdoId) {
+      await sb.from("rdos").update(payload).eq("id", rdoId);
+    } else {
+      const { data } = await sb.from("rdos").insert(payload).select("id").single();
+      if (data) $("#rdoId").value = data.id;
+    }
+  } catch(e) {
+    console.warn("Auto-save to Supabase failed (offline?):", e.message);
   }
 
   lastDraftTime = Date.now();
