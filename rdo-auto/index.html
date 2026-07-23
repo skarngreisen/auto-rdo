@@ -1183,7 +1183,14 @@ async function loadRDOs() {
         if (profile) authorName = profile.name;
       }
       if (!data) return;
+      const role = currentProfile?.role || "colaborador";
+      // Status-based access:
+      // rascunho: anyone can edit
+      // em_revisao: colaborador = read-only, supervisor/admin = edit
+      // aprovado: always read-only (versioned edit via admin panel)
       if (status === "rascunho") {
+        openDraft(data);
+      } else if (status === "em_revisao" && (role === "supervisor" || role === "admin")) {
         openDraft(data);
       } else {
         viewRDO(data);
