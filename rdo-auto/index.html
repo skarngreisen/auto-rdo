@@ -60,6 +60,12 @@ header .back-btn {
   color: #fff; background: none; border: none; font-size: 1.2rem;
   cursor: pointer; padding: .2rem .4rem; margin-right: .2rem;
 }
+.form-tab {
+  background: rgba(255,255,255,.12); color: #fff; border: none;
+  padding: .3rem .7rem; border-radius: 5px; cursor: pointer;
+  font-size: .75rem; font-weight: 600;
+}
+.form-tab.active { background: #fff; color: #1e3a5f; }
 
 /* ============================================================
    CONTAINER & CARDS
@@ -327,6 +333,10 @@ input.inherited, textarea.inherited {
     <h1>RDO Auto</h1>
     <div class="sub" id="headerProjectName"></div>
   </div>
+  <nav id="formTabs" style="display:none;gap:.2rem;">
+    <button class="form-tab active" data-tab="rdo">RDO</button>
+    <button class="form-tab" data-tab="striplog">Striplog</button>
+  </nav>
   <div style="position:relative;">
     <span id="headerUserName" style="font-size:.75rem;cursor:pointer;padding:.2rem .5rem;border-radius:4px;" onclick="toggleUserMenu()">&#9660;</span>
     <div id="userMenu" style="display:none;position:absolute;right:0;top:100%;background:#fff;color:#1a1a2e;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.15);padding:.3rem 0;min-width:140px;z-index:150;">
@@ -425,13 +435,6 @@ input.inherited, textarea.inherited {
           <tr><td>ROP medio (m/h)</td><td><input type="number" step="0.1" id="bitRopCurrent"></td><td><input type="number" step="0.1" id="bitRopPrev"></td></tr>
         </table>
         <!-- Striplog: meter-by-meter depth × time -->
-        <label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Striplog (marcaçao metro a metro)</label>
-        <table class="ops-table" id="striplogTable">
-          <tr><th>Prof. (m)</th><th>Horario</th><th>Observaçao</th><th></th></tr>
-        </table>
-        <button class="btn btn-secondary btn-sm" id="btnAddStriplog" type="button" style="margin-top:.3rem;">+ Marcar metro</button>
-        <div id="striplogROP" style="font-size:.75rem;color:#6b7280;margin-top:.2rem;display:none;"></div>
-
         <!-- Anomalias de Perfuração (event-based) -->
         <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve anomalia nos parâmetros de perfuração?</p>
         <div class="toggle-group" id="toggleAnomaly">
@@ -650,6 +653,23 @@ input.inherited, textarea.inherited {
   </div>
 
   <!-- ============================================================
+       VIEW: STRIPLOG
+       ============================================================ -->
+  <div class="view" id="striplogView">
+    <div class="card">
+      <div class="card-header">Striplog — Marcaçao metro a metro</div>
+      <div style="margin-bottom:.4rem;">
+        <label style="font-size:.78rem;"><input type="checkbox" id="striplogShiftStart"> Início do turno (primeira marcaçao)</label>
+      </div>
+      <table class="ops-table" id="striplogTable">
+        <tr><th>Prof. (m)</th><th>Horario</th><th>Observaçao</th><th></th></tr>
+      </table>
+      <button class="btn btn-secondary btn-sm" id="btnAddStriplog" type="button" style="margin-top:.3rem;">+ Marcar metro</button>
+      <div id="striplogROP" style="font-size:.75rem;color:#6b7280;margin-top:.2rem;display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
        VIEW: READ-ONLY RDO
        ============================================================ -->
   <div class="view" id="readonlyView">
@@ -806,6 +826,14 @@ function showView(viewId) {
     header.style.display = "flex";
   }
 
+  // Show/hide form tabs
+  const formTabs = $("#formTabs");
+  if (viewId === "formView" || viewId === "striplogView") {
+    formTabs.style.display = "flex";
+  } else {
+    formTabs.style.display = "none";
+  }
+
   // Back button visibility
   const btnBack = $("#btnBack");
   if (viewId === "homeView") {
@@ -834,6 +862,14 @@ setTimeout(() => {
 // BACK BUTTON
 // ============================================================
 $("#btnBack").addEventListener("click", () => {
+  const slActive = $("#striplogView").classList.contains("active");
+  if (slActive) {
+    showView("formView");
+    $("#formTabs").style.display = "flex";
+    $$(".form-tab").forEach(t => t.classList.remove("active"));
+    document.querySelector('.form-tab[data-tab="rdo"]').classList.add("active");
+    return;
+  }
   const formActive = $("#formView").classList.contains("active");
   const roActive = $("#readonlyView").classList.contains("active");
   if (formActive || roActive) {
@@ -962,6 +998,22 @@ function populateDraftFromPayload(payload) {
   if (payload.approvalGeologist) $("#approvalGeologist").value = payload.approvalGeologist;
   if (payload.turnoHoras) $("#shiftHours").value = payload.turnoHoras;
 }
+
+// ============================================================
+// FORM TABS (RDO / Striplog)
+// ============================================================
+$$(".form-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    $$(".form-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const target = tab.dataset.tab === "rdo" ? "formView" : "striplogView";
+    $$(".view").forEach(v => v.classList.remove("active"));
+    $("#" + target).classList.add("active");
+    $("#formTabs").style.display = "flex";
+    $("#btnBack").style.visibility = "visible";
+    $("#mainHeader").style.display = "flex";
+  });
+});
 
 // ============================================================
 // TOAST
@@ -2155,8 +2207,15 @@ function buildPayload(status) {
     status: status,
   };
   if (perfOn) {
-    p.profundidade_inicial = parseFloat($("#depthInitial").value) || null;
-    p.profundidade_final = parseFloat($("#depthFinal").value) || null;
+    const sl = collectStriplog();
+    if (sl && sl.length > 0) {
+      const depths = sl.map(r => r.profundidade).sort((a,b) => a - b);
+      p.profundidade_inicial = depths[0];
+      p.profundidade_final = depths[depths.length - 1];
+    } else {
+      p.profundidade_inicial = parseFloat($("#depthInitial").value) || null;
+      p.profundidade_final = parseFloat($("#depthFinal").value) || null;
+    }
     p.estratigrafia_mudou = getToggleState("#toggleStratigraphy");
     if (p.estratigrafia_mudou) {
       p.estratigrafia_profundidade = parseFloat($("#stratDepth").value) || null;
