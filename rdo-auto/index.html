@@ -639,19 +639,19 @@ input.inherited, textarea.inherited {
       <div id="existingPhotos"></div>
     </div>
 
-    <!-- Buttons (sticky footer) -->
-    <div style="position:sticky;bottom:0;background:#f0f2f5;padding:.5rem 0;margin:0 -1rem;padding-left:1rem;padding-right:1rem;box-shadow:0 -2px 8px rgba(0,0,0,.06);z-index:50;">
-      <div style="display:flex;gap:.5rem;margin-bottom:.3rem;">
-        <button class="btn btn-draft" id="btnSaveDraft" type="button" style="flex:1;">Salvar Rascunho</button>
-        <button class="btn btn-primary" id="btnSubmit" type="button" style="flex:1;">Enviar RDO</button>
-      </div>
-      <div>
-        <button class="btn btn-secondary btn-sm" id="btnClearForm" type="button">Limpar formulário</button>
-        <span id="autoSaveIndicator" style="float:right;font-size:.7rem;color:#10b981;opacity:0;transition:opacity .3s;line-height:1.8;">Rascunho salvo</span>
-      </div>
-    </div>
     </div><!-- #formBody -->
     </form>
+  </div>
+
+  <!-- Buttons (sticky footer, visible in form + striplog) -->
+  <div id="stickyFooter" style="display:none;position:sticky;bottom:0;background:#f0f2f5;padding:.5rem 0;box-shadow:0 -2px 8px rgba(0,0,0,.06);z-index:50;max-width:640px;margin:0 auto;">
+    <div style="display:flex;gap:.5rem;margin-bottom:.3rem;padding:0 1rem;">
+      <button class="btn btn-draft" id="btnSaveDraft" type="button" style="flex:1;">Salvar Rascunho</button>
+      <button class="btn btn-primary" id="btnSubmit" type="button" style="flex:1;">Enviar RDO</button>
+    </div>
+    <div style="padding:0 1rem;">
+      <span id="autoSaveIndicator" style="float:right;font-size:.7rem;color:#10b981;opacity:0;transition:opacity .3s;">Rascunho salvo</span>
+    </div>
   </div>
 
   <!-- ============================================================
@@ -832,12 +832,15 @@ function showView(viewId) {
   if (viewId === "formView") {
     formTabs.style.display = "flex";
     updateStriplogTabVisibility();
+    $("#stickyFooter").style.display = "block";
   } else if (viewId === "striplogView") {
     formTabs.style.display = "flex";
     $$(".form-tab").forEach(t => t.classList.remove("active"));
     document.querySelector('.form-tab[data-tab="striplog"]').classList.add("active");
+    $("#stickyFooter").style.display = "block";
   } else {
     formTabs.style.display = "none";
+    $("#stickyFooter").style.display = "none";
   }
 
   // Back button visibility
@@ -2368,14 +2371,6 @@ $("#btnSaveDraft").addEventListener("click", async () => {
 // ============================================================
 // SUBMIT RDO
 // ============================================================
-$("#btnClearForm").addEventListener("click", () => {
-  if (confirm("Tem certeza? Os dados nao salvos serao perdidos.")) {
-    stopAutoDraft();
-    resetForm();
-    showToast("Formulario limpo.", "success");
-  }
-});
-
 $("#btnSubmit").addEventListener("click", async () => {
   if (!currentProjectId) { showToast("Selecione um projeto.","error"); return; }
   $("#btnSaveDraft").disabled = true;
