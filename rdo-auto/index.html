@@ -957,14 +957,15 @@ window.addEventListener("beforeunload", (e) => {
         currentProjectId = draft._projectId;
         delete draft._projectId; delete draft._savedAt;
         // Load project and open draft
+        clearTimeout(splashTimer);
         setTimeout(async () => {
-          // Wait for splash dismiss then load
           if ($("#splashView").classList.contains("active")) {
             showView("homeView");
           }
           await loadProjects();
-          $("#projectSelect").value = currentProjectId;
-          currentProjectName = $("#projectSelect").selectedOptions[0]?.text || "";
+          const sel = $("#projectSelect");
+          sel.value = currentProjectId;
+          currentProjectName = sel.selectedOptions[0]?.text || "";
           $("#headerProjectName").textContent = currentProjectName;
           showView("formView");
           $("#rdoDate").value = draft.data || "";
