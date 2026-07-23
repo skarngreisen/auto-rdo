@@ -1947,15 +1947,30 @@ function updateStriplogROP() {
 
   // Summary line
   if (validRops.length > 0) {
-    // Exclude stop rows from summary (their time is idling, not drilling)
-    const drillRops = [];
+    // Summary: total depth change (all rows) / total elapsed time (excluding stops)
+    let totalDm = 0, firstIni = null, lastTer = null, totalStopDt = 0;
     for (let i = 1; i < rows.length; i++) {
-      if (rows[i].getAttribute("data-mode") === "stop") continue;
-      const rp = rops.find(r => r.rowIndex === i);
-      if (rp) drillRops.push(rp);
+      const mode = rows[i].getAttribute("data-mode");
+      const d = parseFloat(rows[i].querySelector(".slDepth")?.value);
+      const ini = rows[i].querySelector(".slInicio")?.value;
+      const ter = rows[i].querySelector(".slTermino")?.value;
+      if (!isNaN(d)) totalDm = d; // track last valid depth
+      if (mode === "stop" && ini && ter) {
+        const [ih, im] = ini.split(":").map(Number);
+        const [th, tm] = ter.split(":").map(Number);
+        totalStopDt += (th * 60 + tm) - (ih * 60 + im);
+      }
+      if (ini && mode !== "stop") {
+        if (!firstIni) firstIni = ini;
+        lastTer = ter || lastTer;
+      }
     }
-    const totalDm = drillRops.reduce((s, r) => s + r.dm, 0);
-    const totalDt = drillRops.reduce((s, r) => s + r.dt, 0);
+    // Subtract first row depth to get total meters
+    const firstD = parseFloat(rows[1]?.querySelector(".slDepth")?.value) || 0;
+    totalDm = totalDm - firstD;
+    const [fh, fm] = (firstIni || "0:0").split(":").map(Number);
+    const [lh, lm] = (lastTer || "0:0").split(":").map(Number);
+    const totalDt = ((lh * 60 + lm) - (fh * 60 + fm)) - totalStopDt;
     if (totalDt > 0 && totalDm > 0) {
       const avg = (totalDm / (totalDt / 60)).toFixed(1);
       $("#striplogROP").textContent = `${totalDm.toFixed(1)} m em ${totalDt} min | ROP medio: ${avg} m/h`;
