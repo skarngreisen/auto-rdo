@@ -1947,8 +1947,15 @@ function updateStriplogROP() {
 
   // Summary line
   if (validRops.length > 0) {
-    const totalDm = validRops.reduce((s, r) => s + r.dm, 0);
-    const totalDt = validRops.reduce((s, r) => s + r.dt, 0);
+    // Exclude stop rows from summary (their time is idling, not drilling)
+    const drillRops = [];
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i].getAttribute("data-mode") === "stop") continue;
+      const rp = rops.find(r => r.rowIndex === i);
+      if (rp) drillRops.push(rp);
+    }
+    const totalDm = drillRops.reduce((s, r) => s + r.dm, 0);
+    const totalDt = drillRops.reduce((s, r) => s + r.dt, 0);
     if (totalDt > 0 && totalDm > 0) {
       const avg = (totalDm / (totalDt / 60)).toFixed(1);
       $("#striplogROP").textContent = `${totalDm.toFixed(1)} m em ${totalDt} min | ROP medio: ${avg} m/h`;
