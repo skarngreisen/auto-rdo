@@ -1968,8 +1968,11 @@ function updateStriplogROP() {
     // Subtract first row depth to get total meters
     const firstD = parseFloat(rows[1]?.querySelector(".slDepth")?.value) || 0;
     totalDm = totalDm - firstD;
-    const [fh, fm] = (firstIni || "0:0").split(":").map(Number);
-    const [lh, lm] = (lastTer || "0:0").split(":").map(Number);
+    // Use FIRST row's início and LAST row's término (any mode) for elapsed time
+    const firstRowIni = rows[1]?.querySelector(".slInicio")?.value || firstIni || "";
+    const lastRowTer = rows[rows.length - 1]?.querySelector(".slTermino")?.value || "";
+    const [fh, fm] = (firstRowIni || "0:0").split(":").map(Number);
+    const [lh, lm] = (lastRowTer || "0:0").split(":").map(Number);
     const totalDt = ((lh * 60 + lm) - (fh * 60 + fm)) - totalStopDt;
     if (totalDt > 0 && totalDm > 0) {
       const avg = (totalDm / (totalDt / 60)).toFixed(1);
