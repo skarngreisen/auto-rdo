@@ -639,14 +639,16 @@ input.inherited, textarea.inherited {
       <div id="existingPhotos"></div>
     </div>
 
-    <!-- Buttons -->
-    <div style="display:flex;gap:.5rem;margin-bottom:.3rem;">
-      <button class="btn btn-draft" id="btnSaveDraft" type="button" style="flex:1;">Salvar Rascunho</button>
-      <button class="btn btn-primary" id="btnSubmit" type="button" style="flex:1;">Enviar RDO</button>
-    </div>
-    <div style="margin-bottom:2rem;">
-      <button class="btn btn-secondary btn-sm" id="btnClearForm" type="button">Limpar formulário</button>
-      <span id="autoSaveIndicator" style="float:right;font-size:.7rem;color:#10b981;opacity:0;transition:opacity .3s;line-height:2;">Rascunho salvo</span>
+    <!-- Buttons (sticky footer) -->
+    <div style="position:sticky;bottom:0;background:#f0f2f5;padding:.5rem 0;margin:0 -1rem;padding-left:1rem;padding-right:1rem;box-shadow:0 -2px 8px rgba(0,0,0,.06);z-index:50;">
+      <div style="display:flex;gap:.5rem;margin-bottom:.3rem;">
+        <button class="btn btn-draft" id="btnSaveDraft" type="button" style="flex:1;">Salvar Rascunho</button>
+        <button class="btn btn-primary" id="btnSubmit" type="button" style="flex:1;">Enviar RDO</button>
+      </div>
+      <div>
+        <button class="btn btn-secondary btn-sm" id="btnClearForm" type="button">Limpar formulário</button>
+        <span id="autoSaveIndicator" style="float:right;font-size:.7rem;color:#10b981;opacity:0;transition:opacity .3s;line-height:1.8;">Rascunho salvo</span>
+      </div>
     </div>
     </div><!-- #formBody -->
     </form>
