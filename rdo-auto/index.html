@@ -1920,8 +1920,11 @@ $("#btnShiftStart").addEventListener("click", () => {
 $("#btnShiftStop").addEventListener("click", () => {
   const lastDepth = getLastStriplogDepth();
   if (lastDepth <= 0) return;
+  const depth = prompt("Profundidade da parada (m):", lastDepth);
+  if (!depth) return;
+  const reason = prompt("Motivo da parada:", "");
   const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  addStriplogRow(lastDepth, now, "PARADA");
+  addStriplogRow(parseFloat(depth) || lastDepth, now, reason || "Parada");
 });
 
 function collectStriplog() {
