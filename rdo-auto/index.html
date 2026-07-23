@@ -1838,7 +1838,7 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
     ini = inicio || now;
     ter = ""; // locked
   } else if (mode === "meter") {
-    d = depth || String(prevDepth > 0 ? Math.ceil(prevDepth) : "");
+    d = depth || String(prevDepth > 0 ? (Math.floor(prevDepth) + 1) : "");
     ini = prevTermino || prevInicio || ""; // locked
     ter = termino || now;
   } else if (mode === "stop") {
@@ -1943,17 +1943,7 @@ function updateStriplogROP() {
 
 $("#btnAddStriplog").addEventListener("click", () => addStriplogRow("meter","","","",""));
 $("#btnShiftStart").addEventListener("click", () => addStriplogRow("start","","","","Início/retomada"));
-$("#btnShiftStop").addEventListener("click", () => {
-  const prevDepth = getLastStriplogDepth();
-  const depth = prompt("Profundidade da parada (m):", prevDepth > 0 ? prevDepth : "");
-  if (!depth) return;
-  const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  const stopTime = prompt("Horário da parada (hh:mm):", now);
-  if (!stopTime) return;
-  const reason = prompt("Motivo da parada (obrigatório):", "");
-  if (!reason) { alert("Motivo da parada é obrigatório."); return; }
-  addStriplogRow("stop", parseFloat(depth), "", stopTime, reason);
-});
+$("#btnShiftStop").addEventListener("click", () => addStriplogRow("stop","","","",""));
 
 function collectStriplog() {
   const items = [];
