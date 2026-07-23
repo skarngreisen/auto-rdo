@@ -1847,8 +1847,9 @@ $("#btnAddStriplog").addEventListener("click", () => addStriplogRow("","",""));
 
 $("#btnShiftStart").addEventListener("click", () => {
   const lastDepth = getLastStriplogDepth();
+  const startDepth = lastDepth > 0 ? lastDepth : (parseFloat($("#depthInitial").value) || "");
   const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  addStriplogRow(lastDepth > 0 ? lastDepth : "", now, "Início/retomada");
+  addStriplogRow(startDepth, now, "Início/retomada");
 });
 
 function collectStriplog() {
