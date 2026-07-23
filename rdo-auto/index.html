@@ -658,9 +658,7 @@ input.inherited, textarea.inherited {
   <div class="view" id="striplogView">
     <div class="card">
       <div class="card-header">Striplog — Marcaçao metro a metro</div>
-      <div style="margin-bottom:.4rem;">
-        <label style="font-size:.78rem;"><input type="checkbox" id="striplogShiftStart"> Início do turno (primeira marcaçao)</label>
-      </div>
+      <button class="btn btn-sm" id="btnShiftStart" type="button" style="background:#10b981;color:#fff;margin-bottom:.4rem;">Início / Retomada da perfuração</button>
       <table class="ops-table" id="striplogTable">
         <tr><th>Prof. (m)</th><th>Horario</th><th>Observaçao</th><th></th></tr>
       </table>
@@ -1847,6 +1845,12 @@ function updateStriplogROP() {
 
 $("#btnAddStriplog").addEventListener("click", () => addStriplogRow("","",""));
 addStriplogRow("","","");
+
+$("#btnShiftStart").addEventListener("click", () => {
+  const lastDepth = getLastStriplogDepth();
+  const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  addStriplogRow(lastDepth > 0 ? lastDepth : "", now, "Início/retomada");
+});
 
 function collectStriplog() {
   const items = [];
