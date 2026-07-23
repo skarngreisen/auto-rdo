@@ -658,7 +658,8 @@ input.inherited, textarea.inherited {
   <div class="view" id="striplogView">
     <div class="card">
       <div class="card-header">Striplog — Marcaçao metro a metro</div>
-      <button class="btn btn-sm" id="btnShiftStart" type="button" style="background:#10b981;color:#fff;margin-bottom:.4rem;">Início / Retomada da perfuração</button>
+      <button class="btn btn-sm" id="btnShiftStart" type="button" style="background:#10b981;color:#fff;margin-bottom:.4rem;">Início / Retomada</button>
+      <button class="btn btn-sm" id="btnShiftStop" type="button" style="background:#ef4444;color:#fff;margin-bottom:.4rem;">Parada</button>
       <table class="ops-table" id="striplogTable">
         <tr><th>Prof. (m)</th><th>Horario</th><th>ROP (m/h)</th><th>Δ</th><th>Observaçao</th><th></th></tr>
       </table>
@@ -1914,6 +1915,13 @@ $("#btnShiftStart").addEventListener("click", () => {
   const startDepth = lastDepth > 0 ? lastDepth : (parseFloat($("#depthInitial").value) || "");
   const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   addStriplogRow(startDepth, now, "Início/retomada");
+});
+
+$("#btnShiftStop").addEventListener("click", () => {
+  const lastDepth = getLastStriplogDepth();
+  if (lastDepth <= 0) return;
+  const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  addStriplogRow(lastDepth, now, "PARADA");
 });
 
 function collectStriplog() {
