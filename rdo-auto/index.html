@@ -1850,6 +1850,7 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
   const depthStep = mode === "meter" ? "0.01" : "0.1";
   const row = tbody.insertRow(-1);
   row.setAttribute("data-mode", mode);
+  if (mode === "stop") row.style.borderLeft = "3px solid #ef4444";
   row.innerHTML = `
     <td><input type="number" step="${depthStep}" value="${d}" class="slDepth" style="min-width:60px;"></td>
     <td><input type="time" value="${ini}" class="slInicio" style="min-width:80px;" ${mode === "meter" ? "readonly" : ""}></td>
@@ -1896,15 +1897,13 @@ function updateStriplogROP() {
     const prevD = i > 1 ? parseFloat(rows[i - 1].querySelector(".slDepth")?.value) : null;
 
     if (mode === "stop" && ini && prevD !== null) {
-      // Parada: ROP = (prev depth delta) / (parada inicio - prev termino) — shows how fast drilling was before stop
+      // Parada: ROP = (current depth - prev depth) / (parada inicio - prev termino)
       const prevTer = i > 1 ? rows[i - 1].querySelector(".slTermino")?.value : null;
       if (prevTer) {
         const [ih, im] = ini.split(":").map(Number);
         const [ph, pm] = prevTer.split(":").map(Number);
         const dt = (ih * 60 + im) - (ph * 60 + pm);
-        const prev2D = i > 1 ? parseFloat(rows[i - 1].querySelector(".slDepth")?.value) : null;
-        const prev3D = i > 2 ? parseFloat(rows[i - 2].querySelector(".slDepth")?.value) : null;
-        const dm = (prev2D !== null && prev3D !== null) ? prev2D - prev3D : 0;
+        const dm = d - prevD;
         if (dm > 0 && dt > 0) rops.push({ rowIndex: i, rop: (dm / (dt / 60)), dm, dt });
       }
     } else if (ini && ter) {
