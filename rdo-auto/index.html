@@ -666,7 +666,7 @@ input.inherited, textarea.inherited {
         <button class="btn btn-sm" id="btnAddStriplog" type="button" style="background:#3b82f6;color:#fff;">Marcar Metro</button>
       </div>
       <table class="ops-table" id="striplogTable">
-        <tr><th>Prof. (m)</th><th>Início</th><th>Término</th><th>ROP (m/h)</th><th>Δ</th><th>Observaçao</th><th></th></tr>
+        <tr><th>Prof. (m)</th><th>Início</th><th>Término</th><th>ROP (m/h)</th><th>Δ</th><th>Observaçao</th><th>Tipo</th><th></th></tr>
       </table>
       <div id="striplogROP" style="font-size:.75rem;color:#6b7280;margin-top:.2rem;display:none;"></div>
     </div>
@@ -1588,7 +1588,7 @@ function populateForm(rdo) {
     }
     if (rdo.striplog && rdo.striplog.length > 0) {
       clearTable("#striplogTable");
-      rdo.striplog.forEach(s => addStriplogRow("meter", s.profundidade, s.inicio || "", s.termino || "", s.obs));
+      rdo.striplog.forEach(s => addStriplogRow(s.mode || "meter", s.profundidade, s.inicio || "", s.termino || "", s.obs));
     }
     if (rdo.coluna) {
       clearTable("#bhaTable");
@@ -1858,6 +1858,7 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
     <td class="slROP" style="font-size:.75rem;text-align:center;">—</td>
     <td class="slDelta" style="font-size:.75rem;text-align:center;">—</td>
     <td><input type="text" value="${obs || ''}" class="slObs" placeholder="${mode === 'stop' ? 'Motivo da parada (obrigatório)' : 'Ex.: parada para manutencao'}" ${mode === "stop" ? "required" : ""}></td>
+    <td style="font-size:.7rem;color:#6b7280;text-align:center;">${{start:"Início",meter:"Metro",stop:"Parada"}[mode]}</td>
     <td><button class="btn btn-danger btn-sm slRemove" type="button">&times;</button></td>`;
   row.querySelector(".slRemove").addEventListener("click", () => { row.remove(); updateStriplogROP(); });
   row.querySelectorAll("input").forEach(el => el.addEventListener("input", updateStriplogROP));
@@ -1968,7 +1969,10 @@ function collectStriplog() {
     const inicio = row.querySelector(".slInicio")?.value || "";
     const termino = row.querySelector(".slTermino")?.value || "";
     const obs = row.querySelector(".slObs")?.value || "";
-    if (!isNaN(depth) && (inicio || termino)) items.push({ profundidade: depth, inicio, termino, obs: obs || null });
+    if (!isNaN(depth) && (inicio || termino)) {
+      const mode = row.getAttribute("data-mode") || "meter";
+      items.push({ profundidade: depth, inicio, termino, obs: obs || null, mode });
+    }
   }
   return items.length > 0 ? items : null;
 }
