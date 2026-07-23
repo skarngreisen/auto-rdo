@@ -854,7 +854,7 @@ $("#splashView").addEventListener("click", () => {
   loadProjects();
 });
 // Auto-dismiss after 2.5s
-setTimeout(() => {
+let splashTimer = setTimeout(() => {
   if ($("#splashView").classList.contains("active")) {
     showView("homeView");
     loadProjects();
@@ -953,6 +953,7 @@ window.addEventListener("beforeunload", (e) => {
       const secs = Math.floor((Date.now() - draft._savedAt) / 1000);
       const mins = Math.floor(secs / 60);
       if (confirm(`Ha um rascunho nao salvo de ${mins > 0 ? mins + ' min' : secs + ' seg'} atras. Deseja restaura-lo?`)) {
+        clearTimeout(splashTimer); // cancel auto-dismiss
         currentProjectId = draft._projectId;
         delete draft._projectId; delete draft._savedAt;
         // Load project and open draft
