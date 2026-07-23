@@ -1844,7 +1844,6 @@ function updateStriplogROP() {
 }
 
 $("#btnAddStriplog").addEventListener("click", () => addStriplogRow("","",""));
-addStriplogRow("","","");
 
 $("#btnShiftStart").addEventListener("click", () => {
   const lastDepth = getLastStriplogDepth();
@@ -2357,7 +2356,7 @@ function resetForm() {
   $("#weatherCondition").value = "Bom";
   clearTable("#opsTable"); addOpRow("","","","");
   clearTable("#anomalyTable");
-  clearTable("#striplogTable"); addStriplogRow("","","");
+  clearTable("#striplogTable");
   clearTable("#chemTable"); CHEM_OPTIONS.filter(c => c !== "Outro").forEach(c => addChemicalRow(c,"",""));
   clearTable("#matTable"); MAT_OPTIONS.filter(m => m !== "Outro").forEach(m => addMaterialRow(m,"",""));
   clearTable("#fuelTable"); addFuelRow("Sonda","S10","");
