@@ -1922,9 +1922,11 @@ $("#btnShiftStop").addEventListener("click", () => {
   if (lastDepth <= 0) return;
   const depth = prompt("Profundidade da parada (m):", lastDepth);
   if (!depth) return;
-  const reason = prompt("Motivo da parada:", "");
   const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  addStriplogRow(parseFloat(depth) || lastDepth, now, reason || "Parada");
+  const stopTime = prompt("Horario da parada (hh:mm):", now);
+  if (!stopTime) return;
+  const reason = prompt("Motivo da parada:", "");
+  addStriplogRow(parseFloat(depth) || lastDepth, stopTime, reason || "Parada");
 });
 
 function collectStriplog() {
