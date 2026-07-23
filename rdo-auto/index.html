@@ -660,7 +660,7 @@ input.inherited, textarea.inherited {
       <div class="card-header">Striplog — Marcaçao metro a metro</div>
       <button class="btn btn-sm" id="btnShiftStart" type="button" style="background:#10b981;color:#fff;margin-bottom:.4rem;">Início / Retomada da perfuração</button>
       <table class="ops-table" id="striplogTable">
-        <tr><th>Prof. (m)</th><th>Horario</th><th>Observaçao</th><th></th></tr>
+        <tr><th>Prof. (m)</th><th>Horario</th><th>ROP (m/h)</th><th>Δ</th><th>Observaçao</th><th></th></tr>
       </table>
       <button class="btn btn-secondary btn-sm" id="btnAddStriplog" type="button" style="margin-top:.3rem;">+ Marcar metro</button>
       <div id="striplogROP" style="font-size:.75rem;color:#6b7280;margin-top:.2rem;display:none;"></div>
@@ -1825,6 +1825,8 @@ function addStriplogRow(depth, time, obs) {
   row.innerHTML = `
     <td><input type="number" step="0.01" value="${depth || nextDepth || ''}" class="slDepth" style="min-width:60px;"></td>
     <td><input type="time" value="${time || ''}" class="slTime" style="min-width:80px;"></td>
+    <td class="slROP" style="font-size:.75rem;text-align:center;">—</td>
+    <td class="slDelta" style="font-size:.75rem;text-align:center;">—</td>
     <td><input type="text" value="${obs || ''}" class="slObs" placeholder="Ex.: parada para manutencao"></td>
     <td><button class="btn btn-danger btn-sm slRemove" type="button">&times;</button></td>`;
   // Auto-set time if not provided
@@ -1845,24 +1847,64 @@ function getLastStriplogDepth() {
 function updateStriplogROP() {
   const rows = $("#striplogTable").rows;
   if (rows.length <= 1) { $("#striplogROP").style.display = "none"; return; }
-  let firstDepth = null, lastDepth = null, firstTime = null, lastTime = null;
+
+  // Collect valid depth×time pairs
+  const points = [];
   for (let i = 1; i < rows.length; i++) {
     const d = parseFloat(rows[i].querySelector(".slDepth")?.value);
     const t = rows[i].querySelector(".slTime")?.value;
     if (!isNaN(d) && t) {
-      if (firstDepth === null) { firstDepth = d; firstTime = t; }
-      lastDepth = d; lastTime = t;
+      const [h, m] = t.split(":").map(Number);
+      points.push({ depth: d, mins: h * 60 + m, rowIndex: i });
     }
   }
-  if (firstDepth === null || lastDepth === null) { $("#striplogROP").style.display = "none"; return; }
-  const meters = lastDepth - firstDepth;
-  const [fh, fm] = firstTime.split(":").map(Number);
-  const [lh, lm] = lastTime.split(":").map(Number);
-  const totalMin = (lh * 60 + lm) - (fh * 60 + fm);
-  if (totalMin <= 0 || meters <= 0) { $("#striplogROP").style.display = "none"; return; }
-  const rop = (meters / (totalMin / 60)).toFixed(1);
-  $("#striplogROP").textContent = `${meters.toFixed(1)} m em ${totalMin} min | ROP medio: ${rop} m/h`;
-  $("#striplogROP").style.display = "block";
+  if (points.length < 2) { $("#striplogROP").style.display = "none"; return; }
+
+  // Per-row ROP
+  const rops = [];
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const dm = curr.depth - prev.depth;
+    const dt = curr.mins - prev.mins;
+    if (dm <= 0 || dt <= 0) continue;
+    rops.push({ rowIndex: curr.rowIndex, rop: (dm / (dt / 60)) });
+  }
+
+  // Average ROP
+  const avgRop = rops.length > 0 ? rops.reduce((s, r) => s + r.rop, 0) / rops.length : 0;
+
+  // Update each row's ROP and delta cells
+  for (let i = 1; i < rows.length; i++) {
+    const ropCell = rows[i].querySelector(".slROP");
+    const deltaCell = rows[i].querySelector(".slDelta");
+    if (!ropCell || !deltaCell) continue;
+    const r = rops.find(p => p.rowIndex === i);
+    if (r && avgRop > 0) {
+      ropCell.textContent = r.rop.toFixed(1);
+      const pct = Math.floor(Math.abs((r.rop - avgRop) / avgRop * 100));
+      if (pct < 1) {
+        deltaCell.innerHTML = '<span style="color:#9ca3af;">=0%</span>';
+      } else if (r.rop > avgRop) {
+        deltaCell.innerHTML = `<span style="color:#10b981;">↑${pct}%</span>`;
+      } else {
+        deltaCell.innerHTML = `<span style="color:#ef4444;">↓${pct}%</span>`;
+      }
+    } else {
+      ropCell.textContent = "—";
+      deltaCell.textContent = "—";
+    }
+  }
+
+  // Summary line
+  const firstD = points[0].depth, lastD = points[points.length - 1].depth;
+  const meters = lastD - firstD;
+  const totalMin = points[points.length - 1].mins - points[0].mins;
+  if (totalMin > 0 && meters > 0) {
+    const avg = (meters / (totalMin / 60)).toFixed(1);
+    $("#striplogROP").textContent = `${meters.toFixed(1)} m em ${totalMin} min | ROP medio: ${avg} m/h`;
+    $("#striplogROP").style.display = "block";
+  }
 }
 
 $("#btnAddStriplog").addEventListener("click", () => addStriplogRow("","",""));
