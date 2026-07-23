@@ -826,10 +826,15 @@ function showView(viewId) {
     header.style.display = "flex";
   }
 
-  // Show/hide form tabs
+  // Show/hide form tabs (only when formView active, striplog tab conditional)
   const formTabs = $("#formTabs");
-  if (viewId === "formView" || viewId === "striplogView") {
+  if (viewId === "formView") {
     formTabs.style.display = "flex";
+    updateStriplogTabVisibility();
+  } else if (viewId === "striplogView") {
+    formTabs.style.display = "flex";
+    $$(".form-tab").forEach(t => t.classList.remove("active"));
+    document.querySelector('.form-tab[data-tab="striplog"]').classList.add("active");
   } else {
     formTabs.style.display = "none";
   }
@@ -1002,6 +1007,12 @@ function populateDraftFromPayload(payload) {
 // ============================================================
 // FORM TABS (RDO / Striplog)
 // ============================================================
+function updateStriplogTabVisibility() {
+  const perfOn = getToggleState("#toggleDrilling");
+  const slTab = document.querySelector('.form-tab[data-tab="striplog"]');
+  if (slTab) slTab.style.display = perfOn ? "inline-block" : "none";
+}
+
 $$(".form-tab").forEach(tab => {
   tab.addEventListener("click", () => {
     $$(".form-tab").forEach(t => t.classList.remove("active"));
@@ -1689,6 +1700,8 @@ function setupToggle(groupId, sectionId) {
   });
 }
 setupToggle("#toggleDrilling", "#sectionDrilling");
+// Update striplog tab visibility when drilling toggle changes
+$("#toggleDrilling").addEventListener("click", () => setTimeout(updateStriplogTabVisibility, 50));
 setupToggle("#toggleFluid", "#sectionFluid");
 setupToggle("#toggleMateriais", "#sectionMateriais");
 setupToggle("#toggleStratigraphy", "#sectionStratigraphy");
