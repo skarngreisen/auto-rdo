@@ -1847,9 +1847,11 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
     ter = termino || "";
   }
 
+  const depthStep = mode === "meter" ? "0.01" : "0.1";
   const row = tbody.insertRow(-1);
+  row.setAttribute("data-mode", mode);
   row.innerHTML = `
-    <td><input type="number" step="0.01" value="${d}" class="slDepth" style="min-width:60px;"></td>
+    <td><input type="number" step="${depthStep}" value="${d}" class="slDepth" style="min-width:60px;"></td>
     <td><input type="time" value="${ini}" class="slInicio" style="min-width:80px;" ${mode === "meter" ? "readonly" : ""}></td>
     <td><input type="time" value="${ter}" class="slTermino" style="min-width:80px;" ${mode === "start" ? "disabled" : ""}></td>
     <td class="slROP" style="font-size:.75rem;text-align:center;">—</td>
@@ -1884,20 +1886,34 @@ function updateStriplogROP() {
   const rows = $("#striplogTable").rows;
   if (rows.length <= 1) { $("#striplogROP").style.display = "none"; return; }
 
-  // Collect valid depth + inicio→termino pairs (own row timing)
+  // Compute ROP per row: parada rows use previous meter's depth delta + parada inicio
   const rops = [];
   for (let i = 1; i < rows.length; i++) {
+    const mode = rows[i].getAttribute("data-mode");
     const d = parseFloat(rows[i].querySelector(".slDepth")?.value);
     const ini = rows[i].querySelector(".slInicio")?.value;
     const ter = rows[i].querySelector(".slTermino")?.value;
-    if (!isNaN(d) && ini && ter) {
+    const prevD = i > 1 ? parseFloat(rows[i - 1].querySelector(".slDepth")?.value) : null;
+
+    if (mode === "stop" && ini && prevD !== null) {
+      // Parada: ROP = (prev depth delta) / (parada inicio - prev termino) — shows how fast drilling was before stop
+      const prevTer = i > 1 ? rows[i - 1].querySelector(".slTermino")?.value : null;
+      if (prevTer) {
+        const [ih, im] = ini.split(":").map(Number);
+        const [ph, pm] = prevTer.split(":").map(Number);
+        const dt = (ih * 60 + im) - (ph * 60 + pm);
+        const prev2D = i > 1 ? parseFloat(rows[i - 1].querySelector(".slDepth")?.value) : null;
+        const prev3D = i > 2 ? parseFloat(rows[i - 2].querySelector(".slDepth")?.value) : null;
+        const dm = (prev2D !== null && prev3D !== null) ? prev2D - prev3D : 0;
+        if (dm > 0 && dt > 0) rops.push({ rowIndex: i, rop: (dm / (dt / 60)), dm, dt });
+      }
+    } else if (ini && ter) {
+      // Normal row: ROP = own depth delta / own time
       const [ih, im] = ini.split(":").map(Number);
       const [th, tm] = ter.split(":").map(Number);
       const dt = (th * 60 + tm) - (ih * 60 + im);
-      if (dt > 0) {
-        // Need previous row's depth for delta
-        const prevD = i > 1 ? parseFloat(rows[i - 1].querySelector(".slDepth")?.value) : null;
-        const dm = prevD !== null ? d - prevD : 0;
+      if (dt > 0 && prevD !== null) {
+        const dm = d - prevD;
         rops.push({ rowIndex: i, rop: dm > 0 ? (dm / (dt / 60)) : 0, dm, dt });
       }
     }
