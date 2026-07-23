@@ -1903,7 +1903,8 @@ function updateStriplogROP() {
       if (prevTer) {
         const [ih, im] = ini.split(":").map(Number);
         const [ph, pm] = prevTer.split(":").map(Number);
-        const dt = (ih * 60 + im) - (ph * 60 + pm);
+        let dt = (ih * 60 + im) - (ph * 60 + pm);
+        if (dt < 0) dt += 24 * 60;
         const dm = d - prevD;
         if (dm > 0 && dt > 0) rops.push({ rowIndex: i, rop: (dm / (dt / 60)), dm, dt });
       }
@@ -1911,7 +1912,8 @@ function updateStriplogROP() {
       // Normal row: ROP = own depth delta / own time
       const [ih, im] = ini.split(":").map(Number);
       const [th, tm] = ter.split(":").map(Number);
-      const dt = (th * 60 + tm) - (ih * 60 + im);
+      let dt = (th * 60 + tm) - (ih * 60 + im);
+      if (dt < 0) dt += 24 * 60; // midnight crossover
       if (dt > 0 && prevD !== null) {
         const dm = d - prevD;
         rops.push({ rowIndex: i, rop: dm > 0 ? (dm / (dt / 60)) : 0, dm, dt });
@@ -1958,7 +1960,9 @@ function updateStriplogROP() {
       if (mode === "stop" && ini && ter) {
         const [ih, im] = ini.split(":").map(Number);
         const [th, tm] = ter.split(":").map(Number);
-        totalStopDt += (th * 60 + tm) - (ih * 60 + im);
+        let sd = (th * 60 + tm) - (ih * 60 + im);
+        if (sd < 0) sd += 24 * 60;
+        totalStopDt += sd;
       }
       if (ini && mode !== "stop") {
         if (!firstIni) firstIni = ini;
@@ -1973,7 +1977,9 @@ function updateStriplogROP() {
     const lastRowTer = rows[rows.length - 1]?.querySelector(".slTermino")?.value || "";
     const [fh, fm] = (firstRowIni || "0:0").split(":").map(Number);
     const [lh, lm] = (lastRowTer || "0:0").split(":").map(Number);
-    const totalDt = ((lh * 60 + lm) - (fh * 60 + fm)) - totalStopDt;
+    let totalDt = ((lh * 60 + lm) - (fh * 60 + fm));
+    if (totalDt < 0) totalDt += 24 * 60;
+    totalDt -= totalStopDt;
     if (totalDt > 0 && totalDm > 0) {
       const avg = (totalDm / (totalDt / 60)).toFixed(1);
       $("#striplogROP").textContent = `${totalDm.toFixed(1)} m em ${totalDt} min | ROP medio: ${avg} m/h`;
