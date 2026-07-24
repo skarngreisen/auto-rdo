@@ -300,6 +300,11 @@ $$(".form-tab").forEach(tab => {
     const targetId = tab.dataset.tab;
     const target = document.getElementById(targetId);
     if (target) target.classList.add("active");
+    // Show Identificação card only on Equipe tab
+    const identCard = document.getElementById("tabIdentificacao");
+    if (identCard) {
+      identCard.classList.toggle("active", targetId === "tabEquipe");
+    }
   });
 });
 
