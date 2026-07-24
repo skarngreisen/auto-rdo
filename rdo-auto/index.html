@@ -27,6 +27,8 @@ body {
    ============================================================ */
 .view { display: none; }
 .view.active { display: block; }
+.formTabContent { display: none; }
+.formTabContent.active { display: block; }
 
 /* ============================================================
    SPLASH
@@ -337,7 +339,6 @@ input.inherited, textarea.inherited {
   <nav id="formTabs" style="display:none;gap:.2rem;flex-wrap:wrap;">
     <button class="form-tab active" data-tab="tabEquipe">Equipe & Geral</button>
     <button class="form-tab" data-tab="tabPerfuracao">Perfuracao</button>
-    <button class="form-tab" data-tab="tabRevestimento">Revestimento</button>
     <button class="form-tab" data-tab="tabFluidos">Fluidos & Insumos</button>
     <button class="form-tab" data-tab="tabAtividades">Atividades</button>
   </nav>
@@ -387,17 +388,7 @@ input.inherited, textarea.inherited {
     </div>
     </div><!-- tabEquipe -->
     <!-- Tab 2: Perfuracao -->
-    <div class="formTabContent" id="tabPerfuracao" style="display:none;">
-    <!-- Perfuração toggle -->
-    <div class="card">
-      <div class="card-header">Perfuração <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
-      <div class="prefill-note" data-section="perfuracao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
-      <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanço na perfuração?</p>
-      <div class="toggle-group" id="toggleDrilling">
-        <button class="toggle-btn" data-value="yes" type="button">Sim</button>
-        <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
-      </div>
-      <div class="conditional" id="sectionDrilling">
+    <div class="formTabContent" id="tabPerfuracao">
     <!-- Striplog -->
     <div class="card">
       <div class="card-header">Striplog — Marcação metro a metro</div>
@@ -411,7 +402,16 @@ input.inherited, textarea.inherited {
       </table>
       <div id="striplogROP" style="font-size:.75rem;color:#6b7280;margin-top:.2rem;display:none;"></div>
     </div>
-
+    <!-- Perfuração toggle -->
+    <div class="card">
+      <div class="card-header">Perfuração <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
+      <div class="prefill-note" data-section="perfuracao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
+      <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve avanço na perfuração?</p>
+      <div class="toggle-group" id="toggleDrilling">
+        <button class="toggle-btn" data-value="yes" type="button">Sim</button>
+        <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
+      </div>
+      <div class="conditional" id="sectionDrilling">
         <div class="row">
           <div><label for="depthInitial">Prof. Inicial (m)</label><input type="number" step="0.01" id="depthInitial"></div>
           <div><label for="depthFinal">Prof. Final (m)</label><input type="number" step="0.01" id="depthFinal"></div>
@@ -463,29 +463,23 @@ input.inherited, textarea.inherited {
         <button class="btn btn-secondary btn-sm" id="btnAddBHA" type="button" style="margin-top:.3rem;">+ Adicionar item</button>
         <div id="bhaTotal" style="font-size:.8rem;font-weight:700;color:#a04000;margin-top:.3rem;display:none;">Comprimento total da coluna: 0.00 m</div>
 
-
-    </div><!-- tabPerfuracao -->
-
-    <!-- Tab: Revestimento -->
-    <div class="formTabContent" id="tabRevestimento" style="display:none;">
-    <div class="card">
-      <div class="card-header">Revestimento</div>
-      <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve descida de revestimento hoje?</p>
-      <div class="toggle-group" id="toggleCasing">
-        <button class="toggle-btn" data-value="yes" type="button">Sim</button>
-        <button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
-      </div>
-      <div class="conditional" id="sectionCasing">
-        <div class="row">
-          <div><label for="casingMeters">Metros descidos</label><input type="number" step="0.01" id="casingMeters"></div>
+        <!-- Revestimento (event-based) -->
+        <p style="font-size:.82rem;color:#6b7280;margin:.6rem 0 .4rem 0;">Houve descida de revestimento hoje?</p>
+        <div class="toggle-group" id="toggleCasing">
+          <button class="toggle-btn" data-value="yes" type="button">Sim</button>
+          <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
         </div>
-        <div><label for="casingObs">Ocorrencias</label><textarea id="casingObs" rows="2" placeholder="Ex.: Rosca do 3º tubo fora de spec, substituido por reserva"></textarea></div>
+        <div class="conditional" id="sectionCasing">
+          <div class="row">
+            <div><label for="casingMeters">Metros descidos</label><input type="number" step="0.01" id="casingMeters"></div>
+          </div>
+          <div><label for="casingObs">Ocorrências</label><textarea id="casingObs" rows="2" placeholder="Ex.: Rosca do 3º tubo fora de spec, substituido por reserva"></textarea></div>
+        </div>
       </div>
     </div>
-    </div><!-- tabRevestimento -->
 
     <!-- Tab 3: Fluidos & Insumos -->
-    <div class="formTabContent" id="tabFluidos" style="display:none;">
+    <div class="formTabContent" id="tabFluidos">
     <!-- Fluido toggle -->
     <div class="card">
       <div class="card-header">Fluido <span class="prefill-link" data-section="fluido" title="Copiar dados de ontem">copiar de ontem</span></div>
@@ -574,7 +568,7 @@ input.inherited, textarea.inherited {
     </div>
 
   </div><!-- tabFluidos -->
-  <div class="formTabContent" id="tabAtividades" style="display:none;">
+  <div class="formTabContent" id="tabAtividades">
     <!-- Operacoes -->
     <div class="card">
       <div class="card-header">Registro de Atividades</div>
@@ -1677,6 +1671,8 @@ function setupToggle(groupId, sectionId) {
   });
 }
 setupToggle("#toggleDrilling", "#sectionDrilling");
+// Update striplog tab visibility when drilling toggle changes
+$("#toggleDrilling").addEventListener("click", () => setTimeout(updateStriplogTabVisibility, 50));
 setupToggle("#toggleFluid", "#sectionFluid");
 setupToggle("#toggleMateriais", "#sectionMateriais");
 setupToggle("#toggleStratigraphy", "#sectionStratigraphy");
