@@ -1,0 +1,286 @@
+/* RDO Auto — Styles */
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f2f5;
+  color: #1a1a2e;
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+/* ============================================================
+   VIEW CONTAINER
+   ============================================================ */
+.view { display: none; }
+.view.active { display: block; }
+.formTabContent { display: none; }
+.formTabContent.active { display: block; }
+
+/* ============================================================
+   SPLASH
+   ============================================================ */
+#splashView {
+  position: fixed; inset: 0; z-index: 999;
+  background: #fff; cursor: pointer;
+}
+#splashView.active {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+#splashView img { width: 180px; margin-bottom: 0; }
+#splashView .tagline { color: #9ca3af; font-size: .85rem; margin-top: .5rem; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  background: #1e3a5f;
+  color: #fff;
+  padding: .5rem 1rem;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  display: flex; align-items: center; gap: .6rem;
+}
+header img { width: 32px; height: 32px; border-radius: 4px; }
+header h1 { font-size: 1rem; font-weight: 700; }
+header .sub { font-size: .7rem; opacity: .75; }
+header .back-btn {
+  color: #fff; background: none; border: none; font-size: 1.2rem;
+  cursor: pointer; padding: .2rem .4rem; margin-right: .2rem;
+}
+.form-tab {
+  background: rgba(255,255,255,.12); color: #fff; border: none;
+  padding: .3rem .7rem; border-radius: 5px; cursor: pointer;
+  font-size: .75rem; font-weight: 600;
+}
+.form-tab.active { background: #fff; color: #1e3a5f; }
+
+/* ============================================================
+   CONTAINER & CARDS
+   ============================================================ */
+.container { max-width: 640px; margin: 0 auto; padding: .75rem; }
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  padding: 1rem;
+  margin-bottom: .75rem;
+}
+.card-header {
+  font-size: .85rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .04em; color: #1e3a5f;
+  margin-bottom: .75rem; padding-bottom: .5rem;
+  border-bottom: 2px solid #e8ecf1;
+}
+
+/* ============================================================
+   RDO LIST CARDS
+   ============================================================ */
+.rdo-card {
+  background: #fff; border-radius: 10px; padding: .85rem 1rem;
+  margin-bottom: .5rem; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background .15s;
+}
+.rdo-card:hover { background: #f8fafc; }
+.rdo-card .rdo-info { flex: 1; }
+.rdo-card .rdo-info .rdo-date { font-weight: 700; font-size: .9rem; }
+.rdo-card .rdo-info .rdo-meta { font-size: .78rem; color: #6b7280; margin-top: .15rem; }
+.rdo-card .rdo-badge {
+  font-size: .7rem; font-weight: 700; padding: .2rem .5rem; border-radius: 12px;
+  text-transform: uppercase;
+}
+.badge-rascunho { background: #e5e7eb; color: #374151; }
+.badge-em_revisao { background: #fef3c7; color: #92400e; }
+.badge-aprovado { background: #d1fae5; color: #065f46; }
+
+.rdo-actions { display: flex; gap: .5rem; margin-top: .75rem; }
+.rdo-actions .btn { flex: 1; }
+
+.empty-state { text-align: center; padding: 2rem; color: #9ca3af; }
+.empty-state .icon { font-size: 2.5rem; margin-bottom: .5rem; }
+
+/* ============================================================
+   FORM CONTROLS
+   ============================================================ */
+label {
+  display: block; font-size: .78rem; font-weight: 600;
+  color: #374151; margin-bottom: .2rem; margin-top: .6rem;
+}
+label:first-of-type { margin-top: 0; }
+input, select, textarea {
+  width: 100%; padding: .55rem .65rem; font-size: .9rem;
+  border: 1.5px solid #d1d5db; border-radius: 7px;
+  background: #fafbfc; color: #1a1a2e; font-family: inherit;
+  transition: border-color .15s; -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.12); background: #fff;
+}
+textarea { resize: vertical; min-height: 60px; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right .6rem center; padding-right: 2rem;
+}
+input[type="checkbox"] { width: auto; margin-right: .4rem; accent-color: #3b82f6; -webkit-appearance: checkbox !important; appearance: auto; }
+.row { display: flex; gap: .5rem; }
+.row > * { flex: 1; }
+
+/* ============================================================
+   PRE-FILL (inherited from yesterday)
+   ============================================================ */
+.prefill-link {
+  font-size: .7rem; font-weight: 600; color: #3b82f6;
+  cursor: pointer; text-decoration: none; float: right;
+  margin-left: .5rem; white-space: nowrap;
+}
+.prefill-link:hover { color: #1d4ed8; text-decoration: underline; }
+.prefill-note {
+  font-size: .7rem; color: #b91c1c; font-style: italic;
+  margin-top: .3rem; display: none;
+}
+.prefill-note.show { display: block; }
+input.inherited, textarea.inherited {
+  color: #b91c1c !important;
+  border-color: #fca5a5 !important;
+  background: #fef2f2 !important;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .35rem;
+  padding: .6rem 1.2rem; font-size: .88rem; font-weight: 600;
+  border: none; border-radius: 8px; cursor: pointer;
+  transition: background .15s, opacity .15s; font-family: inherit;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: #1e3a5f; color: #fff; width: 100%; }
+.btn-primary:hover { background: #162d4a; }
+.btn-secondary { background: #e8ecf1; color: #374151; }
+.btn-secondary:hover { background: #dde1e7; }
+.btn-draft { background: #fef3c7; color: #92400e; }
+.btn-draft:hover { background: #fde68a; }
+.btn-danger { background: #fee2e2; color: #991b1b; }
+.btn-sm { padding: .35rem .7rem; font-size: .78rem; }
+.btn-full { width: 100%; margin-top: .5rem; }
+.btn:disabled { opacity: .5; pointer-events: none; }
+
+/* ============================================================
+   TOGGLES (Sim/Nao)
+   ============================================================ */
+.toggle-group { display: flex; gap: .4rem; margin: .5rem 0; }
+.toggle-btn {
+  flex: 1; padding: .5rem; font-size: .82rem; font-weight: 700;
+  border: 2px solid #d1d5db; border-radius: 8px;
+  background: #fff; color: #6b7280; cursor: pointer; text-align: center;
+  transition: all .15s;
+}
+.toggle-btn.active-yes { border-color: #10b981; background: #d1fae5; color: #065f46; }
+.toggle-btn.active-no  { border-color: #ef4444; background: #fee2e2; color: #991b1b; }
+
+/* ============================================================
+   CONDITIONAL SECTIONS
+   ============================================================ */
+.conditional { display: none; margin-top: .5rem; }
+.conditional.show { display: block; }
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.ops-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-top: .4rem; }
+.ops-table th {
+  background: #f3f4f6; color: #374151; font-weight: 600;
+  padding: .4rem .3rem; text-align: left; font-size: .72rem;
+}
+.ops-table td { padding: .3rem; border-bottom: 1px solid #f3f4f6; }
+.ops-table input { font-size: .82rem; padding: .4rem .45rem; }
+
+/* ============================================================
+   TIMELINE
+   ============================================================ */
+.timeline-bar { position: relative; }
+.timeline-track {
+  position: relative; height: 22px; background: #e5e7eb;
+  border-radius: 4px; overflow: hidden; width: 100%;
+}
+.timeline-segment {
+  position: absolute; top: 0; height: 100%;
+  border-radius: 2px; cursor: default;
+  transition: opacity .15s;
+}
+.timeline-segment:hover { opacity: .85; }
+.timeline-seg-normal { background: #10b981; }
+.timeline-seg-nao-produtiva { background: #f59e0b; }
+.timeline-seg-parada { background: #ef4444; }
+.timeline-seg-parada-climatica { background: #8b5cf6; }
+
+/* ============================================================
+   PHOTO PREVIEW
+   ============================================================ */
+.photo-grid { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
+.photo-thumb {
+  width: 72px; height: 72px; border-radius: 8px; object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+.photo-placeholder {
+  width: 72px; height: 72px; border-radius: 8px; border: 2px dashed #d1d5db;
+  display: flex; align-items: center; justify-content: center;
+  color: #9ca3af; font-size: 1.5rem;
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  z-index: 200; align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: #fff; border-radius: 12px; padding: 1.5rem;
+  width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 8px 30px rgba(0,0,0,.18);
+}
+.modal h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+
+/* ============================================================
+   READ-ONLY VIEW
+   ============================================================ */
+.ro-section { margin-bottom: 1rem; }
+.ro-section h3 { font-size: .82rem; color: #1e3a5f; margin-bottom: .4rem; border-bottom: 1px solid #e8ecf1; padding-bottom: .3rem; }
+.ro-row { display: flex; font-size: .82rem; padding: .15rem 0; }
+.ro-label { color: #6b7280; width: 100px; flex-shrink: 0; }
+.ro-value { color: #1a1a2e; font-weight: 600; }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast {
+  position: fixed; bottom: 1rem; left: 1rem; right: 1rem;
+  padding: .75rem 1rem; border-radius: 10px;
+  font-size: .85rem; font-weight: 600; text-align: center; z-index: 300;
+  transform: translateY(120%); transition: transform .3s;
+  max-width: 500px; margin: 0 auto;
+}
+.toast.show { transform: translateY(0); }
+.toast.success { background: #d1fae5; color: #065f46; }
+.toast.error { background: #fee2e2; color: #991b1b; }
+
+.spinner {
+  display: inline-block; width: 1rem; height: 1rem;
+  border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 400px) {
+  .row { flex-direction: column; gap: 0; }
+}
