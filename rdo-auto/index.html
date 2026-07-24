@@ -228,6 +228,7 @@ input.inherited, textarea.inherited {
 .timeline-seg-normal { background: #10b981; }
 .timeline-seg-nao-produtiva { background: #f59e0b; }
 .timeline-seg-parada { background: #ef4444; }
+.timeline-seg-parada-climatica { background: #8b5cf6; }
 
 /* ============================================================
    PHOTO PREVIEW
@@ -333,9 +334,11 @@ input.inherited, textarea.inherited {
     <h1>RDO Auto</h1>
     <div class="sub" id="headerProjectName"></div>
   </div>
-  <nav id="formTabs" style="display:none;gap:.2rem;">
-    <button class="form-tab active" data-tab="rdo">RDO</button>
-    <button class="form-tab" data-tab="striplog">Striplog</button>
+  <nav id="formTabs" style="display:none;gap:.2rem;flex-wrap:wrap;">
+    <button class="form-tab active" data-tab="tabEquipe">Equipe & Geral</button>
+    <button class="form-tab" data-tab="tabPerfuracao">Perfuracao</button>
+    <button class="form-tab" data-tab="tabFluidos">Fluidos & Insumos</button>
+    <button class="form-tab" data-tab="tabAtividades">Atividades</button>
   </nav>
   <div style="position:relative;">
     <span id="headerUserName" style="font-size:.75rem;cursor:pointer;padding:.2rem .5rem;border-radius:4px;" onclick="toggleUserMenu()">&#9660;</span>
@@ -1742,7 +1745,7 @@ setupToggle("#toggleAnomaly", "#sectionAnomaly");
 function addOpRow(inicio, termino, tipo, descritivo) {
   const tbody = $("#opsTable");
   const row = tbody.insertRow(-1);
-  const tipoOpts = ["Normal","Nao Produtiva","Parada"];
+  const tipoOpts = ["Normal","Nao Produtiva","Parada","Parada Climatica"];
   const opts = tipoOpts.map(t => `<option value="${t}" ${t === tipo ? "selected" : ""}>${t}</option>`).join("");
   row.innerHTML = `
     <td><input type="time" value="${inicio || ''}" class="opStart"></td>
@@ -1778,7 +1781,7 @@ function updateTimeline() {
     const totalMin = turnoH * 60;
     const leftPct = (startMin / totalMin) * 100;
     const widthPct = ((endMin - startMin) / totalMin) * 100;
-    const cls = tipo === "Parada" ? "timeline-seg-parada" : tipo === "Nao Produtiva" ? "timeline-seg-nao-produtiva" : "timeline-seg-normal";
+    const cls = tipo === "Parada Climatica" ? "timeline-seg-parada-climatica" : tipo === "Parada" ? "timeline-seg-parada" : tipo === "Nao Produtiva" ? "timeline-seg-nao-produtiva" : "timeline-seg-normal";
     const seg = document.createElement("div");
     seg.className = "timeline-segment " + cls;
     seg.style.left = leftPct + "%";
