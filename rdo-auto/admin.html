@@ -506,7 +506,7 @@ async function generatePDF(id) {
   const info = [
     ["Cliente:", proj.cliente || "-", "Data:", r.data || "-"],
     ["Sonda:", proj.sonda || "-", "Turno:", proj.turno || "-"],
-    ["Localidade:", proj.localidade || "-", "Tipo:", r.tipo_dia || "-"],
+    ["Localidade:", proj.localidade || "-"],
   ];
   doc.autoTable({ startY: y, body: info, theme: "plain", styles: { fontSize: 8, cellPadding: 2 },
     columnStyles: { 0: { fontStyle: "bold", cellWidth: 25 }, 1: { cellWidth: 55 }, 2: { fontStyle: "bold", cellWidth: 18 }, 3: { cellWidth: 55 } },
@@ -521,9 +521,31 @@ async function generatePDF(id) {
     doc.text(`${r.profundidade_inicial || 0} → ${r.profundidade_final} m`, M + 30, y);
     y += 5;
   }
-  if (r.estratigrafia_mudou) {
-    doc.text(`${r.estratigrafia_descricao || "-"} (${r.estratigrafia_profundidade || "?"} m)`, M, y);
-    y += 5;
+  // Stratigraphy (array)
+  const stratEntries = r.estratigrafia_mudancas || (r.estratigrafia_descricao ? [{ profundidade: r.estratigrafia_profundidade, descricao: r.estratigrafia_descricao }] : []);
+  if (stratEntries.length > 0) {
+    doc.setFont(undefined, "bold"); doc.text("Estratigrafia:", M, y); y += 4;
+    doc.setFont(undefined, "normal");
+    stratEntries.forEach(s => {
+      doc.text(`${s.descricao || "-"} (${s.profundidade || "?"} m)`, M + 5, y);
+      y += 4;
+    });
+  }
+
+  // Striplog summary
+  if (r.striplog && r.striplog.length > 0) {
+    const depths = r.striplog.map(s => s.profundidade).filter(d => !isNaN(d));
+    if (depths.length > 0) {
+      const firstD = depths[0], lastD = depths[depths.length - 1];
+      const firstT = r.striplog[0].inicio || r.striplog[0].horario || "";
+      const meters = lastD - firstD;
+      if (meters > 0 && firstT) {
+        y += 2; doc.setFontSize(9); doc.setFont(undefined, "bold");
+        doc.text("Striplog:", M, y); doc.setFont(undefined, "normal");
+        doc.text(`${meters.toFixed(1)} m perfurados | Inicio: ${firstT}`, M + 25, y);
+        y += 5;
+      }
+    }
   }
 
   if (r.operacoes && r.operacoes.length > 0) {
@@ -542,17 +564,14 @@ async function generatePDF(id) {
   y += 5;
   if (r.hse_incidentes) { doc.text(`Incidentes: ${r.hse_incidentes}`, M, y); y += 4; }
 
-  y += 2; doc.text(`Clima: ${r.condicoes_climaticas || "-"}${r.chuva ? " (choveu)" : ""}`, M, y); y += 5;
-
   if (r.observacoes) {
     y += 2; doc.setFont(undefined, "bold"); doc.text("Observacoes:", M, y); y += 4;
     doc.setFont(undefined, "normal"); doc.setFontSize(8);
     doc.text(r.observacoes, M, y, { maxWidth: W - 2 * M });
   }
 
-  if (r.aprovacao_geologo) {
-    y += 10; doc.setFontSize(9); doc.text(`Aprovacao: ${r.aprovacao_geologo}`, M, y);
-  }
+  y += 10; doc.setFontSize(9);
+  doc.text(`Supervisor: ${r.aprovacao_geologo || "-"}`, M, y);
 
   const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
