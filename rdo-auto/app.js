@@ -193,30 +193,18 @@ let draftTimer = null;
 let lastDraftTime = null;
 const DRAFT_KEY = "rdo_autosave_draft";
 
-async function saveLocalDraft() {
+function saveLocalDraft() {
   if (!currentProjectId) return;
   const payload = buildPayload("rascunho");
   payload._projectId = currentProjectId;
   payload._savedAt = Date.now();
   localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
-
-  // Also save to Supabase (silent fail if offline)
-  try {
-    const rdoId = $("#rdoId").value;
-    if (rdoId) {
-      await sb.from("rdos").update(payload).eq("id", rdoId);
-    } else {
-      const { data } = await sb.from("rdos").insert(payload).select("id").single();
-      if (data) $("#rdoId").value = data.id;
-    }
-  } catch(e) {
-    console.warn("Auto-save to Supabase failed (offline?):", e.message);
-  }
-
   lastDraftTime = Date.now();
+  // Supabase auto-save disabled (roadmap item)
+  // Visual feedback
   const ind = $("#autoSaveIndicator");
   if (ind) {
-    ind.textContent = "Rascunho salvo";
+    ind.textContent = "Rascunho salvo (local)";
     ind.style.opacity = "1";
     clearTimeout(ind._timeout);
     ind._timeout = setTimeout(() => { ind.style.opacity = "0"; }, 2000);
