@@ -306,13 +306,11 @@ function populateDraftFromPayload(payload) {
 // ============================================================
 $$(".form-tab").forEach(tab => {
   tab.addEventListener("click", () => {
-    console.log("Tab click:", tab.dataset.tab);
     $$(".form-tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
     $$(".formTabContent").forEach(s => s.classList.remove("active"));
     const targetId = tab.dataset.tab;
     const target = document.getElementById(targetId);
-    console.log("Target:", target ? "found" : "MISSING", targetId);
     if (target) target.classList.add("active");
   });
 });
