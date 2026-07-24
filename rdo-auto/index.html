@@ -377,25 +377,29 @@ input.inherited, textarea.inherited {
   <div class="view" id="formView">
     <form id="rdoFormInner" autocomplete="off">
     <input type="hidden" id="rdoId">
-    <!-- Date + Type -->
+    <div id="formBody">
+    <!-- Tab 1: Equipe & Geral -->
+    <div class="formTabContent active" id="tabEquipe">
     <div class="card">
       <div class="card-header">Identificação</div>
-      <div class="row">
-        <div><label for="rdoDate">Data do RDO <span style="color:#ef4444;">*</span></label><input type="date" id="rdoDate" required></div>
-        <div>
-          <label for="rdoDayType">Tipo de dia</label>
-          <select id="rdoDayType">
-            <option value="perfuracao">Perfuração</option>
-            <option value="montagem">Montagem</option>
-            <option value="teste">Teste</option>
-            <option value="parado">Parado</option>
-            <option value="outro">Outro</option>
-          </select>
-        </div>
-      </div>
+      <div><label for="rdoDate">Data do RDO <span style="color:#ef4444;">*</span></label><input type="date" id="rdoDate" required></div>
     </div>
-
-    <div id="formBody">
+    </div><!-- tabEquipe -->
+    <!-- Tab 2: Perfuracao -->
+    <div class="formTabContent" id="tabPerfuracao" style="display:none;">
+    <!-- Striplog -->
+    <div class="card">
+      <div class="card-header">Striplog — Marcação metro a metro</div>
+      <div style="display:flex;gap:.4rem;margin-bottom:.4rem;">
+        <button class="btn btn-sm" id="btnShiftStart" type="button" style="background:#10b981;color:#fff;">Início / Retomada</button>
+        <button class="btn btn-sm" id="btnShiftStop" type="button" style="background:#ef4444;color:#fff;">Parada</button>
+        <button class="btn btn-sm" id="btnAddStriplog" type="button" style="background:#3b82f6;color:#fff;">Marcar Metro</button>
+      </div>
+      <table class="ops-table" id="striplogTable">
+        <tr><th>Prof. (m)</th><th>Início</th><th>Término</th><th>ROP (m/h)</th><th>Δ</th><th>Observaçao</th><th>Tipo</th><th></th></tr>
+      </table>
+      <div id="striplogROP" style="font-size:.75rem;color:#6b7280;margin-top:.2rem;display:none;"></div>
+    </div>
     <!-- Perfuração toggle -->
     <div class="card">
       <div class="card-header">Perfuração <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
@@ -472,6 +476,8 @@ input.inherited, textarea.inherited {
       </div>
     </div>
 
+    <!-- Tab 3: Fluidos & Insumos -->
+    <div class="formTabContent" id="tabFluidos" style="display:none;">
     <!-- Fluido toggle -->
     <div class="card">
       <div class="card-header">Fluido <span class="prefill-link" data-section="fluido" title="Copiar dados de ontem">copiar de ontem</span></div>
@@ -559,6 +565,8 @@ input.inherited, textarea.inherited {
       </div>
     </div>
 
+  </div><!-- tabFluidos -->
+  <div class="formTabContent" id="tabAtividades" style="display:none;">
     <!-- Operacoes -->
     <div class="card">
       <div class="card-header">Registro de Atividades</div>
@@ -610,8 +618,8 @@ input.inherited, textarea.inherited {
 
     <!-- Aprovação -->
     <div class="card">
-      <div class="card-header">Aprovação <span class="prefill-link" data-section="aprovacao" title="Copiar dados de ontem">copiar de ontem</span></div>
-      <div class="prefill-note" data-section="aprovacao">Preenchido com dados de ontem. Confira e edite se necessario.</div>
+      <div class="card-header">Aprovação </div>
+      
       <div><label for="approvalGeologist">Geólogo / Gestor</label><input type="text" id="approvalGeologist"></div>
     </div>
 
@@ -624,7 +632,8 @@ input.inherited, textarea.inherited {
       <div id="existingPhotos"></div>
     </div>
 
-    </div><!-- #formBody -->
+    </div><!-- tabAtividades -->
+  </div><!-- #formBody -->
     </form>
   </div>
 
@@ -642,21 +651,6 @@ input.inherited, textarea.inherited {
   <!-- ============================================================
        VIEW: STRIPLOG
        ============================================================ -->
-  <div class="view" id="striplogView">
-    <div class="card">
-      <div class="card-header">Striplog — Marcaçao metro a metro</div>
-      <div style="display:flex;gap:.4rem;margin-bottom:.4rem;">
-        <button class="btn btn-sm" id="btnShiftStart" type="button" style="background:#10b981;color:#fff;">Início / Retomada</button>
-        <button class="btn btn-sm" id="btnShiftStop" type="button" style="background:#ef4444;color:#fff;">Parada</button>
-        <button class="btn btn-sm" id="btnAddStriplog" type="button" style="background:#3b82f6;color:#fff;">Marcar Metro</button>
-      </div>
-      <table class="ops-table" id="striplogTable">
-        <tr><th>Prof. (m)</th><th>Início</th><th>Término</th><th>ROP (m/h)</th><th>Δ</th><th>Observaçao</th><th>Tipo</th><th></th></tr>
-      </table>
-      <div id="striplogROP" style="font-size:.75rem;color:#6b7280;margin-top:.2rem;display:none;"></div>
-    </div>
-  </div>
-
   <!-- ============================================================
        VIEW: READ-ONLY RDO
        ============================================================ -->
@@ -818,12 +812,6 @@ function showView(viewId) {
   const formTabs = $("#formTabs");
   if (viewId === "formView") {
     formTabs.style.display = "flex";
-    updateStriplogTabVisibility();
-    $("#stickyFooter").style.display = "block";
-  } else if (viewId === "striplogView") {
-    formTabs.style.display = "flex";
-    $$(".form-tab").forEach(t => t.classList.remove("active"));
-    document.querySelector('.form-tab[data-tab="striplog"]').classList.add("active");
     $("#stickyFooter").style.display = "block";
   } else {
     formTabs.style.display = "none";
@@ -858,14 +846,6 @@ let splashTimer = setTimeout(() => {
 // BACK BUTTON
 // ============================================================
 $("#btnBack").addEventListener("click", () => {
-  const slActive = $("#striplogView").classList.contains("active");
-  if (slActive) {
-    showView("formView");
-    $("#formTabs").style.display = "flex";
-    $$(".form-tab").forEach(t => t.classList.remove("active"));
-    document.querySelector('.form-tab[data-tab="rdo"]').classList.add("active");
-    return;
-  }
   const formActive = $("#formView").classList.contains("active");
   const roActive = $("#readonlyView").classList.contains("active");
   if (formActive || roActive) {
@@ -988,7 +968,6 @@ window.addEventListener("beforeunload", (e) => {
 })();
 
 function populateDraftFromPayload(payload) {
-  if (payload.rdoDayType) $("#rdoDayType").value = payload.rdoDayType;
   if (payload.depthInitial != null) { setToggle("#toggleDrilling", true); $("#depthInitial").value = payload.depthInitial || ""; }
   if (payload.depthFinal != null) $("#depthFinal").value = payload.depthFinal || "";
   if (payload.estratigrafia_mudou) { setToggle("#toggleStratigraphy", true); $("#stratDepth").value = payload.estratigrafia_profundidade || ""; $("#stratDescription").value = payload.estratigrafia_descricao || ""; }
@@ -1006,29 +985,20 @@ function populateDraftFromPayload(payload) {
   if (payload.weatherRain) $("#weatherRain").checked = true;
   if (payload.obsGeneral) $("#obsGeneral").value = payload.obsGeneral;
   if (payload.planNextShift) $("#planNextShift").value = payload.planNextShift;
-  if (payload.approvalGeologist) $("#approvalGeologist").value = payload.approvalGeologist;
   if (payload.turnoHoras) $("#shiftHours").value = payload.turnoHoras;
 }
 
 // ============================================================
-// FORM TABS (RDO / Striplog)
+// FORM TABS (section switching within form)
 // ============================================================
-function updateStriplogTabVisibility() {
-  const perfOn = getToggleState("#toggleDrilling");
-  const slTab = document.querySelector('.form-tab[data-tab="striplog"]');
-  if (slTab) slTab.style.display = perfOn ? "inline-block" : "none";
-}
-
 $$(".form-tab").forEach(tab => {
   tab.addEventListener("click", () => {
     $$(".form-tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
-    const target = tab.dataset.tab === "rdo" ? "formView" : "striplogView";
-    $$(".view").forEach(v => v.classList.remove("active"));
-    $("#" + target).classList.add("active");
-    $("#formTabs").style.display = "flex";
-    $("#btnBack").style.visibility = "visible";
-    $("#mainHeader").style.display = "flex";
+    $$(".formTabContent").forEach(s => s.style.display = "none");
+    const targetId = tab.dataset.tab;
+    const target = document.getElementById(targetId);
+    if (target) target.style.display = "block";
   });
 });
 
@@ -1448,8 +1418,6 @@ function prefillTeam() {
 
 function prefillApproval() {
   if (!lastRDO) return;
-  $("#approvalGeologist").value = lastRDO.aprovacao_geologo || "";
-  markInherited([$("#approvalGeologist")]);
 }
 
 // ============================================================
@@ -1521,7 +1489,6 @@ async function requestReopen(id) {
 // ============================================================
 function populateForm(rdo) {
   $("#rdoDate").value = rdo.data;
-  $("#rdoDayType").value = rdo.tipo_dia || "perfuracao";
 
   if (rdo.profundidade_final != null) {
     setToggle("#toggleDrilling", true);
@@ -1659,8 +1626,6 @@ function populateForm(rdo) {
   $("#obsGeneral").value = rdo.observacoes || "";
   $("#planNextShift").value = rdo.planejamento_proximo_turno || "";
 
-  // Aprovacao
-  $("#approvalGeologist").value = rdo.aprovacao_geologo || "";
 
   // Existing photos
   selectedFiles = [];
@@ -2337,8 +2302,7 @@ function buildPayload(status) {
     user_id: (currentUser && currentUser.id) || null,
     projeto_id: currentProjectId,
     data: $("#rdoDate").value || new Date().toISOString().split("T")[0],
-    tipo_dia: $("#rdoDayType").value || null,
-    hse_dds: $("#hseDds").checked,
+      hse_dds: $("#hseDds").checked,
     hse_incidentes: $("#hseIncidents").value || null,
     hse_quase_acidentes: $("#hseNearMiss").value || null,
     hse_hh_expostas: parseFloat($("#hseManHours").value) || null,
@@ -2347,7 +2311,6 @@ function buildPayload(status) {
     planejamento_proximo_turno: $("#planNextShift").value || null,
     condicoes_climaticas: $("#weatherCondition").value,
     chuva: $("#weatherRain").checked,
-    aprovacao_geologo: $("#approvalGeologist").value || null,
     operacoes: collectOps(),
     equipe: collectTeam(),
     status: status,
@@ -2463,7 +2426,6 @@ function resetForm() {
   $("#rdoDate").value = "";
   $("#rdoDate").max = today;
   $("#formBody").style.display = "none";
-  $("#rdoDayType").value = "perfuracao";
   setToggle("#toggleDrilling", false);
   setToggle("#toggleFluid", false);
   setToggle("#toggleMateriais", false);
