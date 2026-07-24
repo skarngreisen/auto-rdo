@@ -337,6 +337,7 @@ input.inherited, textarea.inherited {
   <nav id="formTabs" style="display:none;gap:.2rem;flex-wrap:wrap;">
     <button class="form-tab active" data-tab="tabEquipe">Equipe & Geral</button>
     <button class="form-tab" data-tab="tabPerfuracao">Perfuracao</button>
+    <button class="form-tab" data-tab="tabRevestimento">Revestimento</button>
     <button class="form-tab" data-tab="tabFluidos">Fluidos & Insumos</button>
     <button class="form-tab" data-tab="tabAtividades">Atividades</button>
   </nav>
@@ -1669,8 +1670,6 @@ function setupToggle(groupId, sectionId) {
   });
 }
 setupToggle("#toggleDrilling", "#sectionDrilling");
-// Update striplog tab visibility when drilling toggle changes
-$("#toggleDrilling").addEventListener("click", () => setTimeout(updateStriplogTabVisibility, 50));
 setupToggle("#toggleFluid", "#sectionFluid");
 setupToggle("#toggleMateriais", "#sectionMateriais");
 setupToggle("#toggleStratigraphy", "#sectionStratigraphy");
