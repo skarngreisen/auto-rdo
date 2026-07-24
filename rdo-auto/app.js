@@ -308,10 +308,10 @@ $$(".form-tab").forEach(tab => {
   tab.addEventListener("click", () => {
     $$(".form-tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
-    $$(".formTabContent").forEach(s => s.style.display = "none");
+    $$(".formTabContent").forEach(s => s.classList.remove("active"));
     const targetId = tab.dataset.tab;
     const target = document.getElementById(targetId);
-    if (target) target.style.display = "block";
+    if (target) target.classList.add("active");
   });
 });
 
