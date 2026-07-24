@@ -272,7 +272,7 @@ window.addEventListener("beforeunload", (e) => {
 function populateDraftFromPayload(payload) {
   if (payload.depthInitial != null) { setToggle("#toggleDrilling", true); $("#depthInitial").value = payload.depthInitial || ""; }
   if (payload.depthFinal != null) $("#depthFinal").value = payload.depthFinal || "";
-  if (payload.estratigrafia_mudou) { setToggle("#toggleStratigraphy", true); $("#stratDepth").value = payload.estratigrafia_profundidade || ""; $("#stratDescription").value = payload.estratigrafia_descricao || ""; }
+  if (payload.estratigrafia_mudou && payload.estratigrafia_mudancas) { setToggle("#toggleStratigraphy", true); clearTable("#stratTable"); payload.estratigrafia_mudancas.forEach(s => addStratRow(s.profundidade, s.descricao)); }
   if (payload.revestimento_mudou) { setToggle("#toggleCasing", true); $("#casingMeters").value = payload.revestimento_metros || ""; $("#casingObs").value = payload.revestimento_obs || ""; }
   if (payload.parametros_anomalias && payload.parametros_anomalias.length > 0) {
     setToggle("#toggleAnomaly", true);
@@ -801,10 +801,15 @@ function populateForm(rdo) {
     $("#depthInitial").value = rdo.profundidade_inicial || "";
     $("#depthFinal").value = rdo.profundidade_final || "";
     // Estratigrafia
-    if (rdo.estratigrafia_mudou) {
+    if (rdo.estratigrafia_mudou || (rdo.estratigrafia_mudancas && rdo.estratigrafia_mudancas.length > 0)) {
       setToggle("#toggleStratigraphy", true);
-      $("#stratDepth").value = rdo.estratigrafia_profundidade || "";
-      $("#stratDescription").value = rdo.estratigrafia_descricao || "";
+      clearTable("#stratTable");
+      if (rdo.estratigrafia_mudancas) {
+        rdo.estratigrafia_mudancas.forEach(s => addStratRow(s.profundidade, s.descricao));
+      } else if (rdo.estratigrafia_descricao) {
+        // backward compat: single entry
+        addStratRow(rdo.estratigrafia_profundidade, rdo.estratigrafia_descricao);
+      }
     } else {
       setToggle("#toggleStratigraphy", false);
     }
@@ -1398,6 +1403,29 @@ function addAnomalyRow(parametro, descricao) {
 }
 $("#btnAddAnomaly").addEventListener("click", () => addAnomalyRow("",""));
 
+// ── Estratigrafia (dynamic, multiple changes per day) ──────────
+function addStratRow(depth, desc) {
+  const tbody = $("#stratTable");
+  const row = tbody.insertRow(-1);
+  row.innerHTML = `
+    <td><input type="number" step="0.01" value="${depth || ''}" class="stratDepth" style="min-width:70px;"></td>
+    <td><input type="text" value="${desc || ''}" class="stratDesc" placeholder="Ex.: Fm. Botucatu, arenito fino"></td>
+    <td><button class="btn btn-danger btn-sm stratRemove" type="button">&times;</button></td>`;
+  row.querySelector(".stratRemove").addEventListener("click", () => row.remove());
+}
+$("#btnAddStrat").addEventListener("click", () => addStratRow("",""));
+
+function collectStratigraphy() {
+  const items = [];
+  for (let i = 1; i < $("#stratTable").rows.length; i++) {
+    const row = $("#stratTable").rows[i];
+    const d = parseFloat(row.querySelector(".stratDepth")?.value);
+    const desc = row.querySelector(".stratDesc")?.value || "";
+    if (!isNaN(d) && desc) items.push({ profundidade: d, descricao: desc });
+  }
+  return items.length > 0 ? items : null;
+}
+
 function collectAnomalies() {
   const items = [];
   for (let i = 1; i < $("#anomalyTable").rows.length; i++) {
@@ -1630,8 +1658,7 @@ function buildPayload(status) {
     }
     p.estratigrafia_mudou = getToggleState("#toggleStratigraphy");
     if (p.estratigrafia_mudou) {
-      p.estratigrafia_profundidade = parseFloat($("#stratDepth").value) || null;
-      p.estratigrafia_descricao = $("#stratDescription").value || null;
+      p.estratigrafia_mudancas = collectStratigraphy();
     }
     p.revestimento_mudou = getToggleState("#toggleCasing");
     if (p.revestimento_mudou) {
@@ -1742,6 +1769,7 @@ function resetForm() {
   $("#bitChanged").checked = false;
   clearTable("#opsTable"); addOpRow("","","","");
   clearTable("#anomalyTable");
+  clearTable("#stratTable");
   clearTable("#striplogTable");
   clearTable("#chemTable"); CHEM_OPTIONS.filter(c => c !== "Outro").forEach(c => addChemicalRow(c,"",""));
   clearTable("#matTable"); MAT_OPTIONS.filter(m => m !== "Outro").forEach(m => addMaterialRow(m,"",""));
