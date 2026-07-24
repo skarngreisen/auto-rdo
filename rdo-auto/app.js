@@ -984,7 +984,6 @@ function setupToggle(groupId, sectionId) {
 }
 setupToggle("#toggleDrilling", "#sectionDrilling");
 // Update striplog tab visibility when drilling toggle changes
-$("#toggleDrilling").addEventListener("click", () => setTimeout(updateStriplogTabVisibility, 50));
 setupToggle("#toggleFluid", "#sectionFluid");
 setupToggle("#toggleMateriais", "#sectionMateriais");
 setupToggle("#toggleStratigraphy", "#sectionStratigraphy");
