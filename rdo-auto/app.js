@@ -1721,7 +1721,7 @@ $("#btnSubmit").addEventListener("click", async () => {
     const payload = buildPayload("em_revisao");
     // Merge new photos with existing ones
     const existingUrls = [];
-    $("#existingPhotos img").each(img => existingUrls.push(img.src));
+    $$("#existingPhotos img").forEach(img => existingUrls.push(img.src));
     payload.fotos = [...existingUrls, ...photoUrls];
     if (payload.fotos.length === 0) delete payload.fotos;
 
