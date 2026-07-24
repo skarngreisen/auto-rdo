@@ -52,7 +52,7 @@
 <button class="form-tab active" data-tab="tabEquipe">Equipe &amp; Geral</button>
 <button class="form-tab" data-tab="tabPerfuracao">Perfuração</button>
 <button class="form-tab" data-tab="tabRevestimento">Revestimento</button>
-<button class="form-tab" data-tab="tabFluidos">Fluidos &amp; Insumos</button>
+<button class="form-tab" data-tab="tabFluidos">Insumos</button>
 <button class="form-tab" data-tab="tabAtividades">Atividades</button>
 </nav>
 <div style="position:relative;">
@@ -170,9 +170,26 @@
 <table class="ops-table" id="stratTable">
 <tr><th>Prof. (m)</th><th>Descrição</th><th></th></tr>
 </table>
-<button class="btn btn-secondary btn-sm" id="btnAddStrat" type="button" style="margin-top:.3rem;">+ Adicionar mudança</button>
+<button class="btn btn-secondary btn-sm" id="btnAddStrat" style="margin-top:.3rem;" type="button">+ Adicionar mudança</button>
 </div>
-<label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Dados de Brocas</label>
+<div class="card">
+<div class="card-header">Fluido <span class="prefill-link" data-section="fluido" title="Copiar dados de ontem">copiar de ontem</span></div>
+<div class="prefill-note" data-section="fluido">Preenchido com dados de ontem. Confira e edite se necessario.</div>
+<div class="row">
+<div><label for="fluidDensity">Densidade (lb/gal)</label><input id="fluidDensity" step="0.1" type="number"/></div>
+<div><label for="fluidViscosity">Visc. Marsh (s/qt)</label><input id="fluidViscosity" step="0.1" type="number"/></div>
+</div>
+<div class="row">
+<div><label for="fluidFiltrate">Filtrado API (mL)</label><input id="fluidFiltrate" step="0.1" type="number"/></div>
+<div><label for="fluidPh">pH</label><input id="fluidPh" step="0.1" type="number"/></div>
+<div><label for="fluidFreeWater">Agua Livre (%)</label><input id="fluidFreeWater" step="0.1" type="number"/></div>
+</div>
+<div class="row">
+<div><label for="fluidSand">Areia (%)</label><input id="fluidSand" step="0.1" type="number"/></div>
+<div><label for="fluidApiCake">API Cake (1/32 in)</label><input id="fluidApiCake" step="0.1" type="number"/></div>
+<div><label for="fluidSolids">Solidos (%)</label><input id="fluidSolids" step="0.1" type="number"/></div>
+</div>
+</div><label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Dados de Brocas</label>
 <div style="font-size:.75rem;color:#6b7280;margin-bottom:.3rem;">
 <label><input id="bitChanged" onchange="onBitToggle()" type="checkbox"/> Houve troca de broca? (move atual → anterior)</label>
 </div>
@@ -227,24 +244,7 @@
 </div>
 </div><div class="formTabContent" id="tabFluidos">
 <!-- Fluido toggle -->
-<div class="card">
-<div class="card-header">Fluido <span class="prefill-link" data-section="fluido" title="Copiar dados de ontem">copiar de ontem</span></div>
-<div class="prefill-note" data-section="fluido">Preenchido com dados de ontem. Confira e edite se necessario.</div>
-<div class="row">
-<div><label for="fluidDensity">Densidade (lb/gal)</label><input id="fluidDensity" step="0.1" type="number"/></div>
-<div><label for="fluidViscosity">Visc. Marsh (s/qt)</label><input id="fluidViscosity" step="0.1" type="number"/></div>
-</div>
-<div class="row">
-<div><label for="fluidFiltrate">Filtrado API (mL)</label><input id="fluidFiltrate" step="0.1" type="number"/></div>
-<div><label for="fluidPh">pH</label><input id="fluidPh" step="0.1" type="number"/></div>
-<div><label for="fluidFreeWater">Agua Livre (%)</label><input id="fluidFreeWater" step="0.1" type="number"/></div>
-</div>
-<div class="row">
-<div><label for="fluidSand">Areia (%)</label><input id="fluidSand" step="0.1" type="number"/></div>
-<div><label for="fluidApiCake">API Cake (1/32 in)</label><input id="fluidApiCake" step="0.1" type="number"/></div>
-<div><label for="fluidSolids">Solidos (%)</label><input id="fluidSolids" step="0.1" type="number"/></div>
-</div>
-</div>
+
 <!-- Quimicos (toggle) -->
 <div class="card">
 <div class="card-header">Quimicos</div>
