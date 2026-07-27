@@ -81,6 +81,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
   <nav>
     <button class="active" data-tab="projetos">Projetos</button>
     <button data-tab="rdos">RDOs</button>
+    <button data-tab="usuarios">Usuarios</button>
   </nav>
   <div style="flex:1;"></div>
   <div style="position:relative;">
@@ -143,6 +144,39 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     </div>
   </div>
 
+  <!-- ============ TAB: USUARIOS ============ -->
+  <div class="tab" id="tabUsuarios">
+    <div class="card">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        Usuarios
+        <button class="btn btn-primary btn-sm" id="btnNewUser">+ Novo</button>
+      </div>
+      <table id="usuariosTable">
+        <tr><th>Nome</th><th>Celular</th><th>Funcao</th><th></th></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: New/Edit User -->
+<div class="modal-overlay" id="modalUser">
+  <div class="modal">
+    <h2 id="modalUserTitle">Novo Usuario</h2>
+    <input type="hidden" id="editUserId">
+    <label>Nome</label><input type="text" id="modalUserName">
+    <label>Celular (com DDD)</label><input type="tel" id="modalUserPhone">
+    <label>Senha</label><input type="password" id="modalUserPassword" placeholder="Min. 8 caracteres">
+    <label>Funcao</label><select id="modalUserRole">
+      <option value="colaborador">Colaborador</option>
+      <option value="supervisor">Supervisor</option>
+      <option value="admin">Admin</option>
+    </select>
+    <div style="display:flex;gap:.5rem;margin-top:1rem;">
+      <button class="btn btn-secondary" id="btnUserModalCancel" style="flex:1;">Cancelar</button>
+      <button class="btn btn-primary" id="btnUserModalSave" style="flex:1;">Salvar</button>
+    </div>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -243,6 +277,7 @@ $$("header nav button").forEach(btn => {
     $("#tab" + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1)).classList.add("active");
     if (btn.dataset.tab === "projetos") loadProjetos();
     else if (btn.dataset.tab === "rdos") { loadRDOFilters(); loadRDOs(); }
+    else if (btn.dataset.tab === "usuarios") loadUsuarios();
   });
 });
 
@@ -721,6 +756,77 @@ $("#btnExportCSV").addEventListener("click", async () => {
 });
 
 // ============================================================
+// ============================================================
+// USERS
+// ============================================================
+async function loadUsuarios() {
+  const { data: profiles } = await sb.from("profiles").select("user_id,name,role,phone").order("name");
+  const tbody = $("#usuariosTable");
+  if (!profiles || profiles.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum usuario.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = profiles.map(p => `
+    <tr>
+      <td>${p.name || '-'}</td><td>${p.phone || '-'}</td><td>${p.role}</td>
+      <td class="actions">
+        <button class="btn btn-secondary btn-sm" onclick="editUser('${p.user_id}')">Editar</button>
+      </td>
+    </tr>`).join("");
+}
+
+$("#btnNewUser").addEventListener("click", () => {
+  $("#modalUserTitle").textContent = "Novo Usuario";
+  $("#editUserId").value = "";
+  $("#modalUserName").value = ""; $("#modalUserPhone").value = "";
+  $("#modalUserPassword").value = ""; $("#modalUserRole").value = "colaborador";
+  $("#modalUser").classList.add("show");
+});
+
+async function editUser(userId) {
+  const { data } = await sb.from("profiles").select("*").eq("user_id", userId).single();
+  if (!data) return;
+  $("#modalUserTitle").textContent = "Editar Usuario";
+  $("#editUserId").value = data.user_id;
+  $("#modalUserName").value = data.name || "";
+  $("#modalUserPhone").value = data.phone || "";
+  $("#modalUserPassword").value = "";
+  $("#modalUserRole").value = data.role;
+  $("#modalUser").classList.add("show");
+}
+
+$("#btnUserModalCancel").addEventListener("click", () => $("#modalUser").classList.remove("show"));
+$("#modalUser").addEventListener("click", e => { if (e.target === $("#modalUser")) $("#modalUser").classList.remove("show"); });
+
+$("#btnUserModalSave").addEventListener("click", async () => {
+  const id = $("#editUserId").value;
+  const name = $("#modalUserName").value.trim();
+  const phone = $("#modalUserPhone").value.trim().replace(/\D/g, "");
+  const password = $("#modalUserPassword").value;
+  const role = $("#modalUserRole").value;
+
+  if (!name || !phone || !role) { toast("Preencha todos os campos.", "error"); return; }
+  if (!id && !password) { toast("Senha obrigatoria para novo usuario.", "error"); return; }
+
+  if (!id) {
+    // Create new auth user
+    const email = phone + "@rdo.local";
+    const { data: authData, error: authErr } = await sb.auth.signUp({ email, password });
+    if (authErr) { toast("Erro ao criar usuario: " + authErr.message, "error"); return; }
+    if (!authData?.user) { toast("Erro ao criar usuario.", "error"); return; }
+    await sb.from("profiles").upsert({ user_id: authData.user.id, name, phone, role });
+  } else {
+    await sb.from("profiles").update({ name, phone, role }).eq("user_id", id);
+    if (password.length >= 8) {
+      // Reset password via SQL — can't do from client with anon key
+      toast("Perfil atualizado. Use o SQL Editor para alterar a senha.", "success");
+    }
+  }
+  toast(id ? "Perfil atualizado!" : "Usuario criado!", "success");
+  $("#modalUser").classList.remove("show");
+  loadUsuarios();
+});
+
 // INIT
 // ============================================================
 loadProjetos();
