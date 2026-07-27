@@ -827,8 +827,11 @@ $("#btnUserModalSave").addEventListener("click", async () => {
   } else {
     await sb.from("profiles").update({ name, phone, role }).eq("user_id", id);
     if (password) {
-      // Password change attempted from client — limited by anon key
-      toast("Perfil atualizado. Para alterar a senha, use o SQL Editor.", "success");
+      // Show SQL snippet for password reset
+      const email = phone + "@rdo.local";
+      const sql = `UPDATE auth.users SET encrypted_password = crypt('${password}', gen_salt('bf')) WHERE email = '${email}';`;
+      await navigator.clipboard.writeText(sql);
+      toast("SQL copiado! Execute no SQL Editor do Supabase para alterar a senha.", "success");
     }
   }
   toast(id ? "Perfil atualizado!" : "Usuario criado!", "success");
