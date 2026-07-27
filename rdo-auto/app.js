@@ -790,8 +790,6 @@ async function requestReopen(id) {
 // ============================================================
 function populateForm(rdo) {
   $("#rdoDate").value = rdo.data;
-  alert("revestimento_mudou=" + rdo.revestimento_mudou);
-
   if (rdo.profundidade_final != null) {
     setToggle("#toggleDrilling", true);
     $("#depthInitial").value = rdo.profundidade_inicial || "";
@@ -809,15 +807,7 @@ function populateForm(rdo) {
     } else {
       setToggle("#toggleStratigraphy", false);
     }
-    if (rdo.revestimento_mudou) {
-      alert("revestimento loaded: " + rdo.revestimento_mudou + " metros=" + rdo.revestimento_metros);
-      setToggle("#toggleCasing", true);
-      $("#casingMeters").value = rdo.revestimento_metros || "";
-      $("#casingObs").value = rdo.revestimento_obs || "";
-    } else {
-      setToggle("#toggleCasing", false);
   setToggle("#toggleAnomaly", false);
-    }
 
     if (rdo.brocas) {
       const b = rdo.brocas;
@@ -888,6 +878,14 @@ function populateForm(rdo) {
     }
     if (rdo.combustivel.estoque_s10 != null) $("#fuelS10Stock").value = rdo.combustivel.estoque_s10;
     if (rdo.combustivel.estoque_s500 != null) $("#fuelS500Stock").value = rdo.combustivel.estoque_s500;
+  }
+  // Revestimento (standalone tab)
+  if (rdo.revestimento_mudou) {
+    setToggle("#toggleCasing", true);
+    $("#casingMeters").value = rdo.revestimento_metros || "";
+    $("#casingObs").value = rdo.revestimento_obs || "";
+  } else {
+    setToggle("#toggleCasing", false);
   }
   // Outros Materiais (toggle)
   if (rdo.outros_materiais && Array.isArray(rdo.outros_materiais) && rdo.outros_materiais.length > 0) {
