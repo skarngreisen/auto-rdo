@@ -410,6 +410,7 @@ async function loadRDOs() {
   const { data, error } = await sb.from("rdos")
     .select("id,data,tipo_dia,profundidade_inicial,profundidade_final,formacao,status,version")
     .eq("deleted", false)
+    .eq("latest", true)
     .eq("projeto_id", currentProjectId)
     .order("data", { ascending: false })
     .limit(50);
