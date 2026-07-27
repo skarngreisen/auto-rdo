@@ -816,7 +816,7 @@ function populateForm(rdo) {
       setToggle("#toggleStratigraphy", false);
     }
     if (rdo.revestimento_mudou) {
-      console.log("Loading revestimento: mudou=true, metros=" + rdo.revestimento_metros);
+      alert("revestimento loaded: " + rdo.revestimento_mudou + " metros=" + rdo.revestimento_metros);
       setToggle("#toggleCasing", true);
       $("#casingMeters").value = rdo.revestimento_metros || "";
       $("#casingObs").value = rdo.revestimento_obs || "";
