@@ -27,7 +27,7 @@ $("#btnAuth").addEventListener("click", async () => {
 
   if (isLoginMode) {
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) { errEl.textContent = "Celular ou senha incorretos."; errEl.style.display = "block"; return; }
+    if (error) { errEl.textContent = "Email ou senha incorretos."; errEl.style.display = "block"; return; }
     currentUser = data.user;
   } else {
     if (!name) { errEl.textContent = "Preencha o nome completo."; errEl.style.display = "block"; return; }
@@ -47,7 +47,7 @@ $("#authToggle").addEventListener("click", (e) => {
   $("#authTitle").textContent = isLoginMode ? "Entrar" : "Cadastro";
   $("#btnAuth").textContent = isLoginMode ? "Entrar" : "Cadastrar";
   $("#authName").style.display = isLoginMode ? "none" : "block";
-  $("#authToggleText").textContent = isLoginMode ? "Nao tem conta?" : "Ja tem conta?";
+  $("#authToggleText").textContent = isLoginMode ? "Não tem conta?" : "Já tem conta?";
   $("#authToggle").textContent = isLoginMode ? "Cadastre-se" : "Entrar";
 });
 
@@ -239,7 +239,7 @@ if (!DRAFT_RESTORE_ENABLED) { localStorage.removeItem(DRAFT_KEY); }
     if (draft._projectId && draft._savedAt) {
       const secs = Math.floor((Date.now() - draft._savedAt) / 1000);
       const mins = Math.floor(secs / 60);
-      if (confirm(`Ha um rascunho nao salvo de ${mins > 0 ? mins + ' min' : secs + ' seg'} atras. Deseja restaura-lo?`)) {
+      if (confirm(`Há um rascunho não salvo de ${mins > 0 ? mins + ' min' : secs + ' seg'} atrás. Deseja restaurá-lo?`)) {
         clearTimeout(splashTimer); // cancel auto-dismiss
         currentProjectId = draft._projectId;
         delete draft._projectId; delete draft._savedAt;
@@ -419,7 +419,7 @@ async function loadRDOs() {
   }
 
   if (!data || data.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>Nenhum RDO neste projeto ainda.</p><p style="font-size:.75rem;">Toque em "+ Novo RDO" para comecar.</p></div>`;
+    container.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>Nenhum RDO neste projeto ainda.</p><p style="font-size:.75rem;">Toque em "+ Novo RDO" para começar.</p></div>`;
     return;
   }
 
@@ -497,7 +497,7 @@ async function loadLastRDO() {
     if (data && data.length > 0) {
       lastRDO = data[0];
       if (lastRDO.status === "rascunho") {
-        showToast(`Atencao: o RDO de ${lastRDO.data} nao foi enviado. Use os dados mesmo assim ou finalize-o.`, "error");
+        showToast(`Atenção: o RDO de ${lastRDO.data} não foi enviado. Use os dados mesmo assim ou finalizá-lo.`, "error");
       }
     } else {
       // Fallback: long stoppage — find most recent RDO ever for this project
@@ -542,7 +542,7 @@ async function loadLastStratigraphy() {
     .maybeSingle();
   const el = $("#lastStratigraphy");
   if (data && data.estratigrafia_descricao) {
-    el.textContent = `Ultima descricao (${data.data}): "${data.estratigrafia_descricao}"`;
+    el.textContent = `Última descrição (${data.data}): "${data.estratigrafia_descricao}"`;
     el.style.display = "block";
   } else {
     el.textContent = "";
@@ -572,8 +572,8 @@ function confirmStalePrefill() {
   const daysAgo = Math.floor((refDate - lastDate) / 86400000);
   if (daysAgo <= 1) return true; // yesterday or same day — no warning needed
   return confirm(
-    `O RDO mais recente e do dia ${lastRDO.data.split("-").reverse().join("/")} ` +
-    `(${daysAgo} dias atras). Os dados podem estar desatualizados. Deseja pre-preencher mesmo assim?`
+    `O RDO mais recente é do dia ${lastRDO.data.split("-").reverse().join("/")} ` +
+    `(${daysAgo} dias atrás). Os dados podem estar desatualizados. Deseja pre-preencher mesmo assim?`
   );
 }
 
@@ -765,10 +765,10 @@ async function viewRDO(rdo) {
   c.innerHTML = `
     <div class="card-header">RDO ${rdo.data} — ${rdo.tipo_dia || 'N/D'} <span class="rdo-badge badge-enviado" style="margin-left:.5rem;">Enviado</span></div>
     <div class="ro-row" style="margin-bottom:.4rem;"><span class="ro-label">Autor</span><span class="ro-value">${authorName}</span></div>
-    <div class="ro-section"><h3>Perfuracao</h3>${depthInfo || '<p style="color:#9ca3af;font-size:.8rem;">Sem perfuracao neste dia.</p>'}</div>
-    ${rdo.estratigrafia_mudou ? `<div class="ro-section"><h3>Estratigrafia</h3><div class="ro-row"><span class="ro-label">Mudanca</span><span class="ro-value">${rdo.estratigrafia_descricao || '-'} (${rdo.estratigrafia_profundidade || '?'} m)</span></div></div>` : ''}
+    <div class="ro-section"><h3>Perfuração</h3>${depthInfo || '<p style="color:#9ca3af;font-size:.8rem;">Sem perfuração neste dia.</p>'}</div>
+    ${rdo.estratigrafia_mudou ? `<div class="ro-section"><h3>Estratigrafia</h3><div class="ro-row"><span class="ro-label">Mudança</span><span class="ro-value">${rdo.estratigrafia_descricao || '-'} (${rdo.estratigrafia_profundidade || '?'} m)</span></div></div>` : ''}
     ${rdo.revestimento_mudou ? `<div class="ro-section"><h3>Revestimento</h3><div class="ro-row"><span class="ro-label">Metros</span><span class="ro-value">${rdo.revestimento_metros || '-'} m descidos</span></div>${rdo.revestimento_obs ? `<div class="ro-row"><span class="ro-label">Obs.</span><span class="ro-value">${rdo.revestimento_obs}</span></div>` : ''}</div>` : ''}
-    <div class="ro-section"><h3>Operacoes</h3>${ops || '<p style="color:#9ca3af;font-size:.8rem;">Nenhuma operacao registrada.</p>'}</div>
+    <div class="ro-section"><h3>Operações</h3>${ops || '<p style="color:#9ca3af;font-size:.8rem;">Nenhuma operação registrada.</p>'}</div>
     <div class="ro-section"><h3>Equipe</h3>${equipe || '<p style="color:#9ca3af;font-size:.8rem;">Nenhum membro registrado.</p>'}</div>
     <div class="ro-section"><h3>HSE</h3>
       <div class="ro-row"><span class="ro-label">DDS</span><span class="ro-value">${rdo.hse_dds ? 'Sim' : 'Nao'}</span></div>
@@ -776,8 +776,8 @@ async function viewRDO(rdo) {
       <div class="ro-row"><span class="ro-label">HH Expostas</span><span class="ro-value">${rdo.hse_hh_expostas || '-'}</span></div>
       ${rdo.hse_incidentes ? `<div class="ro-row"><span class="ro-label">Incidentes</span><span class="ro-value">${rdo.hse_incidentes}</span></div>` : ''}
     </div>
-    <div class="ro-section"><h3>Clima</h3><div class="ro-row"><span class="ro-label">Condicao</span><span class="ro-value">${rdo.condicoes_climaticas || '-'}${rdo.chuva ? ' (choveu)' : ''}</span></div></div>
-    ${rdo.observacoes ? `<div class="ro-section"><h3>Observacoes</h3><p style="font-size:.82rem;">${rdo.observacoes}</p></div>` : ''}
+    <!-- CLIMA REMOVED --><div style="display:none;">${rdo.condicoes_climaticas || '-'}${rdo.chuva ? ' (choveu)' : ''}</span></div></div>
+    ${rdo.observacoes ? `<div class="ro-section"><h3>Observações</h3><p style="font-size:.82rem;">${rdo.observacoes}</p></div>` : ''}
     ${rdo.planejamento_proximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.82rem;">${rdo.planejamento_proximo_turno}</p></div>` : ''}
     <div class="ro-section"><h3>Fotos</h3><div class="photo-grid">${fotos}</div></div>
     ${rdo.status === 'aprovado' && !rdo.reopen_requested && currentProfile && currentProfile.role === 'colaborador'
@@ -1057,7 +1057,7 @@ $("#shiftHours").addEventListener("input", updateTimeline);
 // ============================================================
 // COLUNA TABLE
 // ============================================================
-const BHA_OPTIONS = ["BR: Broca","NB: Nearbit","DC: Drill Collar","STB: Estabilizador","HW: Heavy Weight","DP: Drill Pipe","RED: Reducao","UR: Underreamer","Outro"];
+const BHA_OPTIONS = ["BR: Broca","NB: Nearbit","DC: Drill Collar","STB: Estabilizador","HW: Heavy Weight","DP: Drill Pipe","RED: Redução","UR: Underreamer","Outro"];
 
 function addBHARow(item, qty, idPol, odPol, lengthM, totalM) {
   const tbody = $("#bhaTable");
@@ -1065,7 +1065,7 @@ function addBHARow(item, qty, idPol, odPol, lengthM, totalM) {
   const opts = BHA_OPTIONS.map(o => `<option value="${o}" ${o===item||o.startsWith(item)?"selected":""}>${o}</option>`).join("");
   const customVal = BHA_OPTIONS.some(o => o.startsWith(item)) ? "" : (item || "");
   row.innerHTML = `
-    <td><select class="bhaItem" style="min-width:100px;font-size:.82rem;" onchange="onBHAItemChange(this)">${opts}</select><input type="text" class="bhaItemCustom" placeholder="Nome da peca" style="display:none;margin-top:2px;min-width:100px;font-size:.8rem;" value="${customVal}"></td>
+    <td><select class="bhaItem" style="min-width:100px;font-size:.82rem;" onchange="onBHAItemChange(this)">${opts}</select><input type="text" class="bhaItemCustom" placeholder="Nome da peça" style="display:none;margin-top:2px;min-width:100px;font-size:.8rem;" value="${customVal}"></td>
     <td><input type="number" value="${qty || ''}" class="bhaQty" style="min-width:50px"></td>
     <td><input type="number" step="0.01" value="${idPol || ''}" class="bhaId" style="min-width:60px"></td>
     <td><input type="number" step="0.01" value="${odPol || ''}" class="bhaOd" style="min-width:60px"></td>
