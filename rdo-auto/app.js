@@ -15,6 +15,7 @@ const $$ = (sel) => document.querySelectorAll(sel);
 let currentUser = null;
 let currentProfile = null;
 let isLoginMode = true;
+let splashTimer = null;
 
 $("#btnAuth").addEventListener("click", async () => {
   const email = $("#authEmail").value.trim();
@@ -81,7 +82,7 @@ async function loadProfile() {
   $("#headerUserName").textContent = currentProfile.name || currentUser.email;
   $("#userMenuPhone").textContent = currentUser.email;
   showView("splashView");
-  setTimeout(() => {
+  splashTimer = setTimeout(() => {
     showView("homeView");
     loadProjects();
   }, 2500);
@@ -143,7 +144,7 @@ $("#splashView").addEventListener("click", () => {
   loadProjects();
 });
 // Auto-dismiss after 2.5s
-let splashTimer = setTimeout(() => {
+splashTimer = setTimeout(() => {
   if ($("#splashView").classList.contains("active")) {
     showView("homeView");
     loadProjects();
