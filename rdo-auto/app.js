@@ -145,6 +145,7 @@ function showView(viewId) {
 // SPLASH
 // ============================================================
 $("#splashView").addEventListener("click", () => {
+  clearTimeout(splashTimer);
   showView("homeView");
   loadProjects();
 });
