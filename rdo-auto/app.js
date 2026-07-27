@@ -458,7 +458,7 @@ async function loadRDOs() {
       } else if (status === "em_revisao" && (role === "supervisor" || role === "admin")) {
         openDraft(data);
       } else {
-        viewRDO(data);
+        await viewRDO(data);
       }
     });
   });
@@ -738,7 +738,12 @@ function openDraft(rdo) {
 // ============================================================
 // VIEW RDO (read-only)
 // ============================================================
-function viewRDO(rdo) {
+async function viewRDO(rdo) {
+  let authorName = "-";
+  if (rdo.user_id) {
+    const { data: profile } = await sb.from("profiles").select("name").eq("user_id", rdo.user_id).maybeSingle();
+    if (profile) authorName = profile.name;
+  }
   const c = $("#readonlyContent");
   const depthInfo = rdo.profundidade_final != null
     ? `<div class="ro-row"><span class="ro-label">Profundidade</span><span class="ro-value">${rdo.profundidade_inicial || 0} → ${rdo.profundidade_final} m</span></div>`
