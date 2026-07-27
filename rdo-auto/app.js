@@ -1663,6 +1663,7 @@ function buildPayload(status) {
       p.estratigrafia_mudancas = collectStratigraphy();
     }
     p.revestimento_mudou = getToggleState("#toggleCasing");
+    console.log("toggleCasing state:", p.revestimento_mudou);
     if (p.revestimento_mudou) {
       p.revestimento_metros = parseFloat($("#casingMeters").value) || null;
       p.revestimento_obs = $("#casingObs").value || null;
