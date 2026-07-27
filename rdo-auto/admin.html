@@ -166,7 +166,8 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <input type="hidden" id="editUserId">
     <label>Nome</label><input type="text" id="modalUserName">
     <label>Celular (com DDD)</label><input type="tel" id="modalUserPhone">
-    <label>Senha</label><input type="password" id="modalUserPassword" placeholder="Min. 8 caracteres">
+    <label>Nova senha</label><input type="password" id="modalUserPassword" placeholder="Min. 8 caracteres">
+    <label>Confirmar senha</label><input type="password" id="modalUserPassword2" placeholder="Repita a senha">
     <label>Funcao</label><select id="modalUserRole">
       <option value="colaborador">Colaborador</option>
       <option value="supervisor">Supervisor</option>
@@ -782,7 +783,7 @@ $("#btnNewUser").addEventListener("click", () => {
   $("#modalUserTitle").textContent = "Novo Usuario";
   $("#editUserId").value = "";
   $("#modalUserName").value = ""; $("#modalUserPhone").value = "";
-  $("#modalUserPassword").value = ""; $("#modalUserRole").value = "colaborador";
+  $("#modalUserPassword").value = ""; $("#modalUserPassword2").value = ""; $("#modalUserRole").value = "colaborador";
   $("#modalUser").classList.add("show");
 });
 
@@ -793,7 +794,7 @@ async function editUser(userId) {
   $("#editUserId").value = data.user_id;
   $("#modalUserName").value = data.name || "";
   $("#modalUserPhone").value = data.phone || "";
-  $("#modalUserPassword").value = "";
+  $("#modalUserPassword").value = ""; $("#modalUserPassword2").value = "";
   $("#modalUserRole").value = data.role;
   $("#modalUser").classList.add("show");
 }
@@ -810,6 +811,11 @@ $("#btnUserModalSave").addEventListener("click", async () => {
 
   if (!name || !phone || !role) { toast("Preencha todos os campos.", "error"); return; }
   if (!id && !password) { toast("Senha obrigatoria para novo usuario.", "error"); return; }
+  if (password) {
+    const p2 = $("#modalUserPassword2").value;
+    if (password !== p2) { toast("Senhas nao conferem.", "error"); return; }
+    if (password.length < 8) { toast("Senha deve ter no minimo 8 caracteres.", "error"); return; }
+  }
 
   if (!id) {
     // Create new auth user
@@ -820,9 +826,9 @@ $("#btnUserModalSave").addEventListener("click", async () => {
     await sb.from("profiles").upsert({ user_id: authData.user.id, name, phone, role });
   } else {
     await sb.from("profiles").update({ name, phone, role }).eq("user_id", id);
-    if (password.length >= 8) {
-      // Reset password via SQL — can't do from client with anon key
-      toast("Perfil atualizado. Use o SQL Editor para alterar a senha.", "success");
+    if (password) {
+      // Password change attempted from client — limited by anon key
+      toast("Perfil atualizado. Para alterar a senha, use o SQL Editor.", "success");
     }
   }
   toast(id ? "Perfil atualizado!" : "Usuario criado!", "success");
