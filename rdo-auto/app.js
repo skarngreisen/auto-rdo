@@ -16,20 +16,13 @@ let currentUser = null;
 let currentProfile = null;
 let isLoginMode = true;
 
-function phoneToEmail(phone) {
-  let digits = phone.replace(/\D/g, "");
-  if (digits.length === 11) digits = "55" + digits; // normalize to full format
-  return digits + "@rdo.local";
-}
-
 $("#btnAuth").addEventListener("click", async () => {
-  const phone = $("#authPhone").value.trim();
+  const email = $("#authEmail").value.trim();
   const password = $("#authPassword").value.trim();
   const name = $("#authName").value.trim();
   const errEl = $("#authError");
   errEl.style.display = "none";
-  if (!phone || !password) { errEl.textContent = "Preencha celular e senha."; errEl.style.display = "block"; return; }
-  const email = phoneToEmail(phone);
+  if (!email || !password) { errEl.textContent = "Preencha email e senha."; errEl.style.display = "block"; return; }
 
   if (isLoginMode) {
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
@@ -41,7 +34,7 @@ $("#btnAuth").addEventListener("click", async () => {
     if (error) { errEl.textContent = error.message; errEl.style.display = "block"; return; }
     currentUser = data.user;
     if (currentUser) {
-      await sb.from("profiles").upsert({ user_id: currentUser.id, name, role: "colaborador", phone: phone.replace(/\D/g, "") });
+      await sb.from("profiles").upsert({ user_id: currentUser.id, name, role: "colaborador" });
     }
   }
   if (currentUser) await loadProfile();
@@ -85,8 +78,8 @@ async function loadProfile() {
     currentProfile = { role: "colaborador" };
   }
   // Update header user info
-  $("#headerUserName").textContent = currentProfile.name || (currentProfile.phone || currentUser.email);
-  $("#userMenuPhone").textContent = currentProfile.phone || "-";
+  $("#headerUserName").textContent = currentProfile.name || currentUser.email;
+  $("#userMenuPhone").textContent = currentUser.email;
   showView("splashView");
   setTimeout(() => {
     showView("homeView");
@@ -797,6 +790,7 @@ async function requestReopen(id) {
 // ============================================================
 function populateForm(rdo) {
   $("#rdoDate").value = rdo.data;
+  alert("revestimento_mudou=" + rdo.revestimento_mudou);
 
   if (rdo.profundidade_final != null) {
     setToggle("#toggleDrilling", true);
