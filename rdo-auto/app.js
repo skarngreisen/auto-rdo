@@ -1662,12 +1662,6 @@ function buildPayload(status) {
     if (p.estratigrafia_mudou) {
       p.estratigrafia_mudancas = collectStratigraphy();
     }
-    p.revestimento_mudou = getToggleState("#toggleCasing");
-    console.log("Toggles:", "drill="+getToggleState("#toggleDrilling"), "strat="+getToggleState("#toggleStratigraphy"), "casing="+getToggleState("#toggleCasing"), "anom="+getToggleState("#toggleAnomaly"), "fluid="+getToggleState("#toggleFluid"), "mat="+getToggleState("#toggleMateriais"));
-    if (p.revestimento_mudou) {
-      p.revestimento_metros = parseFloat($("#casingMeters").value) || null;
-      p.revestimento_obs = $("#casingObs").value || null;
-    }
     p.brocas = collectBits();
     p.parametros_anomalias = collectAnomalies();
     p.striplog = collectStriplog();
@@ -1675,6 +1669,12 @@ function buildPayload(status) {
   }
   if (fluOn) {
     p.quimicos = collectChemicals();
+  }
+  // Revestimento (standalone tab, not inside perfOn)
+  p.revestimento_mudou = getToggleState("#toggleCasing");
+  if (p.revestimento_mudou) {
+    p.revestimento_metros = parseFloat($("#casingMeters").value) || null;
+    p.revestimento_obs = $("#casingObs").value || null;
   }
   const materiaisOn = getToggleState("#toggleMateriais");
   if (materiaisOn) {
@@ -1692,7 +1692,6 @@ function buildPayload(status) {
 // SAVE DRAFT
 // ============================================================
 $("#btnSaveDraft").addEventListener("click", async () => {
-  console.log("SaveDraft clicked, project:", currentProjectId);
   if (!currentProjectId) { showToast("Selecione um projeto.","error"); return; }
   $("#btnSaveDraft").disabled = true;
   $("#btnSubmit").disabled = true;
