@@ -1692,6 +1692,7 @@ function buildPayload(status) {
 // SAVE DRAFT
 // ============================================================
 $("#btnSaveDraft").addEventListener("click", async () => {
+  console.log("SaveDraft clicked, project:", currentProjectId);
   if (!currentProjectId) { showToast("Selecione um projeto.","error"); return; }
   $("#btnSaveDraft").disabled = true;
   $("#btnSubmit").disabled = true;
