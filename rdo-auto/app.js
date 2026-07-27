@@ -207,9 +207,10 @@ function saveLocalDraft() {
 }
 
 function startAutoDraft() {
+  // Auto-draft disabled — saves only via localStorage for recovery
   stopAutoDraft();
   lastDraftTime = null;
-  draftTimer = setInterval(saveLocalDraft, 120000); // every 2 min
+  // draftTimer = setInterval(saveLocalDraft, 120000); // disabled
 }
 
 function stopAutoDraft() {
@@ -226,8 +227,11 @@ window.addEventListener("beforeunload", (e) => {
   return "";
 });
 
-// Check for saved draft on page load
+// Check for saved draft on page load (DISABLED — re-enable by setting to true)
+const DRAFT_RESTORE_ENABLED = false;
+if (!DRAFT_RESTORE_ENABLED) { localStorage.removeItem(DRAFT_KEY); }
 (function() {
+  if (!DRAFT_RESTORE_ENABLED) return;
   const saved = localStorage.getItem(DRAFT_KEY);
   if (!saved) return;
   try {
