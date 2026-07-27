@@ -580,11 +580,14 @@ async function editRDO(id) {
   if (!original) { toast("RDO nao encontrado.", "error"); return; }
   // Mark original as not latest
   await sb.from("rdos").update({ latest: false }).eq("id", id);
-  // Create copy with version+1
+  // Create copy with version+1, status=rascunho, edited tracking
   const copy = { ...original };
   delete copy.id; delete copy.created_at;
   copy.version = (original.version || 1) + 1;
   copy.latest = true;
+  copy.status = "rascunho";
+  copy.edited_by = currentUser?.id || null;
+  copy.edited_at = new Date().toISOString();
   const { data: newRDO, error } = await sb.from("rdos").insert(copy).select().single();
   if (error) { toast("Erro ao criar copia: " + error.message, "error"); return; }
   toast(`Nova versao (v${copy.version}) criada. Redirecionando para o formulario...`, "success");

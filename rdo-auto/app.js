@@ -407,7 +407,7 @@ async function loadRDOs() {
   container.innerHTML = '<div style="text-align:center;padding:1rem;color:#9ca3af;">Carregando...</div>';
 
   const { data, error } = await sb.from("rdos")
-    .select("id,data,tipo_dia,profundidade_inicial,profundidade_final,formacao,status")
+    .select("id,data,tipo_dia,profundidade_inicial,profundidade_final,formacao,status,version")
     .eq("deleted", false)
     .eq("projeto_id", currentProjectId)
     .order("data", { ascending: false })
@@ -433,7 +433,7 @@ async function loadRDOs() {
     return `
       <div class="rdo-card" data-id="${r.id}" data-status="${r.status}">
         <div class="rdo-info">
-          <div class="rdo-date">${r.data} — ${r.tipo_dia || 'N/D'}</div>
+          <div class="rdo-date">${r.data} — ${r.tipo_dia || 'N/D'}${r.version > 1 ? ` <span style="font-size:.7rem;color:#a04000;">v${r.version}</span>` : ''}</div>
           <div class="rdo-meta">${depthInfo}${r.formacao ? ' | ' + r.formacao : ''}</div>
         </div>
         <div class="rdo-badge ${badgeClass}">${badgeText}</div>
