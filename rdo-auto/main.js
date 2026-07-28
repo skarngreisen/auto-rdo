@@ -27,7 +27,6 @@ $("#btnAuth").addEventListener("click", async () => {
 
   if (isLoginMode) {
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    console.log("SignIn result:", data?.user?.email || "no user", error?.message || "no error");
     if (error) { errEl.textContent = "Email ou senha incorretos."; errEl.style.display = "block"; return; }
     currentUser = data.user;
   } else {
@@ -39,9 +38,7 @@ $("#btnAuth").addEventListener("click", async () => {
       await sb.from("profiles").upsert({ user_id: currentUser.id, name, role: "colaborador" });
     }
   }
-  console.log("After auth, currentUser:", currentUser?.email || "null");
   if (currentUser) await loadProfile();
-  console.log("After loadProfile");
 });
 
 $("#authToggle").addEventListener("click", (e) => {
