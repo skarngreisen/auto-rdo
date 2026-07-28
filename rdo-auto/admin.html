@@ -103,7 +103,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
         <button class="btn btn-primary btn-sm" id="btnNewProject">+ Novo</button>
       </div>
       <table id="projetosTable">
-        <tr><th>Cliente</th><th>Localidade</th><th>Sonda</th><th>Início</th><th>Turnos</th><th>Geólogo</th><th></th></tr>
+        <tr><th>Projeto</th><th>Localidade</th><th>Sonda</th><th>Início</th><th>Turnos</th><th>Geólogo</th><th></th></tr>
       </table>
     </div>
   </div>
@@ -188,9 +188,9 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
   <div class="modal" style="max-width:650px;">
     <h2 id="modalProjectTitle">Novo Projeto</h2>
     <input type="hidden" id="editProjectId">
-    <label>Cliente</label><input type="text" id="modalCliente">
+    <label>Nome do projeto</label><input type="text" id="modalCliente">
     <label>Localidade</label><input type="text" id="modalLocalidade" placeholder="ex: Ribeirao Preto - SP">
-    <label>Sonda</label><input type="text" id="modalSonda">
+    <label>Sonda</label><select id="modalSonda"><option value="">Selecionar sonda...</option><option value="Cardwell">Cardwell</option><option value="R4">R4</option><option value="A10">A10</option><option value="Tornep">Tornep</option></select>
     <div class="row">
       <div><label>Data Início</label><input type="date" id="modalDataInício"></div>
       <div><label>Turno (descricao)</label><input type="text" id="modalTurno" value="07h x 17h"></div>
@@ -206,12 +206,18 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <hr style="margin:1rem 0;border:none;border-top:2px solid #e8ecf1;">
     <div class="card-header">Geologo Responsavel</div>
     <div id="geologoHistory" style="font-size:.75rem;color:#6b7280;margin-bottom:.5rem;"></div>
-    <select id="modalGeologo" style="margin-bottom:.5rem;"><option value="">Selecionar geologo...</option></select>
+    <select id="modalGeologo" style="margin-bottom:.5rem;">
+      <option value="">Selecionar geologo...</option>
+      <option value="c1cdda82-6923-4b81-888b-a4227cd983c8">Fernando Manreza</option>
+      <option value="c2268008-76c8-4b56-9627-84d59e782fe2">Halleph Mariano</option>
+      <option value="339d7145-2bad-4e86-b20b-7d74eaf39351">Murilo de Freitas</option>
+      <option value="0ac2491e-707c-43e4-95c2-e3b207607a4d">Pedro Medeiros</option>
+    </select>
     <div class="card-header" style="margin-top:.75rem;">Supervisores de Turno</div>
     <div id="supervisorHistory" style="font-size:.75rem;color:#6b7280;margin-bottom:.5rem;"></div>
     <div class="row" id="supervisorFields">
-      <div><label>Turno 1</label><select id="modalSupervisor1"><option value="">Selecionar supervisor...</option></select></div>
-      <div id="supervisor2Group" style="display:none;"><label>Turno 2</label><select id="modalSupervisor2"><option value="">Selecionar supervisor...</option></select></div>
+      <div><label>Turno 1 (nome)</label><input type="text" id="modalSupervisor1" placeholder="Nome do supervisor"></div>
+      <div id="supervisor2Group" style="display:none;"><label>Turno 2 (nome)</label><input type="text" id="modalSupervisor2" placeholder="Nome do supervisor"></div>
     </div>
     <div style="display:flex;gap:.5rem;margin-top:1rem;">
       <button class="btn btn-secondary" id="btnModalCancel" style="flex:1;">Cancelar</button>
@@ -363,8 +369,19 @@ async function editProject(id) {
   $("#modalTurnosPorDia").value = data.turnos_por_dia || 1;
   toggleSupervisor2();
 
-  // Load current geologist and supervisors
-  await loadCrewDropdowns();
+  // Supervisor free-text fields
+  $("#modalSupervisor1").value = data.supervisor_turno1 || "";
+  $("#modalSupervisor2").value = data.supervisor_turno2 || "";
+  // Supervisor history display
+  const sup1 = data.supervisor_turno1 || "";
+  const sup2 = data.supervisor_turno2 || "";
+  $("#supervisorHistory").innerHTML = [
+    sup1 ? "Turno 1: <strong>" + sup1 + "</strong>" : "",
+    sup2 ? "Turno 2: <strong>" + sup2 + "</strong>" : "",
+    (!sup1 && !sup2) ? "Nenhum supervisor definido." : ""
+  ].filter(Boolean).join("<br>");
+
+  // Load geologist
   await loadAssignmentState(id);
   $("#modalProject").classList.add("show");
 }
@@ -382,6 +399,8 @@ $("#btnModalSave").addEventListener("click", async () => {
     data_inicio: $("#modalDataInício").value,
     turno: $("#modalTurno").value.trim() || "07h x 17h",
     turnos_por_dia: turnosPorDia,
+    supervisor_turno1: $("#modalSupervisor1").value.trim() || null,
+    supervisor_turno2: $("#modalSupervisor2").value.trim() || null,
   };
   if (!payload.cliente || !payload.localidade || !payload.sonda || !payload.data_inicio) {
     toast("Preencha todos os campos obrigatorios.", "error"); return;
@@ -398,9 +417,6 @@ $("#btnModalSave").addEventListener("click", async () => {
 
   // Save geologist assignment
   await saveAssignment("geologo", projetoId);
-  // Save supervisor assignments
-  await saveAssignment("supervisor", projetoId, 1);
-  if (turnosPorDia === 2) await saveAssignment("supervisor", projetoId, 2);
 
   toast(id ? "Projeto atualizado!" : "Projeto criado!", "success");
   $("#modalProject").classList.remove("show");
@@ -441,15 +457,13 @@ async function loadCrewDropdowns() {
 }
 
 async function loadAssignmentState(projetoId) {
-  const today = new Date().toISOString().split("T")[0];
-
   // Current geologist
   const { data: geoCur } = await sb.from("projeto_geologos")
     .select("user_id, inicio, profiles(name)")
     .eq("projeto_id", projetoId).is("fim", null).maybeSingle();
   if (geoCur) {
     $("#modalGeologo").value = geoCur.user_id;
-    $("#geologoHistory").innerHTML = `Atual: <strong>${geoCur.profiles.name}</strong> (desde ${geoCur.inicio})`;
+    $("#geologoHistory").innerHTML = "Atual: <strong>" + geoCur.profiles.name + "</strong> (desde " + geoCur.inicio + ")";
   } else {
     $("#modalGeologo").value = "";
     $("#geologoHistory").innerHTML = "";
@@ -461,42 +475,8 @@ async function loadAssignmentState(projetoId) {
     .eq("projeto_id", projetoId).not("fim", "is", null)
     .order("inicio", { ascending: false }).limit(5);
   if (geoHist && geoHist.length > 0) {
-    const hist = geoHist.map(g => `${g.profiles.name} (${g.inicio} ate ${g.fim})`).join("<br>");
-    $("#geologoHistory").innerHTML += `<br><span style="color:#9ca3af;">Historico:</span><br>${hist}`;
-  }
-
-  // Current supervisors
-  let sup1Name = "", sup2Name = "";
-  const { data: supCur } = await sb.from("projeto_supervisores")
-    .select("user_id, turno, inicio, profiles(name)")
-    .eq("projeto_id", projetoId).is("fim", null);
-  if (supCur) {
-    supCur.forEach(s => {
-      if (s.turno === 1) {
-        $("#modalSupervisor1").value = s.user_id;
-        sup1Name = s.profiles.name + " (desde " + s.inicio + ")";
-      } else {
-        $("#modalSupervisor2").value = s.user_id;
-        sup2Name = s.profiles.name + " (desde " + s.inicio + ")";
-      }
-    });
-  }
-  const supLines = [];
-  if (sup1Name) supLines.push("Turno 1: <strong>" + sup1Name + "</strong>");
-  if (sup2Name) supLines.push("Turno 2: <strong>" + sup2Name + "</strong>");
-  if (supLines.length === 0) supLines.push("Nenhum supervisor definido.");
-  $("#supervisorHistory").innerHTML = supLines.join("<br>");
-
-  // Supervisor history
-  const { data: supHist } = await sb.from("projeto_supervisores")
-    .select("user_id, turno, inicio, fim, profiles(name)")
-    .eq("projeto_id", projetoId).not("fim", "is", null)
-    .order("inicio", { ascending: false }).limit(5);
-  if (supHist && supHist.length > 0) {
-    const hist = supHist.map(s =>
-      `${s.profiles.name} [T${s.turno}] (${s.inicio} ate ${s.fim})`
-    ).join("<br>");
-    $("#supervisorHistory").innerHTML += `<br><span style="color:#9ca3af;">Historico:</span><br>${hist}`;
+    const hist = geoHist.map(function(g) { return g.profiles.name + " (" + g.inicio + " ate " + g.fim + ")"; }).join("<br>");
+    $("#geologoHistory").innerHTML += "<br><span style=\"color:#9ca3af;\">Historico:</span><br>" + hist;
   }
 }
 
