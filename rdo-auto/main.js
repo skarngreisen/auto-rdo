@@ -810,11 +810,14 @@ async function viewRDO(rdo) {
     if (entries.length > 0) fluidoHTML = entries.map(([k,v]) => row(k, v)).join('');
   }
 
-  // Quimicos
+  // Quimicos — filter rows with actual data (consumo or estoque)
   let quimicosHTML = empty("Nenhum produto quimico utilizado.");
   if (rdo.quimicos && rdo.quimicos.length > 0) {
-    quimicosHTML = `<table class="ops-table"><tr><th>Produto</th><th>Quantidade</th></tr>
-      ${rdo.quimicos.map(q => `<tr><td>${q.produto||'-'}</td><td>${q.quantidade||'-'}</td></tr>`).join('')}</table>`;
+    const filled = rdo.quimicos.filter(q => (q.consumo != null && q.consumo !== "") || (q.estoque != null && q.estoque !== ""));
+    if (filled.length > 0) {
+      quimicosHTML = `<table class="ops-table"><tr><th>Produto</th><th>Consumo</th><th>Estoque</th></tr>
+        ${filled.map(q => `<tr><td>${q.name||'-'}</td><td>${q.consumo != null ? q.consumo : '-'}</td><td>${q.estoque != null ? q.estoque : '<span style="color:#ef4444;">0</span>'}</td></tr>`).join('')}</table>`;
+    }
   }
 
   // Combustivel
@@ -826,15 +829,19 @@ async function viewRDO(rdo) {
     const s500 = rdo.combustivel.consumos.filter(c => c.tipo === 'S500').reduce((s,c) => s + (c.litros||0), 0);
     fuelHTML += `<div style="font-size:.78rem;">S10: ${s10.toFixed(1)} L | S500: ${s500.toFixed(1)} L</div>`;
   }
-  if (rdo.combustivel && (rdo.combustivel.estoque_s10 || rdo.combustivel.estoque_s500)) {
-    fuelHTML += `<div style="font-size:.78rem;margin-top:.2rem;">Estoque: S10 ${rdo.combustivel.estoque_s10||'-'} L | S500 ${rdo.combustivel.estoque_s500||'-'} L</div>`;
-  }
+  // Stock always shown, defaults to 0 in red if never filled
+  const s10stock = rdo.combustivel?.estoque_s10;
+  const s500stock = rdo.combustivel?.estoque_s500;
+  fuelHTML += `<div style="font-size:.78rem;margin-top:.2rem;">Estoque: S10 ${s10stock != null ? s10stock + ' L' : '<span style="color:#ef4444;">0 L</span>'} | S500 ${s500stock != null ? s500stock + ' L' : '<span style="color:#ef4444;">0 L</span>'}</div>`;
 
-  // Materiais
+  // Materiais — filter rows with actual data (consumo or estoque)
   let matHTML = empty("Nenhum material adicional utilizado.");
   if (rdo.outros_materiais && rdo.outros_materiais.length > 0) {
-    matHTML = `<table class="ops-table"><tr><th>Item</th><th>Qtd</th></tr>
-      ${rdo.outros_materiais.map(m => `<tr><td>${m.item||'-'}</td><td>${m.qtd||'-'}</td></tr>`).join('')}</table>`;
+    const filled = rdo.outros_materiais.filter(m => (m.consumo != null && m.consumo !== "") || (m.estoque != null && m.estoque !== ""));
+    if (filled.length > 0) {
+      matHTML = `<table class="ops-table"><tr><th>Item</th><th>Consumo</th><th>Estoque</th></tr>
+        ${filled.map(m => `<tr><td>${m.name||'-'}</td><td>${m.consumo != null ? m.consumo : '-'}</td><td>${m.estoque != null ? m.estoque : '<span style="color:#ef4444;">0</span>'}</td></tr>`).join('')}</table>`;
+    }
   }
 
   // Insumos
@@ -1647,8 +1654,9 @@ function collectChemicals() {
     if (!name) continue;
     const cons = row.querySelector(".chemCons")?.value;
     const est = row.querySelector(".chemEst")?.value;
-    if (cons === "N/A" && est === "N/A") continue;
-    items.push({ name, consumo: cons==="N/A"?null:(parseFloat(cons)||null), estoque: est==="N/A"?null:(parseFloat(est)||null) });
+    // Skip if both are N/A or both are empty (pre-filled rows with no data)
+    if ((cons === "N/A" || cons === "") && (est === "N/A" || est === "")) continue;
+    items.push({ name, consumo: (cons === "N/A" || cons === "") ? null : (parseFloat(cons)||null), estoque: (est === "N/A" || est === "") ? null : (parseFloat(est)||null) });
   }
   return items.length > 0 ? items : null;
 }
@@ -1699,8 +1707,9 @@ function collectMaterials() {
     if (!name) continue;
     const cons = row.querySelector(".matCons")?.value;
     const est = row.querySelector(".matEst")?.value;
-    if (cons === "N/A" && est === "N/A") continue;
-    items.push({ name, consumo: cons==="N/A"?null:(parseFloat(cons)||null), estoque: est==="N/A"?null:(parseFloat(est)||null) });
+    // Skip if both are N/A or both are empty (pre-filled rows with no data)
+    if ((cons === "N/A" || cons === "") && (est === "N/A" || est === "")) continue;
+    items.push({ name, consumo: (cons === "N/A" || cons === "") ? null : (parseFloat(cons)||null), estoque: (est === "N/A" || est === "") ? null : (parseFloat(est)||null) });
   }
   return items.length > 0 ? items : null;
 }
