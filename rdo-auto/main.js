@@ -346,7 +346,7 @@ $("#projectSelect").addEventListener("change", () => {
   localStorage.setItem("rdo_selected_project", id);
   $("#headerProjectName").textContent = currentProjectName;
   $("#rdosList").style.display = "block";
-  $("#btnNewRDO").style.display = "block";
+  $("#homeFooter").style.display = "block";
   loadRDOs();
 });
 
@@ -392,7 +392,7 @@ if (btnModalSave) btnModalSave.addEventListener("click", async () => {
   $("#headerProjectName").textContent = currentProjectName;
   showView("homeView");
   $("#rdosList").style.display = "block";
-  $("#btnNewRDO").style.display = "block";
+  $("#homeFooter").style.display = "block";
   loadRDOs();
 });
 
@@ -402,7 +402,7 @@ if (btnModalSave) btnModalSave.addEventListener("click", async () => {
 async function loadRDOs() {
   const container = $("#rdosList");
   container.style.display = "block";
-  $("#btnNewRDO").style.display = "block";
+  $("#homeFooter").style.display = "block";
   container.innerHTML = '<div style="text-align:center;padding:1rem;color:#9ca3af;">Carregando...</div>';
 
   const { data, error } = await sb.from("rdos")
@@ -1885,7 +1885,7 @@ $("#btnSubmit").addEventListener("click", async () => {
     resetForm();
     showView("homeView");
     $("#rdosList").style.display = "block";
-    $("#btnNewRDO").style.display = "block";
+    $("#homeFooter").style.display = "block";
     loadRDOs();
   } catch(e) { showToast("Erro: "+e.message,"error"); }
   finally {
