@@ -1,5 +1,4 @@
 // RDO Auto — Application Logic
-alert("app.js loaded");
 // ============================================================
 // CONFIG
 // ============================================================
@@ -13,6 +12,7 @@ const $$ = (sel) => document.querySelectorAll(sel);
 // ============================================================
 // AUTH
 // ============================================================
+document.title = "APP LOADED";
 let currentUser = null;
 let currentProfile = null;
 let isLoginMode = true;
