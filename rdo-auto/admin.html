@@ -312,12 +312,16 @@ async function loadProjetos() {
   }
   // Fetch current geologists for all projects in one query
   const projetoIds = data.map(p => p.id);
-  const { data: geologos } = await sb.from("projeto_geologos")
-    .select("projeto_id, profiles!inner(name)")
-    .in("projeto_id", projetoIds)
-    .is("fim", null);
   const geoMap = {};
-  if (geologos) geologos.forEach(g => { geoMap[g.projeto_id] = g.profiles.name; });
+  try {
+    const { data: geologos } = await sb.from("projeto_geologos")
+      .select("projeto_id, profiles!inner(name)")
+      .in("projeto_id", projetoIds)
+      .is("fim", null);
+    if (geologos) geologos.forEach(g => { geoMap[g.projeto_id] = g.profiles.name; });
+  } catch (e) {
+    console.warn("projeto_geologos table not found — run migration-notifications.sql first");
+  }
 
   tbody.innerHTML = data.map(p => `
     <tr>
@@ -543,9 +547,12 @@ async function loadRDOFilters() {
 }
 
 async function loadRDOs() {
+  const tbody = $("#rdosTable");
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Carregando...</td></tr>';
+  try {
   const projetoId = $("#filtroProjeto").value;
   const de = $("#filtroDe").value;
-  const até = $("#filtroAté").value;
+  const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
 
   let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,reopen_requested,projeto_id,version,projetos(cliente,sonda)").eq("deleted", false).order("data", { ascending: false }).limit(200);
@@ -556,7 +563,6 @@ async function loadRDOs() {
   if (status) query = query.eq("status", status);
 
   const { data, error } = await query;
-  const tbody = $("#rdosTable");
   if (error || !data) {
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Erro ao carregar.</td></tr>';
     return;
@@ -581,6 +587,10 @@ async function loadRDOs() {
       </td>
     </tr>`;
   }).join("");
+  } catch (e) {
+    console.error("loadRDOs error:", e);
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#ef4444;">Erro ao carregar RDOs: ' + e.message + '</td></tr>';
+  }
 }
 
 $("#btnFiltrar").addEventListener("click", loadRDOs);
@@ -906,7 +916,7 @@ $("#btnConfirmOk").addEventListener("click", async () => {
 $("#btnExportCSV").addEventListener("click", async () => {
   const projetoId = $("#filtroProjeto").value;
   const de = $("#filtroDe").value;
-  const até = $("#filtroAté").value;
+  const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
   let query = sb.from("rdos").select("data,tipo_dia,profundidade_inicial,profundidade_final,estratigrafia_descricao,status,observacoes,condicoes_climaticas,chuva,hse_dds,hse_hh_expostas,projetos(cliente,sonda)").order("data").limit(500);
   if (projetoId) query = query.eq("projeto_id", projetoId);
@@ -1013,8 +1023,10 @@ $("#btnUserModalSave").addEventListener("click", async () => {
 
 // INIT
 // ============================================================
-loadProjetos();
-loadRDOFilters();
+(async function init() {
+  try { await loadProjetos(); } catch (e) { console.warn("loadProjetos failed:", e.message); }
+  try { await loadRDOFilters(); } catch (e) { console.warn("loadRDOFilters failed:", e.message); }
+})();
 </script>
 <script>window.__PARSE_OK__=true</script>
 </body>
