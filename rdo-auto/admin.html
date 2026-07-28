@@ -23,7 +23,7 @@ th { background: #f3f4f6; color: #374151; font-weight: 600; padding: .5rem .4rem
 td { padding: .45rem .4rem; border-bottom: 1px solid #f3f4f6; }
 tr:hover { background: #f8fafc; }
 
-input, select, textarea {
+input, select, textárea {
   padding: .45rem .55rem; font-size: .85rem; border: 1.5px solid #d1d5db; border-radius: 6px;
   background: #fafbfc; font-family: inherit; width: 100%;
 }
@@ -81,7 +81,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
   <nav>
     <button class="active" data-tab="projetos">Projetos</button>
     <button data-tab="rdos">RDOs</button>
-    <button data-tab="usuarios">Usuarios</button>
+    <button data-tab="usuarios">Usuários</button>
   </nav>
   <div style="flex:1;"></div>
   <div style="position:relative;">
@@ -145,14 +145,14 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
   </div>
 
   <!-- ============ TAB: USUARIOS ============ -->
-  <div class="tab" id="tabUsuarios">
+  <div class="tab" id="tabUsuários">
     <div class="card">
       <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
-        Usuarios
+        Usuários
         <button class="btn btn-primary btn-sm" id="btnNewUser">+ Novo</button>
       </div>
       <table id="usuariosTable">
-        <tr><th>Nome</th><th>Celular</th><th>Funcao</th><th></th></tr>
+        <tr><th>Nome</th><th>Celular</th><th>Função</th><th></th></tr>
       </table>
     </div>
   </div>
@@ -162,13 +162,13 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
 <!-- Modal: New/Edit User -->
 <div class="modal-overlay" id="modalUser">
   <div class="modal">
-    <h2 id="modalUserTitle">Novo Usuario</h2>
+    <h2 id="modalUserTitle">Novo Usuário</h2>
     <input type="hidden" id="editUserId">
     <label>Nome</label><input type="text" id="modalUserName">
     <label>Celular (com DDD)</label><input type="tel" id="modalUserPhone">
     <label>Nova senha</label><input type="password" id="modalUserPassword" placeholder="Min. 8 caracteres">
     <label>Confirmar senha</label><input type="password" id="modalUserPassword2" placeholder="Repita a senha">
-    <label>Funcao</label><select id="modalUserRole">
+    <label>Função</label><select id="modalUserRole">
       <option value="colaborador">Colaborador</option>
       <option value="supervisor">Supervisor</option>
       <option value="admin">Admin</option>
@@ -225,7 +225,7 @@ const sb = window.supabase.createClient(
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
-// ── Auth guard (admin/geologo only) ──
+// ── Auth guard (admin/geólogo only) ──
 let currentUser = null, currentProfile = null;
 (async function adminAuth() {
   const { data } = await sb.auth.getSession();
@@ -278,7 +278,7 @@ $$("header nav button").forEach(btn => {
     $("#tab" + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1)).classList.add("active");
     if (btn.dataset.tab === "projetos") loadProjetos();
     else if (btn.dataset.tab === "rdos") { loadRDOFilters(); loadRDOs(); }
-    else if (btn.dataset.tab === "usuarios") loadUsuarios();
+    else if (btn.dataset.tab === "usuarios") loadUsuários();
   });
 });
 
@@ -373,7 +373,7 @@ async function loadRDOFilters() {
 async function loadRDOs() {
   const projetoId = $("#filtroProjeto").value;
   const de = $("#filtroDe").value;
-  const ate = $("#filtroAté").value;
+  const até = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
 
   let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,reopen_requested,projeto_id,version,projetos(cliente,sonda)").eq("deleted", false).order("data", { ascending: false }).limit(200);
@@ -541,7 +541,7 @@ async function viewRDO(id) {
     </div>
 
     ${r.observacoes ? `<div class="ro-section"><h3>Observações</h3><p style="font-size:.8rem;">${r.observacoes}</p></div>` : ''}
-    ${r.planejamento_proximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.8rem;">${r.planejamento_proximo_turno}</p></div>` : ''}
+    ${r.planejamento_próximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.8rem;">${r.planejamento_próximo_turno}</p></div>` : ''}
   `;
   $("#rdoDetail").style.display = "block";
   $("#rdoDetail").scrollIntoView({ behavior: "smooth" });
@@ -560,7 +560,7 @@ async function approveRDO(id) {
 async function approveReopen(id) {
   const { error } = await sb.from("rdos").update({ reopen_requested: false, status: "rascunho" }).eq("id", id);
   if (error) { toast("Erro: " + error.message, "error"); return; }
-  toast("RDO reaberto para edicao!", "success");
+  toast("RDO reaberto para edição!", "success");
   closeDetail();
   loadRDOs();
 }
@@ -578,10 +578,10 @@ function closeDetail() {
 async function editRDO(id) {
   if (!confirm("Isso criara uma nova versao editavel do RDO. A versao original sera preservada. Continuar?")) return;
   const { data: original } = await sb.from("rdos").select("*").eq("id", id).single();
-  if (!original) { toast("RDO nao encontrado.", "error"); return; }
+  if (!original) { toast("RDO não encontrado.", "error"); return; }
   // Mark original as not latest
   await sb.from("rdos").update({ latest: false }).eq("id", id);
-  // Create copy with version+1, status=rascunho, edited tracking
+  // Creaté copy with version+1, status=rascunho, edited tracking
   const copy = { ...original };
   delete copy.id; delete copy.created_at;
   copy.version = (original.version || 1) + 1;
@@ -590,8 +590,8 @@ async function editRDO(id) {
   copy.edited_by = currentUser?.id || null;
   copy.edited_at = new Date().toISOString();
   const { data: newRDO, error } = await sb.from("rdos").insert(copy).select().single();
-  if (error) { toast("Erro ao criar copia: " + error.message, "error"); return; }
-  toast(`Nova versao (v${copy.version}) criada. Redirecionando para o formulario...`, "success");
+  if (error) { toast("Erro ao criar cópia: " + error.message, "error"); return; }
+  toast(`Nova versão (v${copy.version}) criada. Redirecionando para o formulário...`, "success");
   // Open in field app for editing
   window.open(`index.html?edit=${newRDO.id}`, "_blank");
   loadRDOs();
@@ -604,7 +604,7 @@ const PDF_LOGO = "logo_DH.png";
 
 async function generatePDF(id) {
   const { data: r } = await sb.from("rdos").select("*,projetos(cliente,sonda,localidade,data_inicio,turno)").eq("id", id).single();
-  if (!r) { toast("RDO nao encontrado.", "error"); return; }
+  if (!r) { toast("RDO não encontrado.", "error"); return; }
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = 210, M = 15;
@@ -632,7 +632,7 @@ async function generatePDF(id) {
   y += 5;
   if (r.profundidade_final != null) {
     doc.setFontSize(9); doc.setFont(undefined, "bold");
-    doc.text("Perfuracao:", M, y); doc.setFont(undefined, "normal");
+    doc.text("Perfuração:", M, y); doc.setFont(undefined, "normal");
     doc.text(`${r.profundidade_inicial || 0} \u2192 ${r.profundidade_final} m`, M + 30, y);
     y += 5;
   }
@@ -657,7 +657,7 @@ async function generatePDF(id) {
       if (meters > 0 && firstT) {
         y += 2; doc.setFontSize(9); doc.setFont(undefined, "bold");
         doc.text("Striplog:", M, y); doc.setFont(undefined, "normal");
-        doc.text(`${meters.toFixed(1)} m perfurados | Inicio: ${firstT}`, M + 25, y);
+        doc.text(`${meters.toFixed(1)} m perfurados | Início: ${firstT}`, M + 25, y);
         y += 5;
       }
     }
@@ -675,18 +675,18 @@ async function generatePDF(id) {
 
   y += 2; doc.setFontSize(9); doc.setFont(undefined, "bold"); doc.text("HSE:", M, y); y += 4;
   doc.setFont(undefined, "normal");
-  doc.text(`DDS: ${r.hse_dds ? "Sim" : "Nao"}  |  EPIs: ${r.hse_epis_vistoriados ? "Sim" : "Nao"}  |  HH Expostas: ${r.hse_hh_expostas || "-"}`, M, y);
+  doc.text(`DDS: ${r.hse_dds ? "Sim" : "Não"}  |  EPIs: ${r.hse_epis_vistoriados ? "Sim" : "Não"}  |  HH Expostas: ${r.hse_hh_expostas || "-"}`, M, y);
   y += 5;
   if (r.hse_incidentes) { doc.text(`Incidentes: ${r.hse_incidentes}`, M, y); y += 4; }
 
   if (r.observacoes) {
-    y += 2; doc.setFont(undefined, "bold"); doc.text("Observacoes:", M, y); y += 4;
+    y += 2; doc.setFont(undefined, "bold"); doc.text("Observações:", M, y); y += 4;
     doc.setFont(undefined, "normal"); doc.setFontSize(8);
     doc.text(r.observacoes, M, y, { maxWidth: W - 2 * M });
   }
 
   y += 10; doc.setFontSize(9);
-  doc.text(`Supervisor: ${r.aprovacao_geologo || "-"}`, M, y);
+  doc.text(`Supervisor: ${r.aprovacao_geólogo || "-"}`, M, y);
 
   const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
@@ -734,7 +734,7 @@ $("#btnConfirmOk").addEventListener("click", async () => {
 $("#btnExportCSV").addEventListener("click", async () => {
   const projetoId = $("#filtroProjeto").value;
   const de = $("#filtroDe").value;
-  const ate = $("#filtroAté").value;
+  const até = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
   let query = sb.from("rdos").select("data,tipo_dia,profundidade_inicial,profundidade_final,estratigrafia_descricao,status,observacoes,condicoes_climaticas,chuva,hse_dds,hse_hh_expostas,projetos(cliente,sonda)").order("data").limit(500);
   if (projetoId) query = query.eq("projeto_id", projetoId);
@@ -747,8 +747,8 @@ $("#btnExportCSV").addEventListener("click", async () => {
   const rows = data.map(r => [
     r.data, r.tipo_dia, r.projetos?.cliente||"", r.projetos?.sonda||"",
     r.profundidade_inicial||"", r.profundidade_final||"", r.estratigrafia_descricao||"",
-    r.hse_dds?"Sim":"Nao", r.hse_hh_expostas||"", r.condicoes_climaticas||"",
-    r.chuva?"Sim":"Nao", r.status, (r.observacoes||"").replace(/"/g,'""')
+    r.hse_dds?"Sim":"Não", r.hse_hh_expostas||"", r.condicoes_climaticas||"",
+    r.chuva?"Sim":"Não", r.status, (r.observacoes||"").replace(/"/g,'""')
   ]);
   const csv = [headers.join(","), ...rows.map(r => '"' + r.join('","') + '"')].join("\n");
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
@@ -763,7 +763,7 @@ $("#btnExportCSV").addEventListener("click", async () => {
 // ============================================================
 // USERS
 // ============================================================
-async function loadUsuarios() {
+async function loadUsuários() {
   const { data: profiles } = await sb.from("profiles").select("user_id,name,role,phone").order("name");
   const tbody = $("#usuariosTable");
   if (!profiles || profiles.length === 0) {
@@ -810,19 +810,19 @@ $("#btnUserModalSave").addEventListener("click", async () => {
   const role = $("#modalUserRole").value;
 
   if (!name || !phone || !role) { toast("Preencha todos os campos.", "error"); return; }
-  if (!id && !password) { toast("Senha obrigatoria para novo usuario.", "error"); return; }
+  if (!id && !password) { toast("Senha obrigatória para novo usuário.", "error"); return; }
   if (password) {
     const p2 = $("#modalUserPassword2").value;
-    if (password !== p2) { toast("Senhas nao conferem.", "error"); return; }
-    if (password.length < 8) { toast("Senha deve ter no minimo 8 caracteres.", "error"); return; }
+    if (password !== p2) { toast("Senhas não conferem.", "error"); return; }
+    if (password.length < 8) { toast("Senha deve ter no mínimo 8 caracteres.", "error"); return; }
   }
 
   if (!id) {
-    // Create new auth user
+    // Creaté new auth user
     const email = phone + "@rdo.local";
     const { data: authData, error: authErr } = await sb.auth.signUp({ email, password });
-    if (authErr) { toast("Erro ao criar usuario: " + authErr.message, "error"); return; }
-    if (!authData?.user) { toast("Erro ao criar usuario.", "error"); return; }
+    if (authErr) { toast("Erro ao criar usuário: " + authErr.message, "error"); return; }
+    if (!authData?.user) { toast("Erro ao criar usuário.", "error"); return; }
     await sb.from("profiles").upsert({ user_id: authData.user.id, name, phone, role });
   } else {
     await sb.from("profiles").update({ name, phone, role }).eq("user_id", id);
@@ -834,9 +834,9 @@ $("#btnUserModalSave").addEventListener("click", async () => {
       toast("SQL copiado! Execute no SQL Editor do Supabase para alterar a senha.", "success");
     }
   }
-  toast(id ? "Perfil atualizado!" : "Usuario criado!", "success");
+  toast(id ? "Perfil atualizado!" : "Usuário criado!", "success");
   $("#modalUser").classList.remove("show");
-  loadUsuarios();
+  loadUsuários();
 });
 
 // INIT

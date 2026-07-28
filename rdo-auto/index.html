@@ -36,21 +36,21 @@
      ============================================================ -->
 <div class="view" id="splashView">
 <img alt="DH Perfuração" src="logo_DH.png"/>
-<div class="tagline">Relatorio Diario de Obras</div>
+<div class="tagline">Relatório Diário de Obras</div>
 </div>
 <!-- ============================================================
      HEADER (hidden during splash)
      ============================================================ -->
 <header id="mainHeader" style="display:none;">
 <button class="back-btn" id="btnBack" title="Voltar">←</button>
-<img alt="DH" src="logo_DH.png"/>
+<img alt="DH" src="logo_DH.png" style="width:140px;"/>
 <div style="flex:1;">
 <h1>RDO Auto</h1>
 <div class="sub" id="headerProjectName"></div>
 </div>
 <nav id="formTabs" style="display:none;gap:.2rem;flex-wrap:wrap;">
 <button class="form-tab active" data-tab="tabEquipe">Equipe &amp; Geral</button>
-<button class="form-tab" data-tab="tabPerfuracao">Perfuração</button>
+<button class="form-tab" data-tab="tabPerfuração">Perfuração</button>
 <button class="form-tab" data-tab="tabRevestimento">Revestimento</button>
 <button class="form-tab" data-tab="tabFluidos">Insumos</button>
 <button class="form-tab" data-tab="tabAtividades">Atividades</button>
@@ -89,7 +89,7 @@
 <div class="view" id="formView">
 <form autocomplete="off" id="rdoFormInner">
 <input id="rdoId" type="hidden"/>
-<div class="card formTabContent active" id="tabIdentificacao">
+<div class="card formTabContent active" id="tabIdentificação">
 <div class="card-header">Identificação</div>
 <div><label for="rdoDate">Data do RDO <span style="color:#ef4444;">*</span></label><input id="rdoDate" required="" type="date"/></div>
 </div><div id="formBody">
@@ -113,16 +113,16 @@
 <div><label><input id="hseEpi" type="checkbox"/> EPIs vistoriados</label></div>
 </div>
 <div><label for="hseManHours">Horas-homem expostas</label><input id="hseManHours" step="0.1" type="number"/></div>
-<div><label for="hseIncidents">Incidentes</label><textarea id="hseIncidents" placeholder="Descreva incidentes..." rows="2"></textarea></div>
-<div><label for="hseNearMiss">Quase-acidentes</label><textarea id="hseNearMiss" placeholder="Relate quase-acidentes..." rows="2"></textarea></div>
+<div><label for="hseIncidents">Incidentes</label><textárea id="hseIncidents" placeholder="Descreva incidentes..." rows="2"></textárea></div>
+<div><label for="hseNearMiss">Quase-acidentes</label><textárea id="hseNearMiss" placeholder="Relate quase-acidentes..." rows="2"></textárea></div>
 </div>
-<!-- Observacoes -->
+<!-- Observações -->
 <div class="card">
 <div class="card-header">Observações e Planejamento</div>
 <label for="obsGeneral">Observações</label>
-<textarea id="obsGeneral" placeholder="Registre ocorrencias, decisoes, visitas..." rows="3"></textarea>
+<textárea id="obsGeneral" placeholder="Registre ocorrências, decisões, visitas..." rows="3"></textárea>
 <label for="planNextShift">Planejamento próximo turno</label>
-<textarea id="planNextShift" placeholder="Próximas 24h?" rows="2"></textarea>
+<textárea id="planNextShift" placeholder="Próximas 24h?" rows="2"></textárea>
 </div>
 <!-- Fotos -->
 <div class="card">
@@ -132,7 +132,7 @@
 <!-- Existing photo URLs for drafts -->
 <div id="existingPhotos"></div>
 </div>
-</div><div class="formTabContent" id="tabPerfuracao">
+</div><div class="formTabContent" id="tabPerfuração">
 <!-- Perfuração toggle -->
 <div class="card">
 <div class="card-header">Perfuração <span class="prefill-link" data-section="perfuracao" title="Copiar dados de ontem">copiar de ontem</span></div>
@@ -182,12 +182,12 @@
 <div class="row">
 <div><label for="fluidFiltrate">Filtrado API (mL)</label><input id="fluidFiltrate" step="0.1" type="number"/></div>
 <div><label for="fluidPh">pH</label><input id="fluidPh" step="0.1" type="number"/></div>
-<div><label for="fluidFreeWater">Agua Livre (%)</label><input id="fluidFreeWater" step="0.1" type="number"/></div>
+<div><label for="fluidFreeWater">Água Livre (%)</label><input id="fluidFreeWater" step="0.1" type="number"/></div>
 </div>
 <div class="row">
 <div><label for="fluidSand">Areia (%)</label><input id="fluidSand" step="0.1" type="number"/></div>
 <div><label for="fluidApiCake">API Cake (1/32 in)</label><input id="fluidApiCake" step="0.1" type="number"/></div>
-<div><label for="fluidSolids">Solidos (%)</label><input id="fluidSolids" step="0.1" type="number"/></div>
+<div><label for="fluidSolids">Sólidos (%)</label><input id="fluidSolids" step="0.1" type="number"/></div>
 </div>
 </div><label style="margin-top:.8rem;font-size:.82rem;color:#1e3a5f;">Dados de Brocas</label>
 <div style="font-size:.75rem;color:#6b7280;margin-bottom:.3rem;">
@@ -224,7 +224,7 @@
 <button class="btn btn-secondary btn-sm" id="btnAddBHA" style="margin-top:.3rem;" type="button">+ Adicionar item</button>
 <div id="bhaTotal" style="font-size:.8rem;font-weight:700;color:#a04000;margin-top:.3rem;display:none;">Comprimento total da coluna: 0.00 m</div>
 </div>
-</div><!-- tabPerfuracao -->
+</div><!-- tabPerfuração -->
 <!-- tabRevestimento -->
 <!-- tabFluidos -->
 </div><div class="formTabContent" id="tabRevestimento">
@@ -239,7 +239,7 @@
 <div class="row">
 <div><label for="casingMeters">Metros descidos</label><input id="casingMeters" step="0.01" type="number"/></div>
 </div>
-<div><label for="casingObs">Ocorrências</label><textarea id="casingObs" placeholder="Ex.: Rosca do 3º tubo fora de spec, substituido por reserva" rows="2"></textarea></div>
+<div><label for="casingObs">Ocorrências</label><textárea id="casingObs" placeholder="Ex.: Rosca do 3º tubo fora de spec, substituido por reserva" rows="2"></textárea></div>
 </div>
 </div>
 </div><div class="formTabContent" id="tabFluidos">
@@ -248,17 +248,17 @@
 <!-- Quimicos (toggle) -->
 <div class="card">
 <div class="card-header">Quimicos</div>
-<p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de quimicos hoje?</p>
+<p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de químicos hoje?</p>
 <div class="toggle-group" id="toggleFluid">
 <button class="toggle-btn" data-value="yes" type="button">Sim</button>
-<button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
+<button class="toggle-btn active-no" data-value="no" type="button">Não</button>
 </div>
 <div class="conditional" id="sectionFluid">
-<label style="margin-top:0;font-size:.82rem;color:#1e3a5f;">Quimicos (consumo / estoque)</label>
+<label style="margin-top:0;font-size:.82rem;color:#1e3a5f;">Químicos (consumo / estoque)</label>
 <table class="ops-table" id="chemTable">
 <tr><th>Produto</th><th>Consumo</th><th>Estoque ao fim do turno</th><th style="width:40px;">N/A</th><th></th></tr>
 </table>
-<button class="btn btn-secondary btn-sm" id="btnAddChem" style="margin-top:.3rem;" type="button">+ Adicionar quimico</button>
+<button class="btn btn-secondary btn-sm" id="btnAddChem" style="margin-top:.3rem;" type="button">+ Adicionar químico</button>
 </div>
 </div>
 <!-- Combustivel (always visible) -->
@@ -285,7 +285,7 @@
 <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de outros materiais hoje?</p>
 <div class="toggle-group" id="toggleMateriais">
 <button class="toggle-btn" data-value="yes" type="button">Sim</button>
-<button class="toggle-btn active-no" data-value="no" type="button">Nao</button>
+<button class="toggle-btn active-no" data-value="no" type="button">Não</button>
 </div>
 <div class="conditional" id="sectionMateriais">
 <table class="ops-table" id="matTable">
@@ -305,11 +305,11 @@
 <div><label for="supplyPta">PTA</label><input id="supplyPta" placeholder="-" type="text"/></div>
 <div><label for="supplyMunck">Munck (diária)</label><input id="supplyMunck" placeholder="-" type="text"/></div>
 <div><label for="supplyCrane">Guindaste 70T</label><input id="supplyCrane" placeholder="-" type="text"/></div>
-<div><label for="supplyDebrisRemoval">Rem. Cacamba</label><input id="supplyDebrisRemoval" placeholder="-" type="text"/></div>
+<div><label for="supplyDebrisRemoval">Rem. Caçamba</label><input id="supplyDebrisRemoval" placeholder="-" type="text"/></div>
 </div>
 </div>
 </div><div class="formTabContent" id="tabAtividades">
-<!-- Operacoes -->
+<!-- Operações -->
 <div class="card">
 <div class="card-header">Registro de Atividades</div>
 <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
@@ -327,7 +327,7 @@
 </div>
 </div>
 </div></div><!-- tabEquipe -->
-<!-- Tab 2: Perfuracao -->
+<!-- Tab 2: Perfuração -->
 </form>
 </div>
 <!-- Buttons (sticky footer, visible in form + striplog) -->
@@ -358,7 +358,7 @@
 <div class="modal">
 <h2>Novo Projeto</h2>
 <label for="newClientName">Cliente</label><input id="newClientName" type="text"/>
-<label for="newLocation">Localidade</label><input id="newLocation" placeholder="ex: Ribeirao Preto - SP" type="text"/>
+<label for="newLocation">Localidade</label><input id="newLocation" placeholder="ex: Ribeirão Preto - SP" type="text"/>
 <label for="newRig">Sonda</label><input id="newRig" type="text"/>
 <div class="row">
 <div><label for="newStartDate">Data Início</label><input id="newStartDate" type="date"/></div>
