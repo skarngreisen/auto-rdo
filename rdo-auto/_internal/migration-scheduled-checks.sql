@@ -259,4 +259,6 @@ SELECT cron.schedule(
 -- Verify
 -- ============================================================================
 SELECT 'Scheduled notification check installed' AS status;
-SELECT cron.jobname, cron.schedule, cron.command FROM cron.job WHERE jobname = 'rdo-scheduled-check';
+-- Note: cron.job table may not be accessible via SQL Editor.
+-- Verify in Dashboard → Database → Extensions → pg_cron, or run:
+-- SELECT * FROM cron.job;

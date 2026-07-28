@@ -10,10 +10,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")!;
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const SB_URL = Deno.env.get("SB_URL")!;
+const SB_SERVICE_KEY = Deno.env.get("SB_SERVICE_KEY")!;
 
-const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const sb = createClient(SB_URL, SB_SERVICE_KEY);
 
 interface NotifyPayload {
   user_ids: string[];
