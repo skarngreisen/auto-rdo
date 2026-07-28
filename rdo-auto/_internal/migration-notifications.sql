@@ -121,6 +121,12 @@ END;
 $$;
 
 -- ============================================================================
+-- 6.5 Grants for authenticated role (RLS disabled but still need grants) -----
+-- ============================================================================
+GRANT SELECT, INSERT, UPDATE, DELETE ON projeto_geologos TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON projeto_supervisores TO authenticated;
+
+-- ============================================================================
 -- 7. Verify migration --------------------------------------------------------
 -- ============================================================================
 SELECT 'Migration applied' AS status;
