@@ -139,6 +139,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
         <button class="btn btn-secondary btn-sm" id="btnCloseDetail">Fechar</button>
       <button class="btn btn-primary btn-sm" id="btnPDFDetail" onclick="generatePDF(currentDetailId)" style="display:none;">Exportar PDF</button>
       <button class="btn btn-primary btn-sm" id="btnApprove" style="display:none;background:#10b981;">Aprovar</button>
+      <button class="btn btn-secondary btn-sm" id="btnRevertToDraft" style="display:none;" onclick="revertToDraft(currentDetailId)">Reverter p/ Rascunho</button>
       </div>
       <div id="rdoDetailContent"></div>
     </div>
@@ -587,6 +588,7 @@ async function viewRDO(id) {
   const r = data;
 
   $("#btnPDFDetail").style.display = (r.status !== "rascunho") ? "inline-block" : "none";
+  $("#btnRevertToDraft").style.display = (r.status !== "rascunho") ? "inline-block" : "none";
   const btnApprove = $("#btnApprove");
   if (r.status === "em_revisao") {
     btnApprove.style.display = "inline-block";
@@ -787,7 +789,7 @@ async function viewRDO(id) {
   $("#rdoDetail").scrollIntoView({ behavior: "smooth" });
 }
 
-$("#btnCloseDetail").addEventListener("click", () => { $("#rdoDetail").style.display = "none"; $("#btnPDFDetail").style.display = "none"; $("#btnApprove").style.display = "none"; });
+  $("#btnCloseDetail").addEventListener("click", () => { $("#rdoDetail").style.display = "none"; $("#btnPDFDetail").style.display = "none"; $("#btnApprove").style.display = "none"; $("#btnRevertToDraft").style.display = "none"; });
 
 async function approveRDO(id) {
   const { error } = await sb.from("rdos").update({ status: "aprovado" }).eq("id", id);
@@ -810,6 +812,15 @@ function closeDetail() {
   $("#btnPDFDetail").style.display = "none";
   $("#btnApprove").style.display = "none";
   $("#btnApprove").style.background = "#10b981";
+  $("#btnRevertToDraft").style.display = "none";
+}
+
+async function revertToDraft(id) {
+  const { error } = await sb.from("rdos").update({ status: "rascunho" }).eq("id", id);
+  if (error) { toast("Erro: " + error.message, "error"); return; }
+  toast("RDO revertido para rascunho!", "success");
+  closeDetail();
+  loadRDOs();
 }
 
 // ============================================================
