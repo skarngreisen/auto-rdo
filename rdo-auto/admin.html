@@ -626,38 +626,79 @@ async function viewRDO(id) {
     btnApprove.style.background = "#10b981";
   }
   const c = $("#rdoDetailContent");
-  const yn = v => v ? '<span style="color:#10b981;">Sim</span>' : '<span style="color:#6b7280;">Não</span>';
+  const yn = v => v ? '<span style="color:#10b981;">Sim</span>' : '<span style="color:#6b7280;">Nao</span>';
+  const empty = msg => `<span style="color:#9ca3af;font-size:.82rem;">${msg}</span>`;
 
-  // Striplog table
-  let striplogTable = '';
+  // ── Helpers ──
+  function section(title, body) { return `<div class="ro-section"><h3>${title}</h3>${body}</div>`; }
+  function row(label, value) { return `<div class="ro-row"><span class="ro-label">${label}</span><span class="ro-value">${value}</span></div>`; }
+
+  // ── Data builders ──
+
+  // Stratigraphy
+  const stratEntries = r.estratigrafia_mudancas || (r.estratigrafia_descricao ? [{ profundidade: r.estratigrafia_profundidade, descricao: r.estratigrafia_descricao }] : []);
+
+  // Striplog
+  let striplogHTML = empty("Nenhum registro de striplog.");
   if (r.striplog && r.striplog.length > 0) {
-    striplogTable = `<table class="ops-table"><tr><th>Prof. (m)</th><th>Início</th><th>Término</th><th>Obs</th></tr>
+    striplogHTML = `<table class="ops-table"><tr><th>Prof. (m)</th><th>Inicio</th><th>Termino</th><th>Obs</th></tr>
       ${r.striplog.map(s => `<tr><td>${s.profundidade||'-'}</td><td>${s.inicio||s.horario||'-'}</td><td>${s.termino||'-'}</td><td>${s.obs||''}</td></tr>`).join('')}</table>`;
   }
 
   // Brocas
-  let brocaHTML = '';
+  let brocaHTML = empty("Nenhum dado de broca preenchido.");
   if (r.brocas) {
     const b = r.brocas;
+    let parts = [];
     if (b.atual && Object.values(b.atual).some(v => v)) {
-      brocaHTML += `<div style="font-size:.78rem;font-weight:600;margin-top:.3rem;">Atual</div><table class="ops-table"><tr><th>Fab.</th><th>Série</th><th>Ø</th><th>IADC</th><th>Jatos</th><th>Perf.(m)</th><th>Op.(h)</th><th>ROP</th></tr>
-        <tr><td>${b.atual.fabricante||'-'}</td><td>${b.atual.serie||'-'}</td><td>${b.atual.diametro||'-'}</td><td>${b.atual.modelo||'-'}</td><td>${b.atual.jatos||'-'}</td><td>${b.atual.perfurado||'-'}</td><td>${b.atual.oper_hs||'-'}</td><td>${b.atual.rop||'-'}</td></tr></table>`;
+      parts.push(`<div style="font-size:.78rem;font-weight:600;margin-top:.3rem;">Atual</div><table class="ops-table"><tr><th>Fab.</th><th>Serie</th><th>O</th><th>IADC</th><th>Jatos</th><th>Perf.(m)</th><th>Op.(h)</th><th>ROP</th></tr>
+        <tr><td>${b.atual.fabricante||'-'}</td><td>${b.atual.serie||'-'}</td><td>${b.atual.diametro||'-'}</td><td>${b.atual.modelo||'-'}</td><td>${b.atual.jatos||'-'}</td><td>${b.atual.perfurado||'-'}</td><td>${b.atual.oper_hs||'-'}</td><td>${b.atual.rop||'-'}</td></tr></table>`);
     }
     if (b.anterior && Object.values(b.anterior).some(v => v)) {
-      brocaHTML += `<div style="font-size:.78rem;font-weight:600;margin-top:.3rem;">Anterior</div><table class="ops-table"><tr><th>Fab.</th><th>Série</th><th>Ø</th><th>IADC</th><th>Jatos</th></tr>
-        <tr><td>${b.anterior.fabricante||'-'}</td><td>${b.anterior.serie||'-'}</td><td>${b.anterior.diametro||'-'}</td><td>${b.anterior.modelo||'-'}</td><td>${b.anterior.jatos||'-'}</td></tr></table>`;
+      parts.push(`<div style="font-size:.78rem;font-weight:600;margin-top:.3rem;">Anterior</div><table class="ops-table"><tr><th>Fab.</th><th>Serie</th><th>O</th><th>IADC</th><th>Jatos</th></tr>
+        <tr><td>${b.anterior.fabricante||'-'}</td><td>${b.anterior.serie||'-'}</td><td>${b.anterior.diametro||'-'}</td><td>${b.anterior.modelo||'-'}</td><td>${b.anterior.jatos||'-'}</td></tr></table>`);
     }
+    if (parts.length > 0) brocaHTML = parts.join("");
   }
 
   // BHA
-  let bhaHTML = '';
+  let bhaHTML = empty("Nenhum item de coluna registrado.");
   if (r.coluna && r.coluna.length > 0) {
     bhaHTML = `<table class="ops-table"><tr><th>Item</th><th>Qty</th><th>ID</th><th>OD</th><th>L(m)</th><th>Tot(m)</th></tr>
       ${r.coluna.map(i => `<tr><td>${i.item||'-'}</td><td>${i.qty||'-'}</td><td>${i.id_pol||'-'}</td><td>${i.od_pol||'-'}</td><td>${i.length_m||'-'}</td><td>${i.total_m||'-'}</td></tr>`).join('')}</table>`;
   }
 
-  // Fuel
-  let fuelHTML = '';
+  // Anomalias
+  let anomaliaHTML = empty("Nenhuma anomalia registrada.");
+  if (r.parametros_anomalias && r.parametros_anomalias.length > 0) {
+    anomaliaHTML = r.parametros_anomalias.map(a => row(a.parametro||'-', a.descricao||'')).join('');
+  }
+
+  // Revestimento
+  let revestHTML = row("Houve descida?", yn(r.revestimento_mudou));
+  if (r.revestimento_mudou) {
+    revestHTML += row("Metros", (r.revestimento_metros||'-') + " m");
+    if (r.revestimento_obs) revestHTML += row("Observacao", r.revestimento_obs);
+  } else {
+    revestHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Nao houve descida de revestimento neste dia.</div>`;
+  }
+
+  // Fluido
+  let fluidoHTML = empty("Nenhum parametro de fluido preenchido.");
+  if (r.fluido) {
+    const entries = Object.entries(r.fluido).filter(([k,v]) => v != null);
+    if (entries.length > 0) fluidoHTML = entries.map(([k,v]) => row(k, v)).join('');
+  }
+
+  // Quimicos
+  let quimicosHTML = empty("Nenhum produto quimico utilizado.");
+  if (r.quimicos && r.quimicos.length > 0) {
+    quimicosHTML = `<table class="ops-table"><tr><th>Produto</th><th>Quantidade</th></tr>
+      ${r.quimicos.map(q => `<tr><td>${q.produto||'-'}</td><td>${q.quantidade||'-'}</td></tr>`).join('')}</table>`;
+  }
+
+  // Combustivel
+  let fuelHTML = empty("Nenhum consumo de combustivel registrado.");
   if (r.combustivel && r.combustivel.consumos && r.combustivel.consumos.length > 0) {
     fuelHTML = `<table class="ops-table"><tr><th>Equip.</th><th>Tipo</th><th>Litros</th></tr>
       ${r.combustivel.consumos.map(f => `<tr><td>${f.equipamento||'-'}</td><td>${f.tipo||'-'}</td><td>${f.litros||'-'}</td></tr>`).join('')}</table>`;
@@ -665,65 +706,99 @@ async function viewRDO(id) {
     const s500 = r.combustivel.consumos.filter(c => c.tipo === 'S500').reduce((s,c) => s + (c.litros||0), 0);
     fuelHTML += `<div style="font-size:.78rem;">S10: ${s10.toFixed(1)} L | S500: ${s500.toFixed(1)} L</div>`;
   }
+  if (r.combustivel && (r.combustivel.estoque_s10 || r.combustivel.estoque_s500)) {
+    fuelHTML += `<div style="font-size:.78rem;margin-top:.2rem;">Estoque: S10 ${r.combustivel.estoque_s10||'-'} L | S500 ${r.combustivel.estoque_s500||'-'} L</div>`;
+  }
 
-  // Ops
-  const opsTable = r.operacoes && r.operacoes.length > 0
-    ? `<table class="ops-table"><tr><th>Início</th><th>Término</th><th>Tipo</th><th>Descritivo</th></tr>
-      ${r.operacoes.map(o => `<tr><td>${o.inicio||'-'}</td><td>${o.termino||'-'}</td><td>${o.tipo||'Normal'}</td><td>${o.descritivo||''}</td></tr>`).join('')}</table>`
-    : '<span style="color:#9ca3af;">Nenhuma operação registrada</span>';
+  // Materiais
+  let matHTML = empty("Nenhum material adicional utilizado.");
+  if (r.outros_materiais && r.outros_materiais.length > 0) {
+    matHTML = `<table class="ops-table"><tr><th>Item</th><th>Qtd</th></tr>
+      ${r.outros_materiais.map(m => `<tr><td>${m.item||'-'}</td><td>${m.qtd||'-'}</td></tr>`).join('')}</table>`;
+  }
 
-  // Equipe table
-  const eqTable = r.equipe && r.equipe.length > 0
-    ? `<table class="ops-table"><tr><th>Função</th><th>Nome</th></tr>
-      ${r.equipe.map(e => `<tr><td>${e.funcao||'-'}</td><td>${e.nome||'-'}</td></tr>`).join('')}</table>`
-    : '<span style="color:#9ca3af;">Nenhum membro registrado</span>';
+  // Insumos
+  let insumosHTML = empty("Nenhum insumo utilizado.");
+  if (r.insumos && r.insumos.length > 0) {
+    insumosHTML = `<table class="ops-table"><tr><th>Item</th><th>Qtd</th></tr>
+      ${r.insumos.map(i => `<tr><td>${i.item||'-'}</td><td>${i.qtd||'-'}</td></tr>`).join('')}</table>`;
+  }
 
-  // Stratigraphy
-  const stratEntries = r.estratigrafia_mudancas || (r.estratigrafia_descricao ? [{ profundidade: r.estratigrafia_profundidade, descricao: r.estratigrafia_descricao }] : []);
+  // Operacoes
+  let opsHTML = empty("Nenhuma operacao registrada.");
+  if (r.operacoes && r.operacoes.length > 0) {
+    opsHTML = `<table class="ops-table"><tr><th>Inicio</th><th>Termino</th><th>Tipo</th><th>Descritivo</th></tr>
+      ${r.operacoes.map(o => `<tr><td>${o.inicio||'-'}</td><td>${o.termino||'-'}</td><td>${o.tipo||'Normal'}</td><td>${o.descritivo||''}</td></tr>`).join('')}</table>`;
+  }
+
+  // Equipe
+  let eqHTML = empty("Nenhum membro de equipe registrado.");
+  if (r.equipe && r.equipe.length > 0) {
+    eqHTML = `<table class="ops-table"><tr><th>Funcao</th><th>Nome</th></tr>
+      ${r.equipe.map(e => `<tr><td>${e.funcao||'-'}</td><td>${e.nome||'-'}</td></tr>`).join('')}</table>`;
+  }
+
+  // Fotos
+  let fotosHTML = empty("Nenhuma foto anexada.");
+  if (r.fotos && r.fotos.length > 0) {
+    fotosHTML = `<div class="photo-grid">${r.fotos.map(url => `<img src="${url}" class="photo-thumb" style="cursor:pointer;max-width:120px;border-radius:6px;" onclick="window.open('${url}')">`).join('')}</div>`;
+  }
 
   c.innerHTML = `
-    <div class="ro-section"><h3>Identificação</h3>
-      <div class="ro-row"><span class="ro-label">Projeto</span><span class="ro-value">${r.projetos?.cliente || '-'} (${r.projetos?.sonda || '-'})</span></div>
-      <div class="ro-row"><span class="ro-label">Autor</span><span class="ro-value">${authorName}</span></div>
-      <div class="ro-row"><span class="ro-label">Data</span><span class="ro-value">${r.data || '-'}</span></div>
-    </div>
+    ${section("Identificacao",
+      row("Projeto", (r.projetos?.cliente || '-') + " (" + (r.projetos?.sonda || '-') + ")") +
+      row("Autor", authorName) +
+      row("Data", r.data || '-')
+    )}
 
-    <div class="ro-section"><h3>Perfuração</h3>
-      <div class="ro-row"><span class="ro-label">Houve avanço?</span><span class="ro-value">${r.profundidade_final!=null ? yn(true) : yn(false)}</span></div>
-      ${r.profundidade_final!=null ? `<div class="ro-row"><span class="ro-label">Profundidade</span><span class="ro-value">${r.profundidade_inicial||0} → ${r.profundidade_final} m</span></div>` : '<div class="ro-row"><span class="ro-label">Profundidade</span><span class="ro-value" style="color:#9ca3af;">Não preenchido</span></div>'}
-      ${stratEntries.length > 0 ? stratEntries.map(s => `<div class="ro-row"><span class="ro-label">Estratigrafia</span><span class="ro-value">${s.profundidade}m: ${s.descricao}</span></div>`).join("") : '<div class="ro-row"><span class="ro-label">Estratigrafia</span><span class="ro-value" style="color:#9ca3af;">Nenhuma mudança registrada</span></div>'}
-      ${striplogTable ? `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Striplog</div>${striplogTable}</div>` : '<div class="ro-row"><span class="ro-label">Striplog</span><span class="ro-value" style="color:#9ca3af;">Não preenchido</span></div>'}
-      ${brocaHTML ? `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Brocas</div>${brocaHTML}</div>` : '<div class="ro-row"><span class="ro-label">Brocas</span><span class="ro-value" style="color:#9ca3af;">Não preenchido</span></div>'}
-      ${bhaHTML ? `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">BHA</div>${bhaHTML}</div>` : '<div class="ro-row"><span class="ro-label">BHA</span><span class="ro-value" style="color:#9ca3af;">Não preenchido</span></div>'}
-      ${r.parametros_anomalias && r.parametros_anomalias.length > 0 ? `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Anomalias</div>${r.parametros_anomalias.map(a => `<div class="ro-row"><span class="ro-label">${a.parametro||'-'}</span><span class="ro-value">${a.descricao||''}</span></div>`).join('')}</div>` : '<div class="ro-row"><span class="ro-label">Anomalias</span><span class="ro-value" style="color:#9ca3af;">Nenhuma registrada</span></div>'}
-    </div>
+    ${section("Perfuracao",
+      row("Houve avanco?", r.profundidade_final != null ? yn(true) : yn(false)) +
+      (r.profundidade_final != null
+        ? row("Profundidade", (r.profundidade_inicial||0) + " → " + r.profundidade_final + " m")
+        : row("Profundidade", '<span style="color:#9ca3af;">Nao houve avanco na perfuracao neste dia.</span>')) +
+      (stratEntries.length > 0
+        ? stratEntries.map(s => row("Estratigrafia", s.profundidade + "m: " + s.descricao)).join("")
+        : row("Estratigrafia", '<span style="color:#9ca3af;">Nenhuma mudanca de formacao registrada.</span>')) +
+      '<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Striplog</div>' + striplogHTML + '</div>' +
+      '<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Brocas</div>' + brocaHTML + '</div>' +
+      '<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">BHA</div>' + bhaHTML + '</div>' +
+      '<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Anomalias</div>' + anomaliaHTML + '</div>'
+    )}
 
-    <div class="ro-section"><h3>Revestimento</h3>
-      <div class="ro-row"><span class="ro-label">Houve descida?</span><span class="ro-value">${r.revestimento_mudou ? yn(true) : yn(false)}</span></div>
-      ${r.revestimento_mudou ? `<div class="ro-row"><span class="ro-label">Metros</span><span class="ro-value">${r.revestimento_metros||'-'} m</span></div>${r.revestimento_obs ? `<div class="ro-row"><span class="ro-label">Obs</span><span class="ro-value">${r.revestimento_obs}</span></div>` : ''}` : ''}
-    </div>
+    ${section("Revestimento", revestHTML)}
+    ${section("Fluido", fluidoHTML)}
+    ${section("Quimicos", quimicosHTML)}
+    ${section("Combustivel", fuelHTML)}
+    ${section("Materiais", matHTML)}
+    ${section("Insumos", insumosHTML)}
+    ${section("Operacoes", opsHTML)}
+    ${section("Equipe", eqHTML)}
 
-    <div class="ro-section"><h3>Fluido</h3>
-      ${r.fluido ? Object.entries(r.fluido).filter(([k,v]) => v != null).map(([k,v]) => `<div class="ro-row"><span class="ro-label">${k}</span><span class="ro-value">${v}</span></div>`).join('') : '<span style="color:#9ca3af;">Não preenchido</span>'}
-    </div>
+    ${section("HSE",
+      row("DDS", r.hse_dds ? "Sim" : "Nao") +
+      row("EPIs vistoriados", r.hse_epis_vistoriados ? "Sim" : "Nao") +
+      row("HH Expostas", r.hse_hh_expostas || "-") +
+      (r.hse_incidentes
+        ? row("Incidentes", r.hse_incidentes)
+        : row("Incidentes", '<span style="color:#9ca3af;">Nenhum incidente registrado.</span>')) +
+      (r.hse_quase_acidentes
+        ? row("Quase-acidentes", r.hse_quase_acidentes)
+        : row("Quase-acidentes", '<span style="color:#9ca3af;">Nenhum quase-acidente registrado.</span>'))
+    )}
 
-    <div class="ro-section"><h3>Combustível</h3>
-      ${fuelHTML || '<span style="color:#9ca3af;">Não preenchido</span>'}
-    </div>
+    ${section("Observacoes",
+      r.observacoes
+        ? '<p style="font-size:.82rem;">' + r.observacoes + '</p>'
+        : empty("Nenhuma observacao registrada.")
+    )}
 
-    <div class="ro-section"><h3>Operações</h3>${opsTable}</div>
+    ${section("Planejamento",
+      r.planejamento_proximo_turno
+        ? '<p style="font-size:.82rem;">' + r.planejamento_proximo_turno + '</p>'
+        : empty("Nenhum planejamento registrado.")
+    )}
 
-    <div class="ro-section"><h3>Equipe</h3>${eqTable}</div>
-
-    <div class="ro-section"><h3>HSE</h3>
-      <div class="ro-row"><span class="ro-label">DDS</span><span class="ro-value">${r.hse_dds?'Sim':'Não'}</span></div>
-      <div class="ro-row"><span class="ro-label">EPIs</span><span class="ro-value">${r.hse_epis_vistoriados?'Sim':'Não'}</span></div>
-      <div class="ro-row"><span class="ro-label">HH Expostas</span><span class="ro-value">${r.hse_hh_expostas||'-'}</span></div>
-      ${r.hse_incidentes ? `<div class="ro-row"><span class="ro-label">Incidentes</span><span class="ro-value">${r.hse_incidentes}</span></div>` : ''}
-    </div>
-
-    ${r.observacoes ? `<div class="ro-section"><h3>Observações</h3><p style="font-size:.8rem;">${r.observacoes}</p></div>` : ''}
-    ${r.planejamento_próximo_turno ? `<div class="ro-section"><h3>Planejamento</h3><p style="font-size:.8rem;">${r.planejamento_próximo_turno}</p></div>` : ''}
+    ${section("Fotos", fotosHTML)}
   `;
   $("#rdoDetail").style.display = "block";
   $("#rdoDetail").scrollIntoView({ behavior: "smooth" });
