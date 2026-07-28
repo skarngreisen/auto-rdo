@@ -243,5 +243,6 @@ Fase 1 (MVP+)               Fase 2 (Workflow)      Fase 3 (Notif)      Fase 4 (A
 - **RLS** sera reabilitado na Fase 2 com politicas por papel.
 - **Bucket de fotos** permanece publico ate que auth esteja implementado.
 - A transicao de `enviado` para `em_revisao` requer migracao dos dados existentes (script SQL simples).
+- **Sondas gerenciáveis**: atualmente as sondas sao um dropdown fixo (Cardwell, R4, A10, Tornep). Futuramente, criar tabela `sondas` com CRUD no admin para que novos equipamentos possam ser adicionados sem alterar o codigo.
 - **Unificar insumos e outros_materiais**: atualmente sao duas secoes separadas no formulario (Insumos: agua, limpa fossa, etc.; Outros Materiais: itens diversos). Avaliar se devem ser unificados em uma unica tabela de consumo. O view do RDO ja mostra ambos separadamente com mensagens explicitas de vazio. Revisar apos feedback de campo.
 - **Governanca do banco**: durante o desenvolvimento, o CodeWhale tem acesso superuser (via senha do Postgres) por conveniencia. Quando dados reais de cliente entrarem, faremos o switch: CodeWhale passa a usar apenas a publishable key (INSERT/SELECT), e operacoes de admin (DDL, DELETE, UPDATE) passam a ser feitas via scripts SQL que o Igor revisa e executa manualmente. Gatilho: primeiro cliente real no sistema ou solicitacao explicita do Igor.
