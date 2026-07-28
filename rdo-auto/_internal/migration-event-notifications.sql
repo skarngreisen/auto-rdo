@@ -17,14 +17,10 @@ CREATE OR REPLACE FUNCTION notify_users(p_user_ids UUID[], p_message TEXT)
 RETURNS void LANGUAGE plpgsql AS $$
 DECLARE
     v_edge_url TEXT := 'https://fecskilrtsaeavoznwgi.supabase.co/functions/v1/notify-telegram';
-    v_service_key TEXT := current_setting('app.settings.service_role_key', true);
 BEGIN
     PERFORM net.http_post(
         url := v_edge_url,
-        headers := jsonb_build_object(
-            'Content-Type', 'application/json',
-            'Authorization', 'Bearer ' || v_service_key
-        ),
+        headers := jsonb_build_object('Content-Type', 'application/json'),
         body := jsonb_build_object(
             'user_ids', p_user_ids,
             'message', p_message
