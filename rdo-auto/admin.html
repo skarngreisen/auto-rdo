@@ -206,13 +206,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <hr style="margin:1rem 0;border:none;border-top:2px solid #e8ecf1;">
     <div class="card-header">Geologo Responsavel</div>
     <div id="geologoHistory" style="font-size:.75rem;color:#6b7280;margin-bottom:.5rem;"></div>
-    <select id="modalGeologo" style="margin-bottom:.5rem;">
-      <option value="">Selecionar geologo...</option>
-      <option value="c1cdda82-6923-4b81-888b-a4227cd983c8">Fernando Manreza</option>
-      <option value="c2268008-76c8-4b56-9627-84d59e782fe2">Halleph Mariano</option>
-      <option value="339d7145-2bad-4e86-b20b-7d74eaf39351">Murilo de Freitas</option>
-      <option value="0ac2491e-707c-43e4-95c2-e3b207607a4d">Pedro Medeiros</option>
-    </select>
+    <select id="modalGeologo" style="margin-bottom:.5rem;"><option value="">Selecionar geologo...</option></select>
     <div class="card-header" style="margin-top:.75rem;">Supervisores de Turno</div>
     <div id="supervisorHistory" style="font-size:.75rem;color:#6b7280;margin-bottom:.5rem;"></div>
     <div class="row" id="supervisorFields">
@@ -381,7 +375,8 @@ async function editProject(id) {
     (!sup1 && !sup2) ? "Nenhum supervisor definido." : ""
   ].filter(Boolean).join("<br>");
 
-  // Load geologist
+  // Load geologist dropdown and assignment state
+  await loadCrewDropdowns();
   await loadAssignmentState(id);
   $("#modalProject").classList.add("show");
 }
