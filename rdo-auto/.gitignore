@@ -9,5 +9,8 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Supabase CLI temp files
+supabase/.temp/
+
 # Override parent _internal/ — this project's _internal is documentation, not private
 !_internal/
