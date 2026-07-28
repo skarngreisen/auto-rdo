@@ -222,12 +222,35 @@ Foco: funcionar sem internet na sonda.
 
 ---
 
+## Fase 6: AI Daily Summary
+
+Foco: resumo diario automatizado para gestores, via DeepSeek API.
+
+### 6.1 Prompt engineering
+
+- Escrever system prompt com contexto de perfuracao (ROP, BHA, fluido, nomenclatura).
+- Iterar com RDOs reais ate que o resumo leia como se um geologo tivesse escrito.
+- Output: 300-500 palavras, foco gerencial, anomalias em destaque.
+
+### 6.2 Edge Function (cron)
+
+- Disparo diario as 20:00 (via pg_cron).
+- Le todos os RDOs do dia (agrupados por projeto).
+- Envia JSON para DeepSeek API (V4 Flash).
+- Encaminha resumo para o geologo + Fernando via Telegram.
+
+### 6.3 Custos estimados
+
+- DeepSeek V4 Flash: $0.14/M input, $0.28/M output.
+- 5 projetos × 1 resumo/dia: ~$0.12/mes.
+- 40 projetos: ~$0.96/mes.
+
 ## Resumo visual
 
 ```
-Fase 1 (MVP+)               Fase 2 (Workflow)      Fase 3 (Notif)      Fase 4 (Admin)       Fase 5 (Offline)
-[pre-fill ontem]        →   [em_revisao]       →   [badge]         →   [dashboard]      →   [service worker]
-[pre-fill secao]            [revisado]             [push]              [CSV/PDF (ReportLab)]  [sync offline]
+Fase 1 (MVP+)               Fase 2 (Workflow)      Fase 3 (Notif)      Fase 4 (Admin)       Fase 5 (Offline)      Fase 6 (AI)
+[pre-fill ontem]        →   [em_revisao]       →   [badge]         →   [dashboard]      →   [service worker]  →   [daily summary]
+[pre-fill secao]            [revisado]             [push]              [CSV/PDF]             [sync offline]        [DeepSeek API]
 [limpar form]               [reaberto]            [email]             [graficos]            [PWA install]
 [template perf/manut]       [permissoes]
 [timeline ops colorida]     [log revisao]
