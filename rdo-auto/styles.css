@@ -45,7 +45,7 @@ header {
   box-shadow: 0 2px 8px rgba(0,0,0,.15);
   display: flex; align-items: center; gap: .6rem;
 }
-header img { width: 32px; height: 32px; border-radius: 4px; }
+header img { width: 64px; height: 32px; border-radius: 4px; }
 header h1 { font-size: 1rem; font-weight: 700; }
 header .sub { font-size: .7rem; opacity: .75; }
 header .back-btn {
