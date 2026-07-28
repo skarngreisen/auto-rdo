@@ -16,7 +16,7 @@ CREATE EXTENSION IF NOT EXISTS pg_net;
 CREATE OR REPLACE FUNCTION notify_users(p_user_ids UUID[], p_message TEXT)
 RETURNS void LANGUAGE plpgsql AS $$
 DECLARE
-    v_edge_url TEXT := 'https://<PROJECT_REF>.supabase.co/functions/v1/notify-telegram';
+    v_edge_url TEXT := 'https://fecskilrtsaeavoznwgi.supabase.co/functions/v1/notify-telegram';
     v_service_key TEXT := current_setting('app.settings.service_role_key', true);
 BEGIN
     PERFORM net.http_post(
