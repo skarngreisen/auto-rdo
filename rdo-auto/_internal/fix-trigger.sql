@@ -19,7 +19,7 @@ BEGIN
 
         IF NEW.status = 'em_revisao' AND (TG_OP = 'INSERT' OR OLD.status = 'rascunho') THEN
             IF v_geologo_id IS NOT NULL THEN
-                v_message := format('RDO do projeto %s — %s enviado para revisao.', v_projeto_name, NEW.data);
+                v_message := format('RDO do projeto %s — %s enviado para revisão.', v_projeto_name, NEW.data);
                 v_targets := ARRAY[v_geologo_id];
                 PERFORM notify_users(v_targets, v_message);
             END IF;
