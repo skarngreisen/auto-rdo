@@ -1,5 +1,13 @@
-# Supabase local secrets — never commit
+# Environment secrets — never commit
 .env.local
+*.env.local
 
-# Dependencies (future)
+# Dependencies
 node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Override parent _internal/ — this project's _internal is documentation, not private
+!_internal/

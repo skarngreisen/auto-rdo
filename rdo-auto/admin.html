@@ -103,7 +103,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
         <button class="btn btn-primary btn-sm" id="btnNewProject">+ Novo</button>
       </div>
       <table id="projetosTable">
-        <tr><th>Cliente</th><th>Localidade</th><th>Sonda</th><th>Início</th><th>Turno</th><th></th></tr>
+        <tr><th>Cliente</th><th>Localidade</th><th>Sonda</th><th>Início</th><th>Turnos</th><th>Geólogo</th><th></th></tr>
       </table>
     </div>
   </div>
@@ -185,7 +185,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
 
 <!-- Modal: New/Edit Project -->
 <div class="modal-overlay" id="modalProject">
-  <div class="modal">
+  <div class="modal" style="max-width:650px;">
     <h2 id="modalProjectTitle">Novo Projeto</h2>
     <input type="hidden" id="editProjectId">
     <label>Cliente</label><input type="text" id="modalCliente">
@@ -193,7 +193,25 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <label>Sonda</label><input type="text" id="modalSonda">
     <div class="row">
       <div><label>Data Início</label><input type="date" id="modalDataInício"></div>
-      <div><label>Turno</label><input type="text" id="modalTurno" value="07h x 17h"></div>
+      <div><label>Turno (descricao)</label><input type="text" id="modalTurno" value="07h x 17h"></div>
+    </div>
+    <div class="row" style="margin-top:.5rem;">
+      <div><label>Turnos por dia</label>
+        <select id="modalTurnosPorDia" onchange="toggleSupervisor2()">
+          <option value="1">1 turno (24h)</option>
+          <option value="2">2 turnos (12h cada)</option>
+        </select>
+      </div>
+    </div>
+    <hr style="margin:1rem 0;border:none;border-top:2px solid #e8ecf1;">
+    <div class="card-header">Geologo Responsavel</div>
+    <div id="geologoHistory" style="font-size:.75rem;color:#6b7280;margin-bottom:.5rem;"></div>
+    <select id="modalGeologo" style="margin-bottom:.5rem;"><option value="">Selecionar geologo...</option></select>
+    <div class="card-header" style="margin-top:.75rem;">Supervisores de Turno</div>
+    <div id="supervisorHistory" style="font-size:.75rem;color:#6b7280;margin-bottom:.5rem;"></div>
+    <div class="row" id="supervisorFields">
+      <div><label>Turno 1</label><select id="modalSupervisor1"><option value="">Selecionar supervisor...</option></select></div>
+      <div id="supervisor2Group" style="display:none;"><label>Turno 2</label><select id="modalSupervisor2"><option value="">Selecionar supervisor...</option></select></div>
     </div>
     <div style="display:flex;gap:.5rem;margin-top:1rem;">
       <button class="btn btn-secondary" id="btnModalCancel" style="flex:1;">Cancelar</button>
@@ -289,13 +307,24 @@ async function loadProjetos() {
   const { data } = await sb.from("projetos").select("*").order("created_at", { ascending: false });
   const tbody = $("#projetosTable");
   if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum projeto.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum projeto.</td></tr>';
     return;
   }
+  // Fetch current geologists for all projects in one query
+  const projetoIds = data.map(p => p.id);
+  const { data: geologos } = await sb.from("projeto_geologos")
+    .select("projeto_id, profiles!inner(name)")
+    .in("projeto_id", projetoIds)
+    .is("fim", null);
+  const geoMap = {};
+  if (geologos) geologos.forEach(g => { geoMap[g.projeto_id] = g.profiles.name; });
+
   tbody.innerHTML = data.map(p => `
     <tr>
       <td>${p.cliente}</td><td>${p.localidade}</td><td>${p.sonda}</td>
-      <td>${p.data_inicio}</td><td>${p.turno}</td>
+      <td>${p.data_inicio}</td>
+      <td><span class="badge" style="background:#e8ecf1;color:#374151;">${p.turnos_por_dia || 1}t</span></td>
+      <td style="font-size:.78rem;">${geoMap[p.id] || '-'}</td>
       <td class="actions">
         <button class="btn btn-secondary btn-sm" onclick="editProject('${p.id}')">Editar</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDeleteProject('${p.id}','${p.cliente}')">Excluir</button>
@@ -309,6 +338,13 @@ $("#btnNewProject").addEventListener("click", () => {
   $("#modalCliente").value = ""; $("#modalLocalidade").value = "";
   $("#modalSonda").value = ""; $("#modalDataInício").value = new Date().toISOString().split("T")[0];
   $("#modalTurno").value = "07h x 17h";
+  $("#modalTurnosPorDia").value = "1";
+  $("#modalGeologo").value = "";
+  $("#modalSupervisor1").value = "";
+  $("#modalSupervisor2").value = "";
+  $("#geologoHistory").innerHTML = "";
+  $("#supervisorHistory").innerHTML = "";
+  toggleSupervisor2();
   $("#modalProject").classList.add("show");
 });
 
@@ -320,6 +356,12 @@ async function editProject(id) {
   $("#modalCliente").value = data.cliente; $("#modalLocalidade").value = data.localidade;
   $("#modalSonda").value = data.sonda; $("#modalDataInício").value = data.data_inicio;
   $("#modalTurno").value = data.turno;
+  $("#modalTurnosPorDia").value = data.turnos_por_dia || 1;
+  toggleSupervisor2();
+
+  // Load current geologist and supervisors
+  await loadCrewDropdowns();
+  await loadAssignmentState(id);
   $("#modalProject").classList.add("show");
 }
 
@@ -328,23 +370,34 @@ $("#modalProject").addEventListener("click", e => { if (e.target === $("#modalPr
 
 $("#btnModalSave").addEventListener("click", async () => {
   const id = $("#editProjectId").value;
+  const turnosPorDia = parseInt($("#modalTurnosPorDia").value) || 1;
   const payload = {
     cliente: $("#modalCliente").value.trim(),
     localidade: $("#modalLocalidade").value.trim(),
     sonda: $("#modalSonda").value.trim(),
     data_inicio: $("#modalDataInício").value,
     turno: $("#modalTurno").value.trim() || "07h x 17h",
+    turnos_por_dia: turnosPorDia,
   };
   if (!payload.cliente || !payload.localidade || !payload.sonda || !payload.data_inicio) {
-    toast("Preencha todos os campos.", "error"); return;
+    toast("Preencha todos os campos obrigatorios.", "error"); return;
   }
-  let error;
+  let error, projetoId = id;
   if (id) {
     ({ error } = await sb.from("projetos").update(payload).eq("id", id));
   } else {
-    ({ error } = await sb.from("projetos").insert(payload));
+    const { data: novo, error: insertErr } = await sb.from("projetos").insert(payload).select("id").single();
+    if (insertErr) { toast("Erro: " + insertErr.message, "error"); return; }
+    projetoId = novo.id;
   }
   if (error) { toast("Erro: " + error.message, "error"); return; }
+
+  // Save geologist assignment
+  await saveAssignment("geologo", projetoId);
+  // Save supervisor assignments
+  await saveAssignment("supervisor", projetoId, 1);
+  if (turnosPorDia === 2) await saveAssignment("supervisor", projetoId, 2);
+
   toast(id ? "Projeto atualizado!" : "Projeto criado!", "success");
   $("#modalProject").classList.remove("show");
   loadProjetos();
@@ -357,6 +410,125 @@ function confirmDeleteProject(id, name) {
   $("#confirmTitle").textContent = "Excluir projeto?";
   $("#confirmMsg").textContent = `Tem certeza que deseja excluir "${name}"? Todos os RDOs deste projeto serão excluídos.`;
   $("#modalConfirm").classList.add("show");
+}
+
+// ============================================================
+// CREW ASSIGNMENT HELPERS
+// ============================================================
+function toggleSupervisor2() {
+  const sg = $("#supervisor2Group");
+  sg.style.display = $("#modalTurnosPorDia").value === "2" ? "block" : "none";
+}
+
+async function loadCrewDropdowns() {
+  // Load users with role 'supervisor' (geologist + field supervisors share this pool)
+  const { data: supervisors } = await sb.from("profiles")
+    .select("user_id,name,role")
+    .in("role", ["supervisor", "admin"])
+    .order("name");
+  const opts = (supervisors || []).map(p =>
+    `<option value="${p.user_id}">${p.name}${p.role === 'admin' ? ' (admin)' : ''}</option>`
+  ).join("");
+  const geologoOpts = '<option value="">Selecionar geologo...</option>' + opts;
+  const supOpts = '<option value="">Selecionar supervisor...</option>' + opts;
+  $("#modalGeologo").innerHTML = geologoOpts;
+  $("#modalSupervisor1").innerHTML = supOpts;
+  $("#modalSupervisor2").innerHTML = supOpts;
+}
+
+async function loadAssignmentState(projetoId) {
+  const today = new Date().toISOString().split("T")[0];
+
+  // Current geologist
+  const { data: geoCur } = await sb.from("projeto_geologos")
+    .select("user_id, inicio, profiles(name)")
+    .eq("projeto_id", projetoId).is("fim", null).maybeSingle();
+  if (geoCur) {
+    $("#modalGeologo").value = geoCur.user_id;
+    $("#geologoHistory").innerHTML = `Atual: <strong>${geoCur.profiles.name}</strong> (desde ${geoCur.inicio})`;
+  } else {
+    $("#modalGeologo").value = "";
+    $("#geologoHistory").innerHTML = "";
+  }
+
+  // Geologist history (past assignments)
+  const { data: geoHist } = await sb.from("projeto_geologos")
+    .select("user_id, inicio, fim, profiles(name)")
+    .eq("projeto_id", projetoId).not("fim", "is", null)
+    .order("inicio", { ascending: false }).limit(5);
+  if (geoHist && geoHist.length > 0) {
+    const hist = geoHist.map(g => `${g.profiles.name} (${g.inicio} ate ${g.fim})`).join("<br>");
+    $("#geologoHistory").innerHTML += `<br><span style="color:#9ca3af;">Historico:</span><br>${hist}`;
+  }
+
+  // Current supervisors
+  let sup1Name = "", sup2Name = "";
+  const { data: supCur } = await sb.from("projeto_supervisores")
+    .select("user_id, turno, inicio, profiles(name)")
+    .eq("projeto_id", projetoId).is("fim", null);
+  if (supCur) {
+    supCur.forEach(s => {
+      if (s.turno === 1) {
+        $("#modalSupervisor1").value = s.user_id;
+        sup1Name = s.profiles.name + " (desde " + s.inicio + ")";
+      } else {
+        $("#modalSupervisor2").value = s.user_id;
+        sup2Name = s.profiles.name + " (desde " + s.inicio + ")";
+      }
+    });
+  }
+  const supLines = [];
+  if (sup1Name) supLines.push("Turno 1: <strong>" + sup1Name + "</strong>");
+  if (sup2Name) supLines.push("Turno 2: <strong>" + sup2Name + "</strong>");
+  if (supLines.length === 0) supLines.push("Nenhum supervisor definido.");
+  $("#supervisorHistory").innerHTML = supLines.join("<br>");
+
+  // Supervisor history
+  const { data: supHist } = await sb.from("projeto_supervisores")
+    .select("user_id, turno, inicio, fim, profiles(name)")
+    .eq("projeto_id", projetoId).not("fim", "is", null)
+    .order("inicio", { ascending: false }).limit(5);
+  if (supHist && supHist.length > 0) {
+    const hist = supHist.map(s =>
+      `${s.profiles.name} [T${s.turno}] (${s.inicio} ate ${s.fim})`
+    ).join("<br>");
+    $("#supervisorHistory").innerHTML += `<br><span style="color:#9ca3af;">Historico:</span><br>${hist}`;
+  }
+}
+
+async function saveAssignment(type, projetoId, turno) {
+  const today = new Date().toISOString().split("T")[0];
+  let newUserId, table, currentQuery;
+
+  if (type === "geologo") {
+    newUserId = $("#modalGeologo").value || null;
+    table = "projeto_geologos";
+    currentQuery = sb.from("projeto_geologos").select("id").eq("projeto_id", projetoId).is("fim", null);
+  } else {
+    newUserId = (turno === 1 ? $("#modalSupervisor1").value : $("#modalSupervisor2").value) || null;
+    table = "projeto_supervisores";
+    currentQuery = sb.from("projeto_supervisores").select("id").eq("projeto_id", projetoId).eq("turno", turno).is("fim", null);
+  }
+
+  // Fetch current assignment
+  const { data: cur } = await currentQuery.maybeSingle();
+
+  // If nothing changed, skip
+  if (!cur && !newUserId) return;
+  if (cur) {
+    // Check if it's the same user
+    const { data: curRow } = await sb.from(table).select("user_id").eq("id", cur.id).single();
+    if (curRow && curRow.user_id === newUserId) return;
+    // Close current assignment
+    await sb.from(table).update({ fim: today }).eq("id", cur.id);
+  }
+
+  // Create new assignment if a user was selected
+  if (newUserId) {
+    const row = { projeto_id: projetoId, user_id: newUserId, inicio: today };
+    if (turno) row.turno = turno;
+    await sb.from(table).insert(row);
+  }
 }
 
 // ============================================================
