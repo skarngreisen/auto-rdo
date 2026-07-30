@@ -1615,7 +1615,7 @@ const MAT_OPTIONS = ["Camisa Bomba","Válvula","Gaxeta de Swivel","Óleo 40 - Mo
 function addChemicalRow(name, consumo, estoque) {
   const tbody = $("#chemTable");
   const row = tbody.insertRow(-1);
-  const opts = CHEM_OPTIONS.map(c => `<option value="${c}" ${c===name?"selected":""}>${c}</option>`).join("");
+  const opts = '<option value="">Selecionar...</option>' + CHEM_OPTIONS.map(c => `<option value="${c}" ${c===name?"selected":""}>${c}</option>`).join("");
   row.innerHTML = `
     <td><select class="chemName" style="min-width:100px;font-size:.82rem;" onchange="onChemNameChange(this)">${opts}</select><input type="text" class="chemNameCustom" placeholder="Nome do químico" style="display:none;margin-top:2px;min-width:100px;font-size:.8rem;" value="${CHEM_OPTIONS.includes(name) ? '' : (name||'')}"></td>
     <td><input type="number" step="0.1" class="chemCons" value="${consumo||''}" style="min-width:60px;"></td>
@@ -1625,9 +1625,6 @@ function addChemicalRow(name, consumo, estoque) {
   row.querySelector(".chemRemove").addEventListener("click", () => row.remove());
 }
 $("#btnAddChem").addEventListener("click", () => addChemicalRow("","",""));
-// Pre-populate common chemicals
-CHEM_OPTIONS.filter(c => c !== "Outro").forEach(c => addChemicalRow(c,"",""));
-
 function onChemNameChange(sel) {
   const row = sel.closest("tr");
   const custom = row.querySelector(".chemNameCustom");
@@ -1669,7 +1666,7 @@ function collectChemicals() {
 function addMaterialRow(name, consumo, estoque) {
   const tbody = $("#matTable");
   const row = tbody.insertRow(-1);
-  const opts = MAT_OPTIONS.map(m => `<option value="${m}" ${m===name?"selected":""}>${m}</option>`).join("");
+  const opts = '<option value="">Selecionar...</option>' + MAT_OPTIONS.map(m => `<option value="${m}" ${m===name?"selected":""}>${m}</option>`).join("");
   row.innerHTML = `
     <td><select class="matName" style="min-width:110px;font-size:.82rem;" onchange="onMatNameChange(this)">${opts}</select><input type="text" class="matNameCustom" placeholder="Nome do material" style="display:none;margin-top:2px;min-width:110px;font-size:.8rem;" value="${MAT_OPTIONS.includes(name) ? '' : (name||'')}"></td>
     <td><input type="number" step="0.1" class="matCons" value="${consumo||''}" style="min-width:60px;"></td>
@@ -1679,7 +1676,6 @@ function addMaterialRow(name, consumo, estoque) {
   row.querySelector(".matRemove").addEventListener("click", () => row.remove());
 }
 $("#btnAddMat").addEventListener("click", () => addMaterialRow("","",""));
-MAT_OPTIONS.filter(m => m !== "Outro").forEach(m => addMaterialRow(m,"",""));
 
 function onMatNameChange(sel) {
   const row = sel.closest("tr");
