@@ -255,7 +255,7 @@
 
 <!-- Quimicos (toggle) -->
 <div class="card">
-<div class="card-header">Quimicos</div>
+<div class="card-header">Químicos</div>
 <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve uso de químicos hoje?</p>
 <div class="toggle-group" id="toggleFluid">
 <button class="toggle-btn" data-value="yes" type="button">Sim</button>
@@ -271,7 +271,7 @@
 </div>
 <!-- Combustivel (always visible) -->
 <div class="card">
-<div class="card-header">Combustivel</div>
+<div class="card-header">Combustível</div>
 <table class="ops-table" id="fuelTable">
 <tr><th>Equipamento</th><th>Tipo</th><th>Litros</th><th></th></tr>
 </table>
@@ -314,6 +314,23 @@
 <div><label for="supplyMunck">Munck (diária)</label><input id="supplyMunck" placeholder="-" type="text"/></div>
 <div><label for="supplyCrane">Guindaste 70T</label><input id="supplyCrane" placeholder="-" type="text"/></div>
 <div><label for="supplyDebrisRemoval">Rem. Caçamba</label><input id="supplyDebrisRemoval" placeholder="-" type="text"/></div>
+</div>
+<hr style="margin:.8rem 0;border:none;border-top:1px solid #e5e7eb;">
+<p style="font-size:.82rem;color:#374151;margin-bottom:.2rem;"><strong>Houve troca de óleo do motor da sonda?</strong></p>
+<p style="font-size:.7rem;color:#9ca3af;margin-bottom:.4rem;">Troca de óleo (drenagem completa + filtro novo) é diferente de completar o nível. Só registre aqui se houve troca.</p>
+<div class="toggle-group" id="toggleOilChange">
+<button class="toggle-btn" data-value="yes" type="button">Sim</button>
+<button class="toggle-btn active-no" data-value="no" type="button">Não</button>
+</div>
+<div class="conditional" id="sectionOilChange">
+<div class="row">
+<div><label for="oilType">Tipo / Marca do óleo</label><input id="oilType" placeholder="ex: 15W-40 Lubrax" type="text"/></div>
+<div><label for="oilLiters">Litros consumidos</label><input id="oilLiters" step="0.1" type="number"/></div>
+</div>
+<div class="row">
+<div><label for="oilHorimetro">Horímetro na troca (h)</label><input id="oilHorimetro" step="1" type="number"/></div>
+<div><label><input id="oilFilterChanged" type="checkbox"/> Filtro de óleo trocado</label></div>
+</div>
 </div>
 </div>
 </div><div class="formTabContent" id="tabAtividades">
