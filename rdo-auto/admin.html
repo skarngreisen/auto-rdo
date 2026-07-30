@@ -72,6 +72,14 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
 .ro-row { display: flex; font-size: .78rem; padding: .1rem 0; }
 .ro-label { color: #6b7280; width: 100px; flex-shrink: 0; }
 .ro-value { color: #1a1a2e; font-weight: 600; }
+@media (max-width: 480px) {
+  .ops-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+}
 </style>
 </head>
 <body>

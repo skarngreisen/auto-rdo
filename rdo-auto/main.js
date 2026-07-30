@@ -1264,9 +1264,9 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
   row.setAttribute("data-mode", mode);
   if (mode === "stop") row.style.borderLeft = "3px solid #ef4444";
   row.innerHTML = `
-    <td><input type="number" step="${depthStep}" value="${d}" class="slDepth" style="min-width:60px;"></td>
-    <td><input type="time" value="${ini}" class="slInicio" style="min-width:80px;" ${mode === "meter" ? "readonly" : ""}></td>
-    <td><input type="time" value="${ter}" class="slTermino" style="min-width:80px;" ${mode === "start" ? "disabled" : ""}></td>
+    <td><input type="number" step="${depthStep}" value="${d}" class="slDepth" style="min-width:52px;width:52px;"></td>
+    <td><input type="time" value="${ini}" class="slInicio" style="min-width:72px;width:72px;" ${mode === "meter" ? "readonly" : ""}></td>
+    <td><input type="time" value="${ter}" class="slTermino" style="min-width:72px;width:72px;" ${mode === "start" ? "disabled" : ""}></td>
     <td class="slROP" style="font-size:.75rem;text-align:center;">—</td>
     <td class="slDelta" style="font-size:.75rem;text-align:center;">—</td>
     <td><input type="text" value="${obs || ''}" class="slObs" placeholder="${mode === 'stop' ? 'Motivo da parada (obrigatório)' : 'Ex.: parada para manutencao'}" ${mode === "stop" ? "required" : ""}></td>
