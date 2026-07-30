@@ -932,10 +932,10 @@ async function generatePDF(id) {
   if (r.operacoes && r.operacoes.length > 0) {
     y += 2;
     doc.setFontSize(9); doc.setFont(undefined, "bold"); doc.text("Registro de Atividades:", M, y); y += 4;
-    const ops = r.operacoes.map(o => [o.inicio + "-" + o.termino, o.tipo || "Normal", o.descritivo || ""]);
-    doc.autoTable({ startY: y, head: [["Horario", "Tipo", "Descritivo"]], body: ops, theme: "grid",
+    const ops = r.operacoes.map(o => [o.inicio + "-" + o.termino, o.descritivo || ""]);
+    doc.autoTable({ startY: y, head: [["Horario", "Descritivo"]], body: ops, theme: "grid",
       styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [245, 240, 235], textColor: [0] },
-      columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 25 } }, margin: { left: M } });
+      columnStyles: { 0: { cellWidth: 30 } }, margin: { left: M } });
     y = doc.lastAutoTable.finalY + 3;
   }
 
