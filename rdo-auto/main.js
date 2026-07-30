@@ -1610,7 +1610,7 @@ function collectFluid() {
 }
 // ── Quimicos (dynamic) ──────────────────────────────────────
 const CHEM_OPTIONS = ["Bentonita","CMC","Soda Caustica","Goma Xantana","Sal","Barrilha","Outro"];
-const MAT_OPTIONS = ["Camisa Bomba","Valvula","Gaxeta de Swivel","Oleo 40 - Motor","Hexa-T","Outro"];
+const MAT_OPTIONS = ["Camisa Bomba","Válvula","Gaxeta de Swivel","Óleo 40 - Motor","Hexa-T","Outro"];
 
 function addChemicalRow(name, consumo, estoque) {
   const tbody = $("#chemTable");
@@ -1931,8 +1931,8 @@ function resetForm() {
   clearTable("#anomalyTable");
   clearTable("#stratTable");
   clearTable("#striplogTable");
-  clearTable("#chemTable"); CHEM_OPTIONS.filter(c => c !== "Outro").forEach(c => addChemicalRow(c,"",""));
-  clearTable("#matTable"); MAT_OPTIONS.filter(m => m !== "Outro").forEach(m => addMaterialRow(m,"",""));
+  clearTable("#chemTable"); addChemicalRow("","","");
+  clearTable("#matTable"); addMaterialRow("","","");
   clearTable("#fuelTable"); addFuelRow("Sonda","S10","");
   $("#fuelS10Stock").value = ""; $("#fuelS500Stock").value = "";
   $("#fuelTotals").style.display = "block";
