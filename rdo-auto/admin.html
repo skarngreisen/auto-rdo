@@ -771,6 +771,10 @@ async function viewRDO(id) {
     ${section("Operacoes", opsHTML)}
     ${section("Equipe", eqHTML)}
 
+    ${section("Sonda",
+      row("Horímetro", r.sonda_horimetro != null ? r.sonda_horimetro + " h" : empty("Não preenchido"))
+    )}
+
     ${section("HSE",
       row("DDS", r.hse_dds ? "Sim" : "Nao") +
       row("EPIs vistoriados", r.hse_epis_vistoriados ? "Sim" : "Nao") +

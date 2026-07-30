@@ -1082,6 +1082,9 @@ function populateForm(rdo) {
   $("#hseIncidents").value = rdo.hse_incidentes || "";
   $("#hseNearMiss").value = rdo.hse_quase_acidentes || "";
 
+  // Sonda
+  $("#sondaHorimetro").value = rdo.sonda_horimetro || "";
+
   // Clima
 
 
@@ -1794,6 +1797,7 @@ function buildPayload(status) {
     hse_quase_acidentes: $("#hseNearMiss").value || null,
     hse_hh_expostas: parseFloat($("#hseManHours").value) || null,
     hse_epis_vistoriados: $("#hseEpi").checked,
+    sonda_horimetro: parseInt($("#sondaHorimetro").value) || null,
     observacoes: $("#obsGeneral").value || null,
     planejamento_proximo_turno: $("#planNextShift").value || null,
 
