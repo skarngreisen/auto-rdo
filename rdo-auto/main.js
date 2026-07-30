@@ -1260,17 +1260,21 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
   }
 
   const depthStep = mode === "meter" ? "0.01" : "0.1";
+  const borderColors = { start: "#10b981", meter: "#3b82f6", stop: "#ef4444" };
   const row = tbody.insertRow(-1);
   row.setAttribute("data-mode", mode);
-  if (mode === "stop") row.style.borderLeft = "3px solid #ef4444";
+  row.style.borderLeft = "3px solid " + (borderColors[mode] || "#e5e7eb");
+  const terminoCell = mode === "start"
+    ? '<span style="color:#9ca3af;font-size:.82rem;">—</span>'
+    : `<input type="time" value="${ter}" class="slTermino" style="min-width:72px;width:72px;">`;
   row.innerHTML = `
     <td><input type="number" step="${depthStep}" value="${d}" class="slDepth" style="min-width:52px;width:52px;"></td>
     <td><input type="time" value="${ini}" class="slInicio" style="min-width:72px;width:72px;" ${mode === "meter" ? "readonly" : ""}></td>
-    <td><input type="time" value="${ter}" class="slTermino" style="min-width:72px;width:72px;" ${mode === "start" ? "disabled" : ""}></td>
+    <td>${terminoCell}</td>
     <td class="slROP" style="font-size:.75rem;text-align:center;">—</td>
     <td class="slDelta" style="font-size:.75rem;text-align:center;">—</td>
     <td><input type="text" value="${obs || ''}" class="slObs" placeholder="${mode === 'stop' ? 'Motivo da parada (obrigatório)' : 'Ex.: parada para manutencao'}" ${mode === "stop" ? "required" : ""}></td>
-    <td style="font-size:.7rem;color:#6b7280;text-align:center;">${{start:"Início",meter:"Metro",stop:"Parada"}[mode]}</td>
+    <td style="font-size:.7rem;text-align:center;"><span style="color:${borderColors[mode]};margin-right:3px;">●</span>${{start:"Início",meter:"Metro",stop:"Parada"}[mode]}</td>
     <td><button class="btn btn-danger btn-sm slRemove" type="button">&times;</button></td>`;
   row.querySelector(".slRemove").addEventListener("click", () => { row.remove(); updateStriplogROP(); });
   row.querySelectorAll("input").forEach(el => el.addEventListener("input", updateStriplogROP));
