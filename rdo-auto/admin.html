@@ -899,7 +899,7 @@ async function generatePDF(id) {
   if (r.profundidade_final != null) {
     doc.setFontSize(9); doc.setFont(undefined, "bold");
     doc.text("Perfuração:", M, y); doc.setFont(undefined, "normal");
-    doc.text(`${r.profundidade_inicial || 0} \u2192 ${r.profundidade_final} m`, M + 30, y);
+    doc.text(`${r.profundidade_inicial || 0} a ${r.profundidade_final} m`, M + 30, y);
     y += 5;
   }
   // Stratigraphy (array)
