@@ -269,8 +269,7 @@ if (!DRAFT_RESTORE_ENABLED) { localStorage.removeItem(DRAFT_KEY); }
 })();
 
 function populateDraftFromPayload(payload) {
-  if (payload.depthInitial != null) { setToggle("#toggleDrilling", true); $("#depthInitial").value = payload.depthInitial || ""; }
-  if (payload.depthFinal != null) $("#depthFinal").value = payload.depthFinal || "";
+  if (payload.striplog && payload.striplog.length > 0) { setToggle("#toggleDrilling", true); }
   if (payload.estratigrafia_mudou && payload.estratigrafia_mudancas) { setToggle("#toggleStratigraphy", true); clearTable("#stratTable"); payload.estratigrafia_mudancas.forEach(s => addStratRow(s.profundidade, s.descricao)); }
   if (payload.revestimento_mudou) { setToggle("#toggleCasing", true); $("#casingMeters").value = payload.revestimento_metros || ""; $("#casingObs").value = payload.revestimento_obs || ""; }
   if (payload.parametros_anomalias && payload.parametros_anomalias.length > 0) {
@@ -606,9 +605,6 @@ function prefillDrilling() {
   const y = lastRDO;
   if (!y || y.profundidade_final == null) return;
   setToggle("#toggleDrilling", true);
-  const profIni = $("#depthInitial");
-  profIni.value = y.profundidade_final || "";
-  markInherited([profIni]);
   // Copy broca to ATUAL (assume same broca unless user says otherwise)
   if (y.brocas) {
     const b = y.brocas;
@@ -953,8 +949,7 @@ function populateForm(rdo) {
   $("#rdoDate").value = rdo.data;
   if (rdo.profundidade_final != null) {
     setToggle("#toggleDrilling", true);
-    $("#depthInitial").value = rdo.profundidade_inicial || "";
-    $("#depthFinal").value = rdo.profundidade_final || "";
+    // Depth is computed from striplog, not manual fields
     // Estratigrafia
     if (rdo.estratigrafia_mudou || (rdo.estratigrafia_mudancas && rdo.estratigrafia_mudancas.length > 0)) {
       setToggle("#toggleStratigraphy", true);
@@ -1263,7 +1258,7 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
   // Compute defaults per mode
   let d = depth || "", ini = inicio || "", ter = termino || "";
   if (mode === "start") {
-    d = depth || String(prevDepth > 0 ? prevDepth : (parseFloat($("#depthInitial").value) || ""));
+    d = depth || String(prevDepth > 0 ? prevDepth : "");
     ini = inicio || now;
     ter = ""; // locked
   } else if (mode === "meter") {
@@ -1319,7 +1314,7 @@ function getLastStriplogInicio() {
 
 function updateStriplogROP() {
   const rows = $("#striplogTable").rows;
-  if (rows.length <= 1) { $("#striplogROP").style.display = "none"; return; }
+  if (rows.length <= 1) { $("#striplogROP").textContent = ""; return; }
 
   // Compute ROP per row: parada rows use previous meter's depth delta + parada inicio
   const rops = [];
@@ -1415,8 +1410,9 @@ function updateStriplogROP() {
     totalDt -= totalStopDt;
     if (totalDt > 0 && totalDm > 0) {
       const avg = (totalDm / (totalDt / 60)).toFixed(1);
-      $("#striplogROP").textContent = `${totalDm.toFixed(1)} m em ${totalDt} min | ROP médio: ${avg} m/h`;
-      $("#striplogROP").style.display = "block";
+      const depthStart = firstD;
+      const depthEnd = firstD + totalDm;
+      $("#striplogROP").textContent = `${depthStart.toFixed(2)} a ${depthEnd.toFixed(2)} m | ${totalDm.toFixed(1)} m em ${totalDt} min | ROP médio: ${avg} m/h`;
     }
   }
 }
@@ -1835,9 +1831,6 @@ function buildPayload(status) {
       const depths = sl.map(r => r.profundidade).sort((a,b) => a - b);
       p.profundidade_inicial = depths[0];
       p.profundidade_final = depths[depths.length - 1];
-    } else {
-      p.profundidade_inicial = parseFloat($("#depthInitial").value) || null;
-      p.profundidade_final = parseFloat($("#depthFinal").value) || null;
     }
     p.estratigrafia_mudou = getToggleState("#toggleStratigraphy");
     if (p.estratigrafia_mudou) {
