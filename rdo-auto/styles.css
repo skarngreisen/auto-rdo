@@ -288,5 +288,8 @@ input.inherited, textarea.inherited {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     white-space: nowrap;
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
   }
+  .card { padding: .75rem; }
 }
