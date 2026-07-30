@@ -281,6 +281,12 @@ input.inherited, textarea.inherited {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-@media (max-width: 400px) {
+@media (max-width: 480px) {
   .row { flex-direction: column; gap: 0; }
+  .ops-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
 }
