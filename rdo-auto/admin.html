@@ -202,11 +202,11 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <h2 id="modalProjectTitle">Novo Projeto</h2>
     <input type="hidden" id="editProjectId">
     <label>Nome do projeto</label><input type="text" id="modalCliente">
-    <label>Localidade</label><input type="text" id="modalLocalidade" placeholder="ex: Ribeirao Preto - SP">
+    <label>Localidade</label><input type="text" id="modalLocalidade" placeholder="ex: Ribeirão Preto - SP">
     <label>Sonda</label><select id="modalSonda"><option value="">Selecionar sonda...</option><option value="Cardwell">Cardwell</option><option value="R4">R4</option><option value="A10">A10</option><option value="Tornep">Tornep</option></select>
     <div class="row">
       <div><label>Data Início</label><input type="date" id="modalDataInício"></div>
-      <div><label>Turno (descricao)</label><input type="text" id="modalTurno" value="07h x 17h"></div>
+      <div><label>Turno (descrição)</label><input type="text" id="modalTurno" value="07h x 17h"></div>
     </div>
     <div class="row" style="margin-top:.5rem;">
       <div><label>Turnos por dia</label>
@@ -219,7 +219,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <hr style="margin:1rem 0;border:none;border-top:2px solid #e8ecf1;">
     <div class="card-header">Geologo Responsavel</div>
     <div id="geologoHistory" style="font-size:.75rem;color:#6b7280;margin-bottom:.5rem;"></div>
-    <select id="modalGeologo" style="margin-bottom:.5rem;"><option value="">Selecionar geologo...</option></select>
+    <select id="modalGeologo" style="margin-bottom:.5rem;"><option value="">Selecionar geólogo...</option></select>
     <div class="card-header" style="margin-top:.75rem;">Supervisores de Turno</div>
     <div id="supervisorHistory" style="font-size:.75rem;color:#6b7280;margin-bottom:.5rem;"></div>
     <div class="row" id="supervisorFields">
@@ -412,7 +412,7 @@ $("#btnModalSave").addEventListener("click", async () => {
     supervisor_turno2: $("#modalSupervisor2").value.trim() || null,
   };
   if (!payload.cliente || !payload.localidade || !payload.sonda || !payload.data_inicio) {
-    toast("Preencha todos os campos obrigatorios.", "error"); return;
+    toast("Preencha todos os campos obrigatórios.", "error"); return;
   }
   let error, projetoId = id;
   if (id) {
@@ -458,7 +458,7 @@ async function loadCrewDropdowns() {
   const opts = (supervisors || []).map(p =>
     `<option value="${p.user_id}">${p.name}${p.role === 'admin' ? ' (admin)' : ''}</option>`
   ).join("");
-  const geologoOpts = '<option value="">Selecionar geologo...</option>' + opts;
+  const geologoOpts = '<option value="">Selecionar geólogo...</option>' + opts;
   const supOpts = '<option value="">Selecionar supervisor...</option>' + opts;
   $("#modalGeologo").innerHTML = geologoOpts;
   $("#modalSupervisor1").innerHTML = supOpts;
@@ -616,7 +616,7 @@ async function viewRDO(id) {
     btnApprove.style.background = "#10b981";
   }
   const c = $("#rdoDetailContent");
-  const yn = v => v ? '<span style="color:#10b981;">Sim</span>' : '<span style="color:#6b7280;">Nao</span>';
+  const yn = v => v ? '<span style="color:#10b981;">Sim</span>' : '<span style="color:#6b7280;">Não</span>';
   const empty = msg => `<span style="color:#9ca3af;font-size:.82rem;">${msg}</span>`;
 
   // ── Helpers ──
@@ -670,7 +670,7 @@ async function viewRDO(id) {
     revestHTML += row("Metros", (r.revestimento_metros||'-') + " m");
     if (r.revestimento_obs) revestHTML += row("Observacao", r.revestimento_obs);
   } else {
-    revestHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Nao houve descida de revestimento neste dia.</div>`;
+    revestHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Não houve descida de revestimento neste dia.</div>`;
   }
 
   // Fluido
@@ -752,7 +752,7 @@ async function viewRDO(id) {
       row("Houve avanco?", r.profundidade_final != null ? yn(true) : yn(false)) +
       (r.profundidade_final != null
         ? row("Profundidade", (r.profundidade_inicial||0) + " → " + r.profundidade_final + " m")
-        : row("Profundidade", '<span style="color:#9ca3af;">Nao houve avanco na perfuracao neste dia.</span>')) +
+        : row("Profundidade", '<span style="color:#9ca3af;">Não houve avanço na perfuração neste dia.</span>')) +
       (stratEntries.length > 0
         ? stratEntries.map(s => row("Estratigrafia", s.profundidade + "m: " + s.descricao)).join("")
         : row("Estratigrafia", '<span style="color:#9ca3af;">Nenhuma mudanca de formacao registrada.</span>')) +
@@ -839,7 +839,7 @@ async function revertToDraft(id) {
 // EDIT RDO (versioned — marks old as latest=false, creates copy)
 // ============================================================
 async function editRDO(id) {
-  if (!confirm("Isso criara uma nova versao editavel do RDO. A versao original sera preservada. Continuar?")) return;
+  if (!confirm("Isso criará uma nova versão editável do RDO. A versão original será preservada. Continuar?")) return;
   const { data: original } = await sb.from("rdos").select("*").eq("id", id).single();
   if (!original) { toast("RDO não encontrado.", "error"); return; }
   // Mark original as not latest
@@ -1043,7 +1043,7 @@ async function loadUsuários() {
 }
 
 $("#btnNewUser").addEventListener("click", () => {
-  $("#modalUserTitle").textContent = "Novo Usuario";
+  $("#modalUserTitle").textContent = "Novo Usuário";
   $("#editUserId").value = "";
    $("#modalUserName").value = ""; $("#modalUserEmail").value = ""; $("#modalUserPhone").value = "";
   $("#modalUserPassword").value = ""; $("#modalUserPassword2").value = ""; $("#modalUserRole").value = "colaborador";
@@ -1053,7 +1053,7 @@ $("#btnNewUser").addEventListener("click", () => {
 async function editUser(userId) {
   const { data } = await sb.from("profiles").select("*").eq("user_id", userId).single();
   if (!data) return;
-  $("#modalUserTitle").textContent = "Editar Usuario";
+  $("#modalUserTitle").textContent = "Editar Usuário";
   $("#editUserId").value = data.user_id;
    $("#modalUserName").value = data.name || "";
    $("#modalUserEmail").value = data.email || "";
@@ -1074,7 +1074,7 @@ $("#btnUserModalSave").addEventListener("click", async () => {
   const password = $("#modalUserPassword").value;
   const role = $("#modalUserRole").value;
 
-  if (!name || !email || !role) { toast("Preencha nome, email e funcao.", "error"); return; }
+  if (!name || !email || !role) { toast("Preencha nome, e-mail e função.", "error"); return; }
   if (!id && !password) { toast("Senha obrigatória para novo usuário.", "error"); return; }
   if (password) {
     const p2 = $("#modalUserPassword2").value;
@@ -1085,8 +1085,8 @@ $("#btnUserModalSave").addEventListener("click", async () => {
   if (!id) {
     // Creaté new auth user
     const { data: authData, error: authErr } = await sb.auth.signUp({ email, password });
-    if (authErr) { toast("Erro ao criar usuario: " + authErr.message, "error"); return; }
-    if (!authData?.user) { toast("Erro ao criar usuario.", "error"); return; }
+    if (authErr) { toast("Erro ao criar usuário: " + authErr.message, "error"); return; }
+    if (!authData?.user) { toast("Erro ao criar usuário.", "error"); return; }
     await sb.from("profiles").upsert({ user_id: authData.user.id, name, email, phone, role });
   } else {
     await sb.from("profiles").update({ name, email, phone, role }).eq("user_id", id);

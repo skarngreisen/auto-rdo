@@ -23,7 +23,7 @@ $("#btnAuth").addEventListener("click", async () => {
   const name = $("#authName").value.trim();
   const errEl = $("#authError");
   errEl.style.display = "none";
-  if (!email || !password) { errEl.textContent = "Preencha email e senha."; errEl.style.display = "block"; return; }
+  if (!email || !password) { errEl.textContent = "Preencha e-mail e senha."; errEl.style.display = "block"; return; }
 
   if (isLoginMode) {
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
@@ -749,7 +749,7 @@ async function viewRDO(rdo) {
     if (profile) authorName = profile.name;
   }
   const c = $("#readonlyContent");
-  const yn = v => v ? '<span style="color:#10b981;">Sim</span>' : '<span style="color:#6b7280;">Nao</span>';
+  const yn = v => v ? '<span style="color:#10b981;">Sim</span>' : '<span style="color:#6b7280;">Não</span>';
   const empty = msg => `<span style="color:#9ca3af;font-size:.82rem;">${msg}</span>`;
 
   function section(title, body) { return `<div class="ro-section"><h3>${title}</h3>${body}</div>`; }
@@ -800,7 +800,7 @@ async function viewRDO(rdo) {
     revestHTML += row("Metros", (rdo.revestimento_metros||'-') + " m");
     if (rdo.revestimento_obs) revestHTML += row("Observacao", rdo.revestimento_obs);
   } else {
-    revestHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Nao houve descida de revestimento neste dia.</div>`;
+    revestHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Não houve descida de revestimento neste dia.</div>`;
   }
 
   // Fluido
@@ -883,7 +883,7 @@ async function viewRDO(rdo) {
       row("Houve avanco?", rdo.profundidade_final != null ? yn(true) : yn(false)) +
       (rdo.profundidade_final != null
         ? row("Profundidade", (rdo.profundidade_inicial||0) + " → " + rdo.profundidade_final + " m")
-        : row("Profundidade", '<span style="color:#9ca3af;">Nao houve avanco na perfuracao neste dia.</span>')) +
+        : row("Profundidade", '<span style="color:#9ca3af;">Não houve avanço na perfuração neste dia.</span>')) +
       (stratEntries.length > 0
         ? stratEntries.map(s => row("Estratigrafia", s.profundidade + "m: " + s.descricao)).join("")
         : row("Estratigrafia", '<span style="color:#9ca3af;">Nenhuma mudanca de formacao registrada.</span>')) +
@@ -903,8 +903,8 @@ async function viewRDO(rdo) {
     ${section("Equipe", eqHTML)}
 
     ${section("HSE",
-      row("DDS", rdo.hse_dds ? "Sim" : "Nao") +
-      row("EPIs vistoriados", rdo.hse_epis_vistoriados ? "Sim" : "Nao") +
+      row("DDS", rdo.hse_dds ? "Sim" : "Não") +
+      row("EPIs vistoriados", rdo.hse_epis_vistoriados ? "Sim" : "Não") +
       row("HH Expostas", rdo.hse_hh_expostas || "-") +
       (rdo.hse_incidentes
         ? row("Incidentes", rdo.hse_incidentes)
@@ -1394,7 +1394,7 @@ function updateStriplogROP() {
     totalDt -= totalStopDt;
     if (totalDt > 0 && totalDm > 0) {
       const avg = (totalDm / (totalDt / 60)).toFixed(1);
-      $("#striplogROP").textContent = `${totalDm.toFixed(1)} m em ${totalDt} min | ROP medio: ${avg} m/h`;
+      $("#striplogROP").textContent = `${totalDm.toFixed(1)} m em ${totalDt} min | ROP médio: ${avg} m/h`;
       $("#striplogROP").style.display = "block";
     }
   }
@@ -1613,7 +1613,7 @@ function addChemicalRow(name, consumo, estoque) {
   const row = tbody.insertRow(-1);
   const opts = CHEM_OPTIONS.map(c => `<option value="${c}" ${c===name?"selected":""}>${c}</option>`).join("");
   row.innerHTML = `
-    <td><select class="chemName" style="min-width:100px;font-size:.82rem;" onchange="onChemNameChange(this)">${opts}</select><input type="text" class="chemNameCustom" placeholder="Nome do quimico" style="display:none;margin-top:2px;min-width:100px;font-size:.8rem;" value="${CHEM_OPTIONS.includes(name) ? '' : (name||'')}"></td>
+    <td><select class="chemName" style="min-width:100px;font-size:.82rem;" onchange="onChemNameChange(this)">${opts}</select><input type="text" class="chemNameCustom" placeholder="Nome do químico" style="display:none;margin-top:2px;min-width:100px;font-size:.8rem;" value="${CHEM_OPTIONS.includes(name) ? '' : (name||'')}"></td>
     <td><input type="number" step="0.1" class="chemCons" value="${consumo||''}" style="min-width:60px;"></td>
     <td><input type="number" step="0.1" class="chemEst" value="${estoque||''}" style="min-width:60px;"></td>
     <td><input type="checkbox" class="chemNA" onchange="toggleChemNA(this)"></td>
