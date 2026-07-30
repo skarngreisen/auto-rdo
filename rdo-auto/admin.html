@@ -161,7 +161,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
         <button class="btn btn-primary btn-sm" id="btnNewUser">+ Novo</button>
       </div>
       <table id="usuariosTable">
-        <tr><th>Nome</th><th>Celular</th><th>Função</th><th></th></tr>
+        <tr><th>Nome</th><th>Email</th><th>Celular</th><th>Função</th><th></th></tr>
       </table>
     </div>
   </div>
@@ -174,6 +174,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <h2 id="modalUserTitle">Novo Usuário</h2>
     <input type="hidden" id="editUserId">
     <label>Nome</label><input type="text" id="modalUserName">
+    <label>Email</label><input type="email" id="modalUserEmail" placeholder="ex: nome@gel-eng.com.br">
     <label>Celular (com DDD)</label><input type="tel" id="modalUserPhone">
     <label>Nova senha</label><input type="password" id="modalUserPassword" placeholder="Min. 8 caracteres">
     <label>Confirmar senha</label><input type="password" id="modalUserPassword2" placeholder="Repita a senha">
@@ -1023,15 +1024,15 @@ $("#btnExportCSV").addEventListener("click", async () => {
 // USERS
 // ============================================================
 async function loadUsuários() {
-  const { data: profiles } = await sb.from("profiles").select("user_id,name,role,phone").order("name");
+  const { data: profiles } = await sb.from("profiles").select("user_id,name,email,role,phone").order("name");
   const tbody = $("#usuariosTable");
   if (!profiles || profiles.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum usuario.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum usuario.</td></tr>';
     return;
   }
   tbody.innerHTML = profiles.map(p => `
     <tr>
-      <td>${p.name || '-'}</td><td>${p.phone || '-'}</td><td>${p.role}</td>
+      <td>${p.name || '-'}</td><td>${p.email || '-'}</td><td>${p.phone || '-'}</td><td>${p.role}</td>
       <td class="actions">
         <button class="btn btn-secondary btn-sm" onclick="editUser('${p.user_id}')">Editar</button>
       </td>
@@ -1041,7 +1042,7 @@ async function loadUsuários() {
 $("#btnNewUser").addEventListener("click", () => {
   $("#modalUserTitle").textContent = "Novo Usuario";
   $("#editUserId").value = "";
-  $("#modalUserName").value = ""; $("#modalUserPhone").value = "";
+   $("#modalUserName").value = ""; $("#modalUserEmail").value = ""; $("#modalUserPhone").value = "";
   $("#modalUserPassword").value = ""; $("#modalUserPassword2").value = ""; $("#modalUserRole").value = "colaborador";
   $("#modalUser").classList.add("show");
 });
@@ -1051,8 +1052,9 @@ async function editUser(userId) {
   if (!data) return;
   $("#modalUserTitle").textContent = "Editar Usuario";
   $("#editUserId").value = data.user_id;
-  $("#modalUserName").value = data.name || "";
-  $("#modalUserPhone").value = data.phone || "";
+   $("#modalUserName").value = data.name || "";
+   $("#modalUserEmail").value = data.email || "";
+   $("#modalUserPhone").value = data.phone || "";
   $("#modalUserPassword").value = ""; $("#modalUserPassword2").value = "";
   $("#modalUserRole").value = data.role;
   $("#modalUser").classList.add("show");
@@ -1064,11 +1066,12 @@ $("#modalUser").addEventListener("click", e => { if (e.target === $("#modalUser"
 $("#btnUserModalSave").addEventListener("click", async () => {
   const id = $("#editUserId").value;
   const name = $("#modalUserName").value.trim();
+  const email = $("#modalUserEmail").value.trim();
   const phone = $("#modalUserPhone").value.trim().replace(/\D/g, "");
   const password = $("#modalUserPassword").value;
   const role = $("#modalUserRole").value;
 
-  if (!name || !phone || !role) { toast("Preencha todos os campos.", "error"); return; }
+  if (!name || !email || !role) { toast("Preencha nome, email e funcao.", "error"); return; }
   if (!id && !password) { toast("Senha obrigatória para novo usuário.", "error"); return; }
   if (password) {
     const p2 = $("#modalUserPassword2").value;
@@ -1078,16 +1081,14 @@ $("#btnUserModalSave").addEventListener("click", async () => {
 
   if (!id) {
     // Creaté new auth user
-    const email = phone + "@rdo.local";
     const { data: authData, error: authErr } = await sb.auth.signUp({ email, password });
-    if (authErr) { toast("Erro ao criar usuário: " + authErr.message, "error"); return; }
-    if (!authData?.user) { toast("Erro ao criar usuário.", "error"); return; }
-    await sb.from("profiles").upsert({ user_id: authData.user.id, name, phone, role });
+    if (authErr) { toast("Erro ao criar usuario: " + authErr.message, "error"); return; }
+    if (!authData?.user) { toast("Erro ao criar usuario.", "error"); return; }
+    await sb.from("profiles").upsert({ user_id: authData.user.id, name, email, phone, role });
   } else {
-    await sb.from("profiles").update({ name, phone, role }).eq("user_id", id);
+    await sb.from("profiles").update({ name, email, phone, role }).eq("user_id", id);
     if (password) {
       // Show SQL snippet for password reset
-      const email = phone + "@rdo.local";
       const sql = `UPDATE auth.users SET encrypted_password = crypt('${password}', gen_salt('bf')) WHERE email = '${email}';`;
       await navigator.clipboard.writeText(sql);
       toast("SQL copiado! Execute no SQL Editor do Supabase para alterar a senha.", "success");
