@@ -902,6 +902,17 @@ async function viewRDO(rdo) {
     ${section("Operacoes", opsHTML)}
     ${section("Equipe", eqHTML)}
 
+    ${section("Sonda",
+      row("Horímetro", rdo.sonda_horimetro != null ? rdo.sonda_horimetro + " h" : empty("Não preenchido")) +
+      (rdo.troca_oleo
+        ? `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Troca de Óleo</div>` +
+          row("Tipo / Marca", rdo.troca_oleo.tipo || "-") +
+          row("Litros", (rdo.troca_oleo.litros || "-") + " L") +
+          row("Horímetro", (rdo.troca_oleo.horimetro || "-") + " h") +
+          row("Filtro trocado", rdo.troca_oleo.filtro_trocado ? "Sim" : "Não") + "</div>"
+        : row("Troca de óleo", empty("Não houve troca de óleo neste dia.")))
+    )}
+
     ${section("HSE",
       row("DDS", rdo.hse_dds ? "Sim" : "Não") +
       row("EPIs vistoriados", rdo.hse_epis_vistoriados ? "Sim" : "Não") +
@@ -1084,6 +1095,16 @@ function populateForm(rdo) {
 
   // Sonda
   $("#sondaHorimetro").value = rdo.sonda_horimetro || "";
+  if (rdo.troca_oleo) {
+    setToggle("#toggleOilChange", true);
+    const o = rdo.troca_oleo;
+    $("#oilType").value = o.tipo || "";
+    $("#oilLiters").value = o.litros || "";
+    $("#oilHorimetro").value = o.horimetro || "";
+    $("#oilFilterChanged").checked = !!o.filtro_trocado;
+  } else {
+    setToggle("#toggleOilChange", false);
+  }
 
   // Clima
 
@@ -1150,6 +1171,7 @@ setupToggle("#toggleMateriais", "#sectionMateriais");
 setupToggle("#toggleStratigraphy", "#sectionStratigraphy");
 setupToggle("#toggleCasing", "#sectionCasing");
 setupToggle("#toggleAnomaly", "#sectionAnomaly");
+setupToggle("#toggleOilChange", "#sectionOilChange");
 
 // ============================================================
 // OPERATIONS TABLE
@@ -1721,6 +1743,16 @@ function collectSupplies() {
   const i = { agua:$("#supplyWater").value||null, limpa_fossa:$("#supplySeptic").value||null, limpeza_banheiro:$("#supplyBathroom").value||null, pta:$("#supplyPta").value||null, munck:$("#supplyMunck").value||null, guindaste:$("#supplyCrane").value||null, remocao_cacamba:$("#supplyDebrisRemoval").value||null };
   return Object.values(i).some(v=>v!==null&&v!=="") ? i : null;
 }
+
+function collectOilChange() {
+  if (!getToggleState("#toggleOilChange")) return null;
+  const tipo = $("#oilType").value.trim() || null;
+  const litros = parseFloat($("#oilLiters").value) || null;
+  const horimetro = parseInt($("#oilHorimetro").value) || null;
+  const filtro = $("#oilFilterChanged").checked;
+  if (!tipo && !litros && !horimetro) return null;
+  return { tipo, litros, horimetro, filtro_trocado: filtro };
+}
 // ── Combustivel (dynamic) ───────────────────────────────────
 const FUEL_EQUIP = ["Gerador","Compressor","Sonda","Bomba","Outro"];
 const FUEL_TYPES = ["S10","S500"];
@@ -1838,6 +1870,7 @@ function buildPayload(status) {
     p.outros_materiais = collectMaterials();
   }
   p.fluido = collectFluid();  // always collected
+  p.troca_oleo = collectOilChange();
   p.combustivel = collectFuel();
   p.insumos = collectSupplies();
   // Strip nulls
@@ -1922,6 +1955,7 @@ function resetForm() {
   setToggle("#toggleStratigraphy", false);
   setToggle("#toggleCasing", false);
   setToggle("#toggleAnomaly", false);
+  setToggle("#toggleOilChange", false);
   $$("input[type='text'], input[type='number'], textarea").forEach(el => {
     if (!["rdoDate","projectSelect"].includes(el.id)) el.value = "";
   });

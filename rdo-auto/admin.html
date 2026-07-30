@@ -772,7 +772,14 @@ async function viewRDO(id) {
     ${section("Equipe", eqHTML)}
 
     ${section("Sonda",
-      row("Horímetro", r.sonda_horimetro != null ? r.sonda_horimetro + " h" : empty("Não preenchido"))
+      row("Horímetro", r.sonda_horimetro != null ? r.sonda_horimetro + " h" : empty("Não preenchido")) +
+      (r.troca_oleo
+        ? `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Troca de Óleo</div>` +
+          row("Tipo / Marca", r.troca_oleo.tipo || "-") +
+          row("Litros", (r.troca_oleo.litros || "-") + " L") +
+          row("Horímetro", (r.troca_oleo.horimetro || "-") + " h") +
+          row("Filtro trocado", r.troca_oleo.filtro_trocado ? "Sim" : "Não") + "</div>"
+        : row("Troca de óleo", empty("Não houve troca de óleo neste dia.")))
     )}
 
     ${section("HSE",
