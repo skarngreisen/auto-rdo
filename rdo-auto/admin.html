@@ -714,13 +714,6 @@ async function viewRDO(id) {
     }
   }
 
-  // Insumos
-  let insumosHTML = empty("Nenhum insumo utilizado.");
-  if (r.insumos && r.insumos.length > 0) {
-    insumosHTML = `<table class="ops-table"><tr><th>Item</th><th>Qtd</th></tr>
-      ${r.insumos.map(i => `<tr><td>${i.item||'-'}</td><td>${i.qtd||'-'}</td></tr>`).join('')}</table>`;
-  }
-
   // Operacoes
   let opsHTML = empty("Nenhuma operacao registrada.");
   if (r.operacoes && r.operacoes.length > 0) {
@@ -767,7 +760,6 @@ async function viewRDO(id) {
     ${section("Quimicos", quimicosHTML)}
     ${section("Combustivel", fuelHTML)}
     ${section("Materiais", matHTML)}
-    ${section("Insumos", insumosHTML)}
     ${section("Operacoes", opsHTML)}
     ${section("Equipe", eqHTML)}
 

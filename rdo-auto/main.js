@@ -844,13 +844,6 @@ async function viewRDO(rdo) {
     }
   }
 
-  // Insumos
-  let insumosHTML = empty("Nenhum insumo utilizado.");
-  if (rdo.insumos && rdo.insumos.length > 0) {
-    insumosHTML = `<table class="ops-table"><tr><th>Item</th><th>Qtd</th></tr>
-      ${rdo.insumos.map(i => `<tr><td>${i.item||'-'}</td><td>${i.qtd||'-'}</td></tr>`).join('')}</table>`;
-  }
-
   // Operacoes
   let opsHTML = empty("Nenhuma operacao registrada.");
   if (rdo.operacoes && rdo.operacoes.length > 0) {
@@ -898,7 +891,6 @@ async function viewRDO(rdo) {
     ${section("Quimicos", quimicosHTML)}
     ${section("Combustivel", fuelHTML)}
     ${section("Materiais", matHTML)}
-    ${section("Insumos", insumosHTML)}
     ${section("Operacoes", opsHTML)}
     ${section("Equipe", eqHTML)}
 
@@ -1872,7 +1864,6 @@ function buildPayload(status) {
   p.fluido = collectFluid();  // always collected
   p.troca_oleo = collectOilChange();
   p.combustivel = collectFuel();
-  p.insumos = collectSupplies();
   // Strip nulls
   Object.keys(p).forEach(k => { if (p[k]===null||p[k]===undefined) delete p[k]; });
   return p;
