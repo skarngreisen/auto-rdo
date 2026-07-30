@@ -1038,8 +1038,22 @@ async function loadUsuários() {
       <td>${p.name || '-'}</td><td>${p.email || '-'}</td><td>${p.phone || '-'}</td><td>${p.role}</td>
       <td class="actions">
         <button class="btn btn-secondary btn-sm" onclick="editUser('${p.user_id}')">Editar</button>
+        <button class="btn btn-secondary btn-sm" onclick="copyOnboarding('${p.user_id}')">📋 Onboard</button>
       </td>
     </tr>`).join("");
+}
+
+async function copyOnboarding(userId) {
+  const { data } = await sb.from("profiles").select("name,email").eq("user_id", userId).maybeSingle();
+  if (!data) { toast("Usuário não encontrado.", "error"); return; }
+  const msg = `Aqui está seu acesso ao RDO Auto!\n\n` +
+    `Login: ${data.email}\n` +
+    `Senha: a definida pelo administrador\n\n` +
+    `Ative as notificações no Telegram:\n` +
+    `https://t.me/rdoauto_bot?start=${userId}\n\n` +
+    `Basta clicar no link acima e enviar /start para receber notificações dos seus RDOs.`;
+  await navigator.clipboard.writeText(msg);
+  toast("Mensagem de onboarding copiada!", "success");
 }
 
 $("#btnNewUser").addEventListener("click", () => {
@@ -1083,11 +1097,19 @@ $("#btnUserModalSave").addEventListener("click", async () => {
   }
 
   if (!id) {
-    // Creaté new auth user
     const { data: authData, error: authErr } = await sb.auth.signUp({ email, password });
     if (authErr) { toast("Erro ao criar usuário: " + authErr.message, "error"); return; }
     if (!authData?.user) { toast("Erro ao criar usuário.", "error"); return; }
     await sb.from("profiles").upsert({ user_id: authData.user.id, name, email, phone, role });
+    // Auto-copy onboarding message with the password
+    const onboardMsg = `Aqui está seu acesso ao RDO Auto!\n\n` +
+      `Login: ${email}\n` +
+      `Senha: ${password}\n\n` +
+      `Ative as notificações no Telegram:\n` +
+      `https://t.me/rdoauto_bot?start=${authData.user.id}\n\n` +
+      `Basta clicar no link acima e enviar /start para receber notificações dos seus RDOs.`;
+    await navigator.clipboard.writeText(onboardMsg);
+    toast("Mensagem de onboarding copiada! Envie para o usuário.", "success");
   } else {
     await sb.from("profiles").update({ name, email, phone, role }).eq("user_id", id);
     if (password) {
