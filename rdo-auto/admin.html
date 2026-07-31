@@ -683,10 +683,14 @@ async function viewRDO(id) {
   // Quimicos — filter rows with actual data (consumo or estoque)
   let quimicosHTML = empty("Nenhum produto quimico utilizado.");
   if (r.quimicos && r.quimicos.length > 0) {
-    const filled = r.quimicos.filter(q => (q.consumo != null && q.consumo !== "") || (q.estoque != null && q.estoque !== ""));
+    const filled = r.quimicos.filter(q => (q.qtd != null && q.qtd !== "") || (q.consumo != null && q.consumo !== ""));
     if (filled.length > 0) {
-      quimicosHTML = `<table class="ops-table"><tr><th>Produto</th><th>Consumo</th><th>Estoque</th></tr>
-        ${filled.map(q => `<tr><td>${q.name||'-'}</td><td>${q.consumo != null ? q.consumo : '-'}</td><td>${q.estoque != null ? q.estoque : '<span style="color:#ef4444;">0</span>'}</td></tr>`).join('')}</table>`;
+      quimicosHTML = `<table class="ops-table"><tr><th>Produto</th><th>Tipo</th><th>Qtd</th></tr>
+        ${filled.map(q => {
+          const qtd = q.qtd ?? q.consumo;
+          const tipo = q.tipo || "consumo";
+          return '<tr><td>' + (q.name||'-') + '</td><td>' + (tipo === 'reabastecimento' ? 'Reabastecimento' : 'Consumo') + '</td><td>' + (qtd != null ? qtd : '-') + '</td></tr>';
+        }).join('')}</table>`;
     }
   }
 
@@ -704,13 +708,17 @@ async function viewRDO(id) {
   const s500stock = r.combustivel?.estoque_s500;
   fuelHTML += `<div style="font-size:.78rem;margin-top:.2rem;">Estoque: S10 ${s10stock != null ? s10stock + ' L' : '<span style="color:#ef4444;">0 L</span>'} | S500 ${s500stock != null ? s500stock + ' L' : '<span style="color:#ef4444;">0 L</span>'}</div>`;
 
-  // Materiais — filter rows with actual data (consumo or estoque)
+  // Materiais — filter rows with actual data (qtd or legacy consumo)
   let matHTML = empty("Nenhum material adicional utilizado.");
   if (r.outros_materiais && r.outros_materiais.length > 0) {
-    const filled = r.outros_materiais.filter(m => (m.consumo != null && m.consumo !== "") || (m.estoque != null && m.estoque !== ""));
+    const filled = r.outros_materiais.filter(m => (m.qtd != null && m.qtd !== "") || (m.consumo != null && m.consumo !== ""));
     if (filled.length > 0) {
-      matHTML = `<table class="ops-table"><tr><th>Item</th><th>Consumo</th><th>Estoque</th></tr>
-        ${filled.map(m => `<tr><td>${m.name||'-'}</td><td>${m.consumo != null ? m.consumo : '-'}</td><td>${m.estoque != null ? m.estoque : '<span style="color:#ef4444;">0</span>'}</td></tr>`).join('')}</table>`;
+      matHTML = `<table class="ops-table"><tr><th>Item</th><th>Tipo</th><th>Qtd</th></tr>
+        ${filled.map(m => {
+          const qtd = m.qtd ?? m.consumo;
+          const tipo = m.tipo || "consumo";
+          return '<tr><td>' + (m.name||'-') + '</td><td>' + (tipo === 'reabastecimento' ? 'Reabastecimento' : 'Consumo') + '</td><td>' + (qtd != null ? qtd : '-') + '</td></tr>';
+        }).join('')}</table>`;
     }
   }
 

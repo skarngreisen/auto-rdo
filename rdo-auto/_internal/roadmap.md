@@ -256,6 +256,7 @@ Fase 1 (MVP+)               Fase 2 (Workflow)      Fase 3 (Notif)      Fase 4 (A
 [timeline ops colorida]     [log revisao]
 [BHA dropdown]
 [striplog → auto ROP/depth]
+[completação: revestimento + pré-filtro + limpeza/desenvolvimento]
 ```
 
 ---
@@ -266,7 +267,14 @@ Fase 1 (MVP+)               Fase 2 (Workflow)      Fase 3 (Notif)      Fase 4 (A
 - **RLS** sera reabilitado na Fase 2 com politicas por papel.
 - **Bucket de fotos** permanece publico ate que auth esteja implementado.
 - A transicao de `enviado` para `em_revisao` requer migracao dos dados existentes (script SQL simples).
+- **Aba Completação** (substituir Revestimento): além da descida de revestimento existente, adicionar:
+  - "Houve descida de pré-filtro?" — metros, observações. Se sim: registrar pressão de chegada (pressão na linha de fluido quando o pré-filtro cobre todas as seções filtrantes, indicando completação do espaço anular) e quantos sacos (bags) foram necessários até essa pressão.
+  - "Houve limpeza e desenvolvimento do poço?" — toggle com: dados do compressor (modelo, pressão máxima), horímetro do compressor ao final do dia, tabela dinâmica de uso do compressor (hora / prof. de arranque / pressão de arranque / pressão de trabalho, botão +Adicionar profundidade)
+  - "Houve jateamento?" — toggle com tabela estilo striplog: início, término, início da seção filtrante (m), fim da seção filtrante (m), observação. Botão +Adicionar jateamento.
+- **Aba Inventário + Equipamentos**: aba de consulta (read-only) do estoque atual na obra. Não controla entradas/saídas diretamente. O controle diário fica na aba Insumos: no primeiro dia do projeto, o usuário registra a chegada de todos os itens; nos dias seguintes, registra entradas e saídas. Ao fim do projeto, o inventário digital é confrontado com o físico e as discrepâncias são anotadas no RDO final. Detalhar depois.
+- **Estoque auto-calculado**: o campo Estoque foi removido do formulário. Cada linha de Químicos/Materiais agora tem Tipo (Consumo/Reabastecimento) + Qtd. O estoque será calculado automaticamente como soma de reabastecimentos - consumos, visível na aba Inventário + Equipamentos e no view do RDO.
+- **Dropdown BHA com diâmetros de broca**: substituir as siglas atuais (BR, NB, DC, etc.) por diâmetros nominais (9 7/8", 12 1/4", 17 1/2", 18", 22", 17 3/4", Outro). Aguardar lista completa de diâmetros usados pela DH.
 - **Checklist da Sonda**: expandir a seção Sonda além do horímetro. Adicionar checklists diários de inspeção (nível de óleo, mangueiras, cabos, freios, etc.) com registro de não-conformidades. Ver Artesano (cabo desgastado não reportado a tempo).
 - **Sondas gerenciáveis**: atualmente as sondas sao um dropdown fixo (Cardwell, R4, A10, Tornep). Futuramente, criar tabela `sondas` com CRUD no admin para que novos equipamentos possam ser adicionados sem alterar o codigo.
-- **Unificar insumos e outros_materiais**: atualmente sao duas secoes separadas no formulario (Insumos: agua, limpa fossa, etc.; Outros Materiais: itens diversos). Avaliar se devem ser unificados em uma unica tabela de consumo. O view do RDO ja mostra ambos separadamente com mensagens explicitas de vazio. Revisar apos feedback de campo.
+
 - **Governanca do banco**: durante o desenvolvimento, o CodeWhale tem acesso superuser (via senha do Postgres) por conveniencia. Quando dados reais de cliente entrarem, faremos o switch: CodeWhale passa a usar apenas a publishable key (INSERT/SELECT), e operacoes de admin (DDL, DELETE, UPDATE) passam a ser feitas via scripts SQL que o Igor revisa e executa manualmente. Gatilho: primeiro cliente real no sistema ou solicitacao explicita do Igor.
