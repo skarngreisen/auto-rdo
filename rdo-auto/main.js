@@ -806,13 +806,17 @@ async function viewRDO(rdo) {
     if (entries.length > 0) fluidoHTML = entries.map(([k,v]) => row(k, v)).join('');
   }
 
-  // Quimicos — filter rows with actual data (consumo or estoque)
+  // Quimicos — filter rows with actual data (qtd or legacy consumo)
   let quimicosHTML = empty("Nenhum produto quimico utilizado.");
   if (rdo.quimicos && rdo.quimicos.length > 0) {
-    const filled = rdo.quimicos.filter(q => (q.consumo != null && q.consumo !== "") || (q.estoque != null && q.estoque !== ""));
+    const filled = rdo.quimicos.filter(q => (q.qtd != null && q.qtd !== "") || (q.consumo != null && q.consumo !== ""));
     if (filled.length > 0) {
-      quimicosHTML = `<table class="ops-table"><tr><th>Produto</th><th>Consumo</th><th>Estoque</th></tr>
-        ${filled.map(q => `<tr><td>${q.name||'-'}</td><td>${q.consumo != null ? q.consumo : '-'}</td><td>${q.estoque != null ? q.estoque : '<span style="color:#ef4444;">0</span>'}</td></tr>`).join('')}</table>`;
+      quimicosHTML = `<table class="ops-table"><tr><th>Produto</th><th>Tipo</th><th>Qtd</th></tr>
+        ${filled.map(q => {
+          const qtd = q.qtd ?? q.consumo;
+          const tipo = q.tipo || "consumo";
+          return `<tr><td>${q.name||'-'}</td><td>${tipo === 'reabastecimento' ? 'Reabastecimento' : 'Consumo'}</td><td>${qtd != null ? qtd : '-'}</td></tr>`;
+        }).join('')}</table>`;
     }
   }
 
@@ -830,13 +834,17 @@ async function viewRDO(rdo) {
   const s500stock = rdo.combustivel?.estoque_s500;
   fuelHTML += `<div style="font-size:.78rem;margin-top:.2rem;">Estoque: S10 ${s10stock != null ? s10stock + ' L' : '<span style="color:#ef4444;">0 L</span>'} | S500 ${s500stock != null ? s500stock + ' L' : '<span style="color:#ef4444;">0 L</span>'}</div>`;
 
-  // Materiais — filter rows with actual data (consumo or estoque)
+  // Materiais — filter rows with actual data (qtd or legacy consumo)
   let matHTML = empty("Nenhum material adicional utilizado.");
   if (rdo.outros_materiais && rdo.outros_materiais.length > 0) {
-    const filled = rdo.outros_materiais.filter(m => (m.consumo != null && m.consumo !== "") || (m.estoque != null && m.estoque !== ""));
+    const filled = rdo.outros_materiais.filter(m => (m.qtd != null && m.qtd !== "") || (m.consumo != null && m.consumo !== ""));
     if (filled.length > 0) {
-      matHTML = `<table class="ops-table"><tr><th>Item</th><th>Consumo</th><th>Estoque</th></tr>
-        ${filled.map(m => `<tr><td>${m.name||'-'}</td><td>${m.consumo != null ? m.consumo : '-'}</td><td>${m.estoque != null ? m.estoque : '<span style="color:#ef4444;">0</span>'}</td></tr>`).join('')}</table>`;
+      matHTML = `<table class="ops-table"><tr><th>Item</th><th>Tipo</th><th>Qtd</th></tr>
+        ${filled.map(m => {
+          const qtd = m.qtd ?? m.consumo;
+          const tipo = m.tipo || "consumo";
+          return `<tr><td>${m.name||'-'}</td><td>${tipo === 'reabastecimento' ? 'Reabastecimento' : 'Consumo'}</td><td>${qtd != null ? qtd : '-'}</td></tr>`;
+        }).join('')}</table>`;
     }
   }
 
@@ -1024,7 +1032,7 @@ function populateForm(rdo) {
   if (rdo.quimicos && Array.isArray(rdo.quimicos) && rdo.quimicos.length > 0) {
     setToggle("#toggleFluid", true);
     clearTable("#chemTable");
-    rdo.quimicos.forEach(c => addChemicalRow(c.name, c.consumo, c.estoque));
+    rdo.quimicos.forEach(c => addChemicalRow(c.name, c.tipo || "consumo", c.qtd ?? c.consumo));
   }
   // Combustivel (always)
   if (rdo.combustivel) {
@@ -1047,7 +1055,7 @@ function populateForm(rdo) {
   if (rdo.outros_materiais && Array.isArray(rdo.outros_materiais) && rdo.outros_materiais.length > 0) {
     setToggle("#toggleMateriais", true);
     clearTable("#matTable");
-    rdo.outros_materiais.forEach(m => addMaterialRow(m.name, m.consumo, m.estoque));
+    rdo.outros_materiais.forEach(m => addMaterialRow(m.name, m.tipo || "consumo", m.qtd ?? m.consumo));
   }
 
   // Insumos (always populated, independent of Fluid toggle)
@@ -1625,14 +1633,15 @@ function collectFluid() {
 const CHEM_OPTIONS = ["Bentonita","CMC","Soda Caustica","Goma Xantana","Sal","Barrilha","Outro"];
 const MAT_OPTIONS = ["Camisa Bomba","Válvula","Gaxeta de Swivel","Óleo 40 - Motor","Hexa-T","Outro"];
 
-function addChemicalRow(name, consumo, estoque) {
+function addChemicalRow(name, tipo, qtd) {
   const tbody = $("#chemTable");
   const row = tbody.insertRow(-1);
   const opts = '<option value="">Selecionar...</option>' + CHEM_OPTIONS.map(c => `<option value="${c}" ${c===name?"selected":""}>${c}</option>`).join("");
+  const tipoSel = tipo === "reabastecimento" ? "reabastecimento" : "consumo";
   row.innerHTML = `
     <td><select class="chemName" style="min-width:100px;font-size:.82rem;" onchange="onChemNameChange(this)">${opts}</select><input type="text" class="chemNameCustom" placeholder="Nome do químico" style="display:none;margin-top:2px;min-width:100px;font-size:.8rem;" value="${CHEM_OPTIONS.includes(name) ? '' : (name||'')}"></td>
-    <td><input type="number" step="0.1" class="chemCons" value="${consumo||''}" style="min-width:60px;"></td>
-    <td><input type="number" step="0.1" class="chemEst" value="${estoque||''}" style="min-width:60px;"></td>
+    <td><select class="chemTipo" style="min-width:70px;font-size:.8rem;"><option value="consumo" ${tipoSel==='consumo'?'selected':''}>Consumo</option><option value="reabastecimento" ${tipoSel==='reabastecimento'?'selected':''}>Reabastecimento</option></select></td>
+    <td><input type="number" step="0.1" class="chemQtd" value="${qtd||''}" style="min-width:55px;"></td>
     <td><input type="checkbox" class="chemNA" onchange="toggleChemNA(this)"></td>
     <td><button class="btn btn-danger btn-sm chemRemove" type="button">&times;</button></td>`;
   row.querySelector(".chemRemove").addEventListener("click", () => row.remove());
@@ -1646,14 +1655,14 @@ function onChemNameChange(sel) {
 
 function toggleChemNA(cb) {
   const row = cb.closest("tr");
-  const cons = row.querySelector(".chemCons");
-  const est = row.querySelector(".chemEst");
+  const tipo = row.querySelector(".chemTipo");
+  const qtd = row.querySelector(".chemQtd");
   if (cb.checked) {
-    cons.dataset.prev = cons.value; cons.value = "N/A"; cons.disabled = true;
-    est.dataset.prev = est.value; est.value = "N/A"; est.disabled = true;
+    tipo.dataset.prev = tipo.value; tipo.value = "consumo"; tipo.disabled = true;
+    qtd.dataset.prev = qtd.value; qtd.value = "N/A"; qtd.disabled = true;
   } else {
-    cons.value = cons.dataset.prev || ""; cons.disabled = false;
-    est.value = est.dataset.prev || ""; est.disabled = false;
+    tipo.value = tipo.dataset.prev || "consumo"; tipo.disabled = false;
+    qtd.value = qtd.dataset.prev || ""; qtd.disabled = false;
   }
 }
 
@@ -1666,24 +1675,24 @@ function collectChemicals() {
     let name = sel?.value || "";
     if (name === "Outro") name = custom?.value || "";
     if (!name) continue;
-    const cons = row.querySelector(".chemCons")?.value;
-    const est = row.querySelector(".chemEst")?.value;
-    // Skip if both are N/A or both are empty (pre-filled rows with no data)
-    if ((cons === "N/A" || cons === "") && (est === "N/A" || est === "")) continue;
-    items.push({ name, consumo: (cons === "N/A" || cons === "") ? null : (parseFloat(cons)||null), estoque: (est === "N/A" || est === "") ? null : (parseFloat(est)||null) });
+    const qtd = row.querySelector(".chemQtd")?.value;
+    if (qtd === "N/A" || qtd === "") continue;
+    const tipo = row.querySelector(".chemTipo")?.value || "consumo";
+    items.push({ name, tipo, qtd: parseFloat(qtd) || null });
   }
   return items.length > 0 ? items : null;
 }
 
 // ── Materiais (dynamic) ─────────────────────────────────────
-function addMaterialRow(name, consumo, estoque) {
+function addMaterialRow(name, tipo, qtd) {
   const tbody = $("#matTable");
   const row = tbody.insertRow(-1);
   const opts = '<option value="">Selecionar...</option>' + MAT_OPTIONS.map(m => `<option value="${m}" ${m===name?"selected":""}>${m}</option>`).join("");
+  const tipoSel = tipo === "reabastecimento" ? "reabastecimento" : "consumo";
   row.innerHTML = `
     <td><select class="matName" style="min-width:110px;font-size:.82rem;" onchange="onMatNameChange(this)">${opts}</select><input type="text" class="matNameCustom" placeholder="Nome do material" style="display:none;margin-top:2px;min-width:110px;font-size:.8rem;" value="${MAT_OPTIONS.includes(name) ? '' : (name||'')}"></td>
-    <td><input type="number" step="0.1" class="matCons" value="${consumo||''}" style="min-width:60px;"></td>
-    <td><input type="number" step="0.1" class="matEst" value="${estoque||''}" style="min-width:60px;"></td>
+    <td><select class="matTipo" style="min-width:70px;font-size:.8rem;"><option value="consumo" ${tipoSel==='consumo'?'selected':''}>Consumo</option><option value="reabastecimento" ${tipoSel==='reabastecimento'?'selected':''}>Reabastecimento</option></select></td>
+    <td><input type="number" step="0.1" class="matQtd" value="${qtd||''}" style="min-width:55px;"></td>
     <td><input type="checkbox" class="matNA" onchange="toggleMatNA(this)"></td>
     <td><button class="btn btn-danger btn-sm matRemove" type="button">&times;</button></td>`;
   row.querySelector(".matRemove").addEventListener("click", () => row.remove());
@@ -1698,14 +1707,14 @@ function onMatNameChange(sel) {
 
 function toggleMatNA(cb) {
   const row = cb.closest("tr");
-  const cons = row.querySelector(".matCons");
-  const est = row.querySelector(".matEst");
+  const tipo = row.querySelector(".matTipo");
+  const qtd = row.querySelector(".matQtd");
   if (cb.checked) {
-    cons.dataset.prev = cons.value; cons.value = "N/A"; cons.disabled = true;
-    est.dataset.prev = est.value; est.value = "N/A"; est.disabled = true;
+    tipo.dataset.prev = tipo.value; tipo.value = "consumo"; tipo.disabled = true;
+    qtd.dataset.prev = qtd.value; qtd.value = "N/A"; qtd.disabled = true;
   } else {
-    cons.value = cons.dataset.prev || ""; cons.disabled = false;
-    est.value = est.dataset.prev || ""; est.disabled = false;
+    tipo.value = tipo.dataset.prev || "consumo"; tipo.disabled = false;
+    qtd.value = qtd.dataset.prev || ""; qtd.disabled = false;
   }
 }
 
@@ -1718,11 +1727,10 @@ function collectMaterials() {
     let name = sel?.value || "";
     if (name === "Outro") name = custom?.value || "";
     if (!name) continue;
-    const cons = row.querySelector(".matCons")?.value;
-    const est = row.querySelector(".matEst")?.value;
-    // Skip if both are N/A or both are empty (pre-filled rows with no data)
-    if ((cons === "N/A" || cons === "") && (est === "N/A" || est === "")) continue;
-    items.push({ name, consumo: (cons === "N/A" || cons === "") ? null : (parseFloat(cons)||null), estoque: (est === "N/A" || est === "") ? null : (parseFloat(est)||null) });
+    const qtd = row.querySelector(".matQtd")?.value;
+    if (qtd === "N/A" || qtd === "") continue;
+    const tipo = row.querySelector(".matTipo")?.value || "consumo";
+    items.push({ name, tipo, qtd: parseFloat(qtd) || null });
   }
   return items.length > 0 ? items : null;
 }
