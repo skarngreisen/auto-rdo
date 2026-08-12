@@ -51,7 +51,7 @@
 <nav id="formTabs" style="display:none;gap:.2rem;flex-wrap:wrap;">
 <button class="form-tab active" data-tab="tabEquipe">Equipe &amp; Geral</button>
 <button class="form-tab" data-tab="tabPerfuração">Perfuração</button>
-<button class="form-tab" data-tab="tabRevestimento">Revestimento</button>
+<button class="form-tab" data-tab="tabRevestimento">Completação</button>
 <button class="form-tab" data-tab="tabFluidos">Insumos</button>
 <button class="form-tab" data-tab="tabAtividades">Atividades</button>
 </nav>
@@ -232,6 +232,7 @@
 <!-- tabRevestimento -->
 <!-- tabFluidos -->
 </div><div class="formTabContent" id="tabRevestimento">
+<!-- Revestimento -->
 <div class="card">
 <div class="card-header">Revestimento</div>
 <p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve descida de revestimento hoje?</p>
@@ -244,6 +245,58 @@
 <div><label for="casingMeters">Metros descidos</label><input id="casingMeters" step="0.01" type="number"/></div>
 </div>
 <div><label for="casingObs">Ocorrências</label><textarea id="casingObs" placeholder="Ex.: Rosca do 3º tubo fora de spec, substituido por reserva" rows="2"></textarea></div>
+</div>
+</div>
+<!-- Pre-filtro -->
+<div class="card">
+<div class="card-header">Pré-filtro</div>
+<p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve descida de pré-filtro hoje?</p>
+<div class="toggle-group" id="togglePreFiltro">
+<button class="toggle-btn" data-value="yes" type="button">Sim</button>
+<button class="toggle-btn active-no" data-value="no" type="button">Não</button>
+</div>
+<div class="conditional" id="sectionPreFiltro">
+<div class="row">
+<div><label for="preFiltroMeters">Metros descidos</label><input id="preFiltroMeters" step="0.01" type="number"/></div>
+<div><label for="preFiltroBags">Sacos (bags)</label><input id="preFiltroBags" step="1" type="number"/></div>
+</div>
+<div><label for="preFiltroPressao">Pressão de chegada</label><input id="preFiltroPressao" step="0.01" type="number"/></div>
+<div><label for="preFiltroObs">Observações</label><textarea id="preFiltroObs" rows="2"></textarea></div>
+</div>
+</div>
+<!-- Limpeza e desenvolvimento -->
+<div class="card">
+<div class="card-header">Limpeza e Desenvolvimento</div>
+<p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve limpeza e desenvolvimento do poço hoje?</p>
+<div class="toggle-group" id="toggleDesenvolvimento">
+<button class="toggle-btn" data-value="yes" type="button">Sim</button>
+<button class="toggle-btn active-no" data-value="no" type="button">Não</button>
+</div>
+<div class="conditional" id="sectionDesenvolvimento">
+<div class="row">
+<div><label for="compressorModelo">Compressor (modelo)</label><input id="compressorModelo" type="text"/></div>
+<div><label for="compressorPressaoMax">Pressão máxima</label><input id="compressorPressaoMax" step="0.01" type="number"/></div>
+</div>
+<div><label for="compressorHorimetro">Horímetro do compressor ao final do dia</label><input id="compressorHorimetro" step="1" type="number"/></div>
+<table class="ops-table" id="compressorTable">
+<tr><th>Hora</th><th>Prof. arranque (m)</th><th>Pressão arranque</th><th>Pressão trabalho</th><th></th></tr>
+</table>
+<button class="btn btn-secondary btn-sm" id="btnAddCompressor" style="margin-top:.3rem;" type="button">+ Adicionar profundidade</button>
+</div>
+</div>
+<!-- Jateamento -->
+<div class="card">
+<div class="card-header">Jateamento</div>
+<p style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Houve jateamento hoje?</p>
+<div class="toggle-group" id="toggleJateamento">
+<button class="toggle-btn" data-value="yes" type="button">Sim</button>
+<button class="toggle-btn active-no" data-value="no" type="button">Não</button>
+</div>
+<div class="conditional" id="sectionJateamento">
+<table class="ops-table" id="jateamentoTable">
+<tr><th>Início</th><th>Término</th><th>Início seção (m)</th><th>Fim seção (m)</th><th>Obs</th><th></th></tr>
+</table>
+<button class="btn btn-secondary btn-sm" id="btnAddJateamento" style="margin-top:.3rem;" type="button">+ Adicionar jateamento</button>
 </div>
 </div>
 </div><div class="formTabContent" id="tabFluidos">
