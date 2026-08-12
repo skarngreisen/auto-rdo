@@ -803,9 +803,7 @@ async function viewRDO(rdo) {
   let preFiltroHTML = row("Houve descida?", yn(rdo.pre_filtro_mudou));
   if (rdo.pre_filtro_mudou && rdo.pre_filtro) {
     const pf = rdo.pre_filtro;
-    if (pf.metros != null) preFiltroHTML += row("Metros", pf.metros + " m");
-    if (pf.bags != null) preFiltroHTML += row("Sacos (bags)", pf.bags);
-    if (pf.pressao != null) preFiltroHTML += row("Pressão de chegada", pf.pressao);
+    if (pf.bags != null) preFiltroHTML += row("Bags (aumento de pressão)", pf.bags);
     if (pf.obs) preFiltroHTML += row("Observação", pf.obs);
   } else {
     preFiltroHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Não houve descida de pré-filtro neste dia.</div>`;
@@ -817,7 +815,8 @@ async function viewRDO(rdo) {
     const d = rdo.desenvolvimento;
     if (d.modelo) desenvHTML += row("Compressor", d.modelo);
     if (d.pressao_max != null) desenvHTML += row("Pressão máx.", d.pressao_max);
-    if (d.horimetro != null) desenvHTML += row("Horímetro", d.horimetro + " h");
+    if (d.horimetro_inicio != null) desenvHTML += row("Horímetro início", d.horimetro_inicio + " h");
+    if (d.horimetro_fim != null) desenvHTML += row("Horímetro fim", d.horimetro_fim + " h");
     if (d.uso && d.uso.length > 0) {
       desenvHTML += `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Uso do compressor</div><table class="ops-table"><tr><th>Hora</th><th>Prof. arr. (m)</th><th>P. arr.</th><th>P. trab.</th></tr>
         ${d.uso.map(u => `<tr><td>${u.hora||'-'}</td><td>${u.prof_arranque != null ? u.prof_arranque : '-'}</td><td>${u.pressao_arranque != null ? u.pressao_arranque : '-'}</td><td>${u.pressao_trabalho != null ? u.pressao_trabalho : '-'}</td></tr>`).join('')}</table></div>`;
@@ -1093,9 +1092,7 @@ function populateForm(rdo) {
   // Pré-filtro
   if (rdo.pre_filtro_mudou && rdo.pre_filtro) {
     setToggle("#togglePreFiltro", true);
-    $("#preFiltroMeters").value = rdo.pre_filtro.metros || "";
     $("#preFiltroBags").value = rdo.pre_filtro.bags || "";
-    $("#preFiltroPressao").value = rdo.pre_filtro.pressao || "";
     $("#preFiltroObs").value = rdo.pre_filtro.obs || "";
   } else {
     setToggle("#togglePreFiltro", false);
@@ -1106,7 +1103,8 @@ function populateForm(rdo) {
     const d = rdo.desenvolvimento;
     $("#compressorModelo").value = d.modelo || "";
     $("#compressorPressaoMax").value = d.pressao_max || "";
-    $("#compressorHorimetro").value = d.horimetro || "";
+    $("#compressorHorimetroInicio").value = d.horimetro_inicio || "";
+    $("#compressorHorimetroFim").value = d.horimetro_fim || "";
     clearTable("#compressorTable");
     if (d.uso && Array.isArray(d.uso)) {
       d.uso.forEach(u => addCompressorRow(u.hora, u.prof_arranque, u.pressao_arranque, u.pressao_trabalho));
@@ -1829,12 +1827,10 @@ function collectOilChange() {
 // ── Pré-filtro ──────────────────────────────────────────────
 function collectPreFiltro() {
   if (!getToggleState("#togglePreFiltro")) return null;
-  const metros = parseFloat($("#preFiltroMeters").value) || null;
-  const bags = parseInt($("#preFiltroBags").value) || null;
-  const pressao = parseFloat($("#preFiltroPressao").value) || null;
+  const bags = parseFloat($("#preFiltroBags").value) || null;
   const obs = $("#preFiltroObs").value.trim() || null;
-  if (metros == null && bags == null && pressao == null && !obs) return null;
-  return { metros, bags, pressao, obs };
+  if (bags == null && !obs) return null;
+  return { bags, obs };
 }
 
 // ── Limpeza e Desenvolvimento (compressor) ──────────────────
@@ -1874,10 +1870,11 @@ function collectDesenvolvimento() {
   if (!getToggleState("#toggleDesenvolvimento")) return null;
   const modelo = $("#compressorModelo").value.trim() || null;
   const pressao_max = parseFloat($("#compressorPressaoMax").value) || null;
-  const horimetro = parseInt($("#compressorHorimetro").value) || null;
+  const horimetro_inicio = parseInt($("#compressorHorimetroInicio").value) || null;
+  const horimetro_fim = parseInt($("#compressorHorimetroFim").value) || null;
   const uso = collectCompressorUso();
-  if (!modelo && !pressao_max && !horimetro && !uso) return null;
-  return { modelo, pressao_max, horimetro, uso };
+  if (!modelo && !pressao_max && !horimetro_inicio && !horimetro_fim && !uso) return null;
+  return { modelo, pressao_max, horimetro_inicio, horimetro_fim, uso };
 }
 
 // ── Jateamento ──────────────────────────────────────────────
