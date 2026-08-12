@@ -799,6 +799,42 @@ async function viewRDO(rdo) {
     revestHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Não houve descida de revestimento neste dia.</div>`;
   }
 
+  // Pré-filtro
+  let preFiltroHTML = row("Houve descida?", yn(rdo.pre_filtro_mudou));
+  if (rdo.pre_filtro_mudou && rdo.pre_filtro) {
+    const pf = rdo.pre_filtro;
+    if (pf.metros != null) preFiltroHTML += row("Metros", pf.metros + " m");
+    if (pf.bags != null) preFiltroHTML += row("Sacos (bags)", pf.bags);
+    if (pf.pressao != null) preFiltroHTML += row("Pressão de chegada", pf.pressao);
+    if (pf.obs) preFiltroHTML += row("Observação", pf.obs);
+  } else {
+    preFiltroHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Não houve descida de pré-filtro neste dia.</div>`;
+  }
+
+  // Limpeza e desenvolvimento
+  let desenvHTML = row("Houve limpeza?", yn(rdo.desenvolvimento_mudou));
+  if (rdo.desenvolvimento_mudou && rdo.desenvolvimento) {
+    const d = rdo.desenvolvimento;
+    if (d.modelo) desenvHTML += row("Compressor", d.modelo);
+    if (d.pressao_max != null) desenvHTML += row("Pressão máx.", d.pressao_max);
+    if (d.horimetro != null) desenvHTML += row("Horímetro", d.horimetro + " h");
+    if (d.uso && d.uso.length > 0) {
+      desenvHTML += `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Uso do compressor</div><table class="ops-table"><tr><th>Hora</th><th>Prof. arr. (m)</th><th>P. arr.</th><th>P. trab.</th></tr>
+        ${d.uso.map(u => `<tr><td>${u.hora||'-'}</td><td>${u.prof_arranque != null ? u.prof_arranque : '-'}</td><td>${u.pressao_arranque != null ? u.pressao_arranque : '-'}</td><td>${u.pressao_trabalho != null ? u.pressao_trabalho : '-'}</td></tr>`).join('')}</table></div>`;
+    }
+  } else {
+    desenvHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Não houve limpeza e desenvolvimento neste dia.</div>`;
+  }
+
+  // Jateamento
+  let jateamentoHTML = row("Houve jateamento?", yn(rdo.jateamento_mudou));
+  if (rdo.jateamento_mudou && rdo.jateamento && rdo.jateamento.length > 0) {
+    jateamentoHTML += `<table class="ops-table" style="margin-top:.3rem;"><tr><th>Início</th><th>Término</th><th>Seção ini. (m)</th><th>Seção fim (m)</th><th>Obs</th></tr>
+      ${rdo.jateamento.map(j => `<tr><td>${j.inicio||'-'}</td><td>${j.termino||'-'}</td><td>${j.secao_inicio != null ? j.secao_inicio : '-'}</td><td>${j.secao_fim != null ? j.secao_fim : '-'}</td><td>${j.obs||''}</td></tr>`).join('')}</table>`;
+  } else {
+    jateamentoHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Não houve jateamento neste dia.</div>`;
+  }
+
   // Fluido
   let fluidoHTML = empty("Nenhum parametro de fluido preenchido.");
   if (rdo.fluido) {
@@ -891,6 +927,9 @@ async function viewRDO(rdo) {
     )}
 
     ${section("Revestimento", revestHTML)}
+    ${section("Pré-filtro", preFiltroHTML)}
+    ${section("Limpeza e Desenvolvimento", desenvHTML)}
+    ${section("Jateamento", jateamentoHTML)}
     ${section("Fluido", fluidoHTML)}
     ${section("Quimicos", quimicosHTML)}
     ${section("Combustivel", fuelHTML)}
@@ -1051,6 +1090,40 @@ function populateForm(rdo) {
   } else {
     setToggle("#toggleCasing", false);
   }
+  // Pré-filtro
+  if (rdo.pre_filtro_mudou && rdo.pre_filtro) {
+    setToggle("#togglePreFiltro", true);
+    $("#preFiltroMeters").value = rdo.pre_filtro.metros || "";
+    $("#preFiltroBags").value = rdo.pre_filtro.bags || "";
+    $("#preFiltroPressao").value = rdo.pre_filtro.pressao || "";
+    $("#preFiltroObs").value = rdo.pre_filtro.obs || "";
+  } else {
+    setToggle("#togglePreFiltro", false);
+  }
+  // Limpeza e desenvolvimento
+  if (rdo.desenvolvimento_mudou && rdo.desenvolvimento) {
+    setToggle("#toggleDesenvolvimento", true);
+    const d = rdo.desenvolvimento;
+    $("#compressorModelo").value = d.modelo || "";
+    $("#compressorPressaoMax").value = d.pressao_max || "";
+    $("#compressorHorimetro").value = d.horimetro || "";
+    clearTable("#compressorTable");
+    if (d.uso && Array.isArray(d.uso)) {
+      d.uso.forEach(u => addCompressorRow(u.hora, u.prof_arranque, u.pressao_arranque, u.pressao_trabalho));
+    } else {
+      addCompressorRow("","","","");
+    }
+  } else {
+    setToggle("#toggleDesenvolvimento", false);
+  }
+  // Jateamento
+  if (rdo.jateamento_mudou && rdo.jateamento && Array.isArray(rdo.jateamento)) {
+    setToggle("#toggleJateamento", true);
+    clearTable("#jateamentoTable");
+    rdo.jateamento.forEach(j => addJateamentoRow(j.inicio, j.termino, j.secao_inicio, j.secao_fim, j.obs));
+  } else {
+    setToggle("#toggleJateamento", false);
+  }
   // Outros Materiais (toggle)
   if (rdo.outros_materiais && Array.isArray(rdo.outros_materiais) && rdo.outros_materiais.length > 0) {
     setToggle("#toggleMateriais", true);
@@ -1165,6 +1238,9 @@ setupToggle("#toggleFluid", "#sectionFluid");
 setupToggle("#toggleMateriais", "#sectionMateriais");
 setupToggle("#toggleStratigraphy", "#sectionStratigraphy");
 setupToggle("#toggleCasing", "#sectionCasing");
+setupToggle("#togglePreFiltro", "#sectionPreFiltro");
+setupToggle("#toggleDesenvolvimento", "#sectionDesenvolvimento");
+setupToggle("#toggleJateamento", "#sectionJateamento");
 setupToggle("#toggleAnomaly", "#sectionAnomaly");
 setupToggle("#toggleOilChange", "#sectionOilChange");
 
@@ -1749,6 +1825,97 @@ function collectOilChange() {
   if (!tipo && !litros && !horimetro) return null;
   return { tipo, litros, horimetro, filtro_trocado: filtro };
 }
+
+// ── Pré-filtro ──────────────────────────────────────────────
+function collectPreFiltro() {
+  if (!getToggleState("#togglePreFiltro")) return null;
+  const metros = parseFloat($("#preFiltroMeters").value) || null;
+  const bags = parseInt($("#preFiltroBags").value) || null;
+  const pressao = parseFloat($("#preFiltroPressao").value) || null;
+  const obs = $("#preFiltroObs").value.trim() || null;
+  if (metros == null && bags == null && pressao == null && !obs) return null;
+  return { metros, bags, pressao, obs };
+}
+
+// ── Limpeza e Desenvolvimento (compressor) ──────────────────
+function addCompressorRow(hora, profArranque, pressaoArranque, pressaoTrabalho) {
+  const tbody = $("#compressorTable");
+  const row = tbody.insertRow(-1);
+  row.innerHTML = `
+    <td><input type="time" value="${hora || ''}" class="compHora" style="min-width:72px;width:72px;"></td>
+    <td><input type="number" step="0.01" value="${profArranque || ''}" class="compProf" style="min-width:60px;width:70px;"></td>
+    <td><input type="number" step="0.01" value="${pressaoArranque || ''}" class="compPressaoArr" style="min-width:55px;width:65px;"></td>
+    <td><input type="number" step="0.01" value="${pressaoTrabalho || ''}" class="compPressaoTrab" style="min-width:55px;width:65px;"></td>
+    <td><button class="btn btn-danger btn-sm compRemove" type="button">&times;</button></td>`;
+  row.querySelector(".compRemove").addEventListener("click", () => row.remove());
+}
+$("#btnAddCompressor").addEventListener("click", () => addCompressorRow("","","",""));
+
+function collectCompressorUso() {
+  const items = [];
+  for (let i = 1; i < $("#compressorTable").rows.length; i++) {
+    const row = $("#compressorTable").rows[i];
+    const hora = row.querySelector(".compHora")?.value || "";
+    const prof = row.querySelector(".compProf")?.value || "";
+    const pArr = row.querySelector(".compPressaoArr")?.value || "";
+    const pTrab = row.querySelector(".compPressaoTrab")?.value || "";
+    if (!hora && !prof && !pArr && !pTrab) continue;
+    items.push({
+      hora: hora || null,
+      prof_arranque: parseFloat(prof) || null,
+      pressao_arranque: parseFloat(pArr) || null,
+      pressao_trabalho: parseFloat(pTrab) || null,
+    });
+  }
+  return items.length > 0 ? items : null;
+}
+
+function collectDesenvolvimento() {
+  if (!getToggleState("#toggleDesenvolvimento")) return null;
+  const modelo = $("#compressorModelo").value.trim() || null;
+  const pressao_max = parseFloat($("#compressorPressaoMax").value) || null;
+  const horimetro = parseInt($("#compressorHorimetro").value) || null;
+  const uso = collectCompressorUso();
+  if (!modelo && !pressao_max && !horimetro && !uso) return null;
+  return { modelo, pressao_max, horimetro, uso };
+}
+
+// ── Jateamento ──────────────────────────────────────────────
+function addJateamentoRow(inicio, termino, secaoInicio, secaoFim, obs) {
+  const tbody = $("#jateamentoTable");
+  const row = tbody.insertRow(-1);
+  row.innerHTML = `
+    <td><input type="time" value="${inicio || ''}" class="jatInicio" style="min-width:72px;width:72px;"></td>
+    <td><input type="time" value="${termino || ''}" class="jatTermino" style="min-width:72px;width:72px;"></td>
+    <td><input type="number" step="0.01" value="${secaoInicio || ''}" class="jatSecIni" style="min-width:60px;width:70px;"></td>
+    <td><input type="number" step="0.01" value="${secaoFim || ''}" class="jatSecFim" style="min-width:60px;width:70px;"></td>
+    <td><input type="text" value="${obs || ''}" class="jatObs" placeholder="Obs" style="min-width:90px;"></td>
+    <td><button class="btn btn-danger btn-sm jatRemove" type="button">&times;</button></td>`;
+  row.querySelector(".jatRemove").addEventListener("click", () => row.remove());
+}
+$("#btnAddJateamento").addEventListener("click", () => addJateamentoRow("","","","",""));
+
+function collectJateamento() {
+  if (!getToggleState("#toggleJateamento")) return null;
+  const items = [];
+  for (let i = 1; i < $("#jateamentoTable").rows.length; i++) {
+    const row = $("#jateamentoTable").rows[i];
+    const inicio = row.querySelector(".jatInicio")?.value || "";
+    const termino = row.querySelector(".jatTermino")?.value || "";
+    const secIni = row.querySelector(".jatSecIni")?.value || "";
+    const secFim = row.querySelector(".jatSecFim")?.value || "";
+    const obs = row.querySelector(".jatObs")?.value || "";
+    if (!inicio && !termino && !secIni && !secFim && !obs) continue;
+    items.push({
+      inicio: inicio || null,
+      termino: termino || null,
+      secao_inicio: parseFloat(secIni) || null,
+      secao_fim: parseFloat(secFim) || null,
+      obs: obs || null,
+    });
+  }
+  return items.length > 0 ? items : null;
+}
 // ── Combustivel (dynamic) ───────────────────────────────────
 const FUEL_EQUIP = ["Gerador","Compressor","Sonda","Bomba","Outro"];
 const FUEL_TYPES = ["S10","S500"];
@@ -1858,6 +2025,21 @@ function buildPayload(status) {
     p.revestimento_metros = parseFloat($("#casingMeters").value) || null;
     p.revestimento_obs = $("#casingObs").value || null;
   }
+  // Pré-filtro
+  p.pre_filtro_mudou = getToggleState("#togglePreFiltro");
+  if (p.pre_filtro_mudou) {
+    p.pre_filtro = collectPreFiltro();
+  }
+  // Limpeza e desenvolvimento
+  p.desenvolvimento_mudou = getToggleState("#toggleDesenvolvimento");
+  if (p.desenvolvimento_mudou) {
+    p.desenvolvimento = collectDesenvolvimento();
+  }
+  // Jateamento
+  p.jateamento_mudou = getToggleState("#toggleJateamento");
+  if (p.jateamento_mudou) {
+    p.jateamento = collectJateamento();
+  }
   const materiaisOn = getToggleState("#toggleMateriais");
   if (materiaisOn) {
     p.outros_materiais = collectMaterials();
@@ -1946,6 +2128,9 @@ function resetForm() {
   setToggle("#toggleMateriais", false);
   setToggle("#toggleStratigraphy", false);
   setToggle("#toggleCasing", false);
+  setToggle("#togglePreFiltro", false);
+  setToggle("#toggleDesenvolvimento", false);
+  setToggle("#toggleJateamento", false);
   setToggle("#toggleAnomaly", false);
   setToggle("#toggleOilChange", false);
   $$("input[type='text'], input[type='number'], textarea").forEach(el => {
@@ -1963,6 +2148,8 @@ function resetForm() {
   $("#fuelS10Stock").value = ""; $("#fuelS500Stock").value = "";
   $("#fuelTotals").style.display = "block";
   clearTable("#bhaTable"); addBHARow("","","","","","");
+  clearTable("#compressorTable"); addCompressorRow("","","","");
+  clearTable("#jateamentoTable"); addJateamentoRow("","","","","");
   clearTable("#teamTable"); DEFAULT_ROLES.forEach(r => addTeamMemberRow(r,""));
   selectedFiles = [];
   $("#photoInput").value = "";
