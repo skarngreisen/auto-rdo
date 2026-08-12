@@ -256,11 +256,7 @@
 <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
 </div>
 <div class="conditional" id="sectionPreFiltro">
-<div class="row">
-<div><label for="preFiltroMeters">Metros descidos</label><input id="preFiltroMeters" step="0.01" type="number"/></div>
-<div><label for="preFiltroBags">Sacos (bags)</label><input id="preFiltroBags" step="1" type="number"/></div>
-</div>
-<div><label for="preFiltroPressao">Pressão de chegada</label><input id="preFiltroPressao" step="0.01" type="number"/></div>
+<div><label for="preFiltroBags">Com quantos bags foi notado aumento de pressão na linha de fluido?</label><input id="preFiltroBags" step="0.1" type="number"/></div>
 <div><label for="preFiltroObs">Observações</label><textarea id="preFiltroObs" rows="2"></textarea></div>
 </div>
 </div>
@@ -277,7 +273,10 @@
 <div><label for="compressorModelo">Compressor (modelo)</label><input id="compressorModelo" type="text"/></div>
 <div><label for="compressorPressaoMax">Pressão máxima</label><input id="compressorPressaoMax" step="0.01" type="number"/></div>
 </div>
-<div><label for="compressorHorimetro">Horímetro do compressor ao final do dia</label><input id="compressorHorimetro" step="1" type="number"/></div>
+<div class="row">
+<div><label for="compressorHorimetroInicio">Horímetro início do turno</label><input id="compressorHorimetroInicio" step="1" type="number"/></div>
+<div><label for="compressorHorimetroFim">Horímetro final do turno</label><input id="compressorHorimetroFim" step="1" type="number"/></div>
+</div>
 <table class="ops-table" id="compressorTable">
 <tr><th>Hora</th><th>Prof. arranque (m)</th><th>Pressão arranque</th><th>Pressão trabalho</th><th></th></tr>
 </table>
