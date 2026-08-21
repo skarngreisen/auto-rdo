@@ -70,6 +70,10 @@ async function doLogout() {
   $("#userMenu").style.display = "none";
 }
 
+function goToAdmin() {
+  window.location.href = "admin.html";
+}
+
 async function loadProfile() {
   const { data } = await sb.from("profiles").select("*").eq("user_id", currentUser.id).maybeSingle();
   currentProfile = data;
@@ -81,6 +85,8 @@ async function loadProfile() {
   // Update header user info
   $("#headerUserName").textContent = currentProfile.name || currentUser.email;
   $("#userMenuPhone").textContent = currentUser.email;
+  const isPrivileged = currentProfile.role === "admin" || currentProfile.role === "supervisor";
+  $("#btnAdmin").style.display = isPrivileged ? "block" : "none";
   showView("splashView");
   splashTimer = setTimeout(() => {
     showView("homeView");
