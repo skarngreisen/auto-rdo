@@ -204,6 +204,34 @@ input.inherited, textarea.inherited {
 .ops-table input { font-size: .82rem; padding: .4rem .45rem; }
 
 /* ============================================================
+   STRIPLOG CARDS
+   ============================================================ */
+.striplog-list { display: flex; flex-direction: column; gap: .5rem; margin-top: .4rem; }
+.striplog-card {
+  display: flex; align-items: stretch; gap: .4rem;
+  background: #fff; border: 1px solid #e5e7eb; border-left: 4px solid #e5e7eb;
+  border-radius: 8px; padding: .55rem;
+}
+.sl-body { flex: 1; display: flex; flex-direction: column; gap: .4rem; min-width: 0; }
+.sl-row { display: flex; gap: .5rem; align-items: flex-end; }
+.sl-field { flex: 1; min-width: 0; }
+.sl-field-obs { flex: 2; }
+.sl-label { display: block; font-size: .66rem; font-weight: 600; color: #6b7280; margin: 0 0 .15rem; }
+.sl-field input { width: 100%; font-size: .85rem; padding: .4rem .5rem; }
+.sl-stat { flex: 0 0 auto; display: flex; flex-direction: column; justify-content: flex-end; min-width: 3rem; text-align: center; }
+.sl-stat .sl-label { text-align: center; }
+.sl-stat-value { font-size: .8rem; font-weight: 700; color: #374151; line-height: 1.9; }
+.sl-type { align-self: center; font-size: .7rem; font-weight: 700; white-space: nowrap; }
+.sl-locked { color: #9ca3af; font-size: .85rem; line-height: 2.2; }
+.sl-remove {
+  flex: 0 0 auto; align-self: flex-start;
+  width: 26px; height: 26px; padding: 0;
+  border: none; background: #fee2e2; color: #991b1b; border-radius: 6px;
+  font-size: 1.05rem; line-height: 1; cursor: pointer;
+}
+.sl-remove:hover { background: #fecaca; }
+
+/* ============================================================
    TIMELINE
    ============================================================ */
 .timeline-bar { position: relative; }

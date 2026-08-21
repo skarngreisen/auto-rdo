@@ -1212,8 +1212,13 @@ function setToggle(groupId, show) {
 }
 
 function clearTable(tableId) {
-  const tbody = $(tableId);
-  while (tbody.rows.length > 1) tbody.deleteRow(1);
+  const el = $(tableId);
+  if (!el) return;
+  if (el.rows) {
+    while (el.rows.length > 1) el.deleteRow(1);
+  } else {
+    el.innerHTML = "";
+  }
 }
 function hasOpsRows() { return $("#opsTable").rows.length > 1; }
 function hasColunaRows() { return $("#bhaTable").rows.length > 1; }
@@ -1337,7 +1342,6 @@ function onBHAItemChange(sel) {
 
 // ── Striplog ─────────────────────────────────────────────────
 function addStriplogRow(mode, depth, inicio, termino, obs) {
-  const tbody = $("#striplogTable");
   const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   const prevDepth = getLastStriplogDepth();
   const prevTermino = getLastStriplogTermino();
@@ -1361,78 +1365,113 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
 
   const depthStep = mode === "meter" ? "0.01" : "0.1";
   const borderColors = { start: "#10b981", meter: "#3b82f6", stop: "#ef4444" };
-  const row = tbody.insertRow(-1);
-  row.setAttribute("data-mode", mode);
-  row.style.borderLeft = "3px solid " + (borderColors[mode] || "#e5e7eb");
-  const terminoCell = mode === "start"
-    ? '<span style="color:#9ca3af;font-size:.82rem;">—</span>'
-    : `<input type="time" value="${ter}" class="slTermino" style="min-width:72px;width:72px;">`;
-  row.innerHTML = `
-    <td><input type="number" step="${depthStep}" value="${d}" class="slDepth" style="min-width:52px;width:52px;"></td>
-    <td><input type="time" value="${ini}" class="slInicio" style="min-width:72px;width:72px;" ${mode === "meter" ? "readonly" : ""}></td>
-    <td>${terminoCell}</td>
-    <td class="slROP" style="font-size:.75rem;text-align:center;">—</td>
-    <td class="slDelta" style="font-size:.75rem;text-align:center;">—</td>
-    <td><input type="text" value="${obs || ''}" class="slObs" placeholder="${mode === 'stop' ? 'Motivo da parada (obrigatório)' : 'Ex.: parada para manutencao'}" ${mode === "stop" ? "required" : ""}></td>
-    <td style="font-size:.7rem;text-align:center;"><span style="color:${borderColors[mode]};margin-right:3px;">●</span>${{start:"Início",meter:"Metro",stop:"Parada"}[mode]}</td>
-    <td><button class="btn btn-danger btn-sm slRemove" type="button">&times;</button></td>`;
-  row.querySelector(".slRemove").addEventListener("click", () => { row.remove(); updateStriplogROP(); });
-  row.querySelectorAll("input").forEach(el => el.addEventListener("input", updateStriplogROP));
+  const borderColor = borderColors[mode] || "#e5e7eb";
+  const modeLabel = { start: "Início", meter: "Metro", stop: "Parada" }[mode] || "Metro";
+  const terminoField = mode === "start"
+    ? '<span class="sl-locked">—</span>'
+    : `<input type="time" value="${ter}" class="slTermino">`;
+
+  const card = document.createElement("div");
+  card.className = "striplog-card";
+  card.setAttribute("data-mode", mode);
+  card.style.borderLeftColor = borderColor;
+  card.innerHTML = `
+    <div class="sl-body">
+      <div class="sl-row">
+        <div class="sl-field">
+          <span class="sl-label">Início</span>
+          <input type="time" value="${ini}" class="slInicio" ${mode === "meter" ? "readonly" : ""}>
+        </div>
+        <div class="sl-field">
+          <span class="sl-label">Término</span>
+          ${terminoField}
+        </div>
+        <div class="sl-field">
+          <span class="sl-label">Prof. (m)</span>
+          <input type="number" step="${depthStep}" value="${d}" class="slDepth">
+        </div>
+      </div>
+      <div class="sl-row">
+        <div class="sl-stat">
+          <span class="sl-label">ROP</span>
+          <span class="sl-stat-value slROP">—</span>
+        </div>
+        <div class="sl-stat">
+          <span class="sl-label">Δ</span>
+          <span class="sl-stat-value slDelta">—</span>
+        </div>
+        <div class="sl-field sl-field-obs">
+          <span class="sl-label">Observação</span>
+          <input type="text" value="${obs || ''}" class="slObs" placeholder="${mode === 'stop' ? 'Motivo da parada (obrigatório)' : 'Ex.: parada para manutencao'}" ${mode === "stop" ? "required" : ""}>
+        </div>
+        <span class="sl-type"><span style="color:${borderColor};">●</span> ${modeLabel}</span>
+      </div>
+    </div>
+    <button class="sl-remove" type="button" title="Remover entrada">&times;</button>`;
+
+  $("#striplogTable").appendChild(card);
+  card.querySelector(".sl-remove").addEventListener("click", () => { card.remove(); updateStriplogROP(); });
+  card.querySelectorAll("input").forEach(el => el.addEventListener("input", updateStriplogROP));
   updateStriplogROP();
 }
 
+function getStriplogCards() {
+  return Array.from($("#striplogTable").querySelectorAll(".striplog-card"));
+}
+
 function getLastStriplogDepth() {
-  const rows = $("#striplogTable").rows;
-  if (rows.length <= 1) return 0;
-  const lastInput = rows[rows.length - 1].querySelector(".slDepth");
+  const cards = getStriplogCards();
+  if (cards.length === 0) return 0;
+  const lastInput = cards[cards.length - 1].querySelector(".slDepth");
   return parseFloat(lastInput?.value) || 0;
 }
 
 function getLastStriplogTermino() {
-  const rows = $("#striplogTable").rows;
-  if (rows.length <= 1) return "";
-  return rows[rows.length - 1].querySelector(".slTermino")?.value || "";
+  const cards = getStriplogCards();
+  if (cards.length === 0) return "";
+  return cards[cards.length - 1].querySelector(".slTermino")?.value || "";
 }
 
 function getLastStriplogInicio() {
-  const rows = $("#striplogTable").rows;
-  if (rows.length <= 1) return "";
-  return rows[rows.length - 1].querySelector(".slInicio")?.value || "";
+  const cards = getStriplogCards();
+  if (cards.length === 0) return "";
+  return cards[cards.length - 1].querySelector(".slInicio")?.value || "";
 }
 
 function updateStriplogROP() {
-  const rows = $("#striplogTable").rows;
-  if (rows.length <= 1) { $("#striplogROP").textContent = ""; return; }
+  const cards = getStriplogCards();
+  if (cards.length === 0) { $("#striplogROP").textContent = ""; return; }
 
-  // Compute ROP per row: parada rows use previous meter's depth delta + parada inicio
+  // Compute ROP per card: parada cards use previous meter's depth delta + parada inicio
   const rops = [];
-  for (let i = 1; i < rows.length; i++) {
-    const mode = rows[i].getAttribute("data-mode");
-    const d = parseFloat(rows[i].querySelector(".slDepth")?.value);
-    const ini = rows[i].querySelector(".slInicio")?.value;
-    const ter = rows[i].querySelector(".slTermino")?.value;
-    const prevD = i > 1 ? parseFloat(rows[i - 1].querySelector(".slDepth")?.value) : null;
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    const mode = card.getAttribute("data-mode");
+    const d = parseFloat(card.querySelector(".slDepth")?.value);
+    const ini = card.querySelector(".slInicio")?.value;
+    const ter = card.querySelector(".slTermino")?.value;
+    const prevD = i > 0 ? parseFloat(cards[i - 1].querySelector(".slDepth")?.value) : null;
 
     if (mode === "stop" && ini && prevD !== null) {
       // Parada: ROP = (current depth - prev depth) / (parada inicio - prev termino)
-      const prevTer = i > 1 ? rows[i - 1].querySelector(".slTermino")?.value : null;
+      const prevTer = i > 0 ? cards[i - 1].querySelector(".slTermino")?.value : null;
       if (prevTer) {
         const [ih, im] = ini.split(":").map(Number);
         const [ph, pm] = prevTer.split(":").map(Number);
         let dt = (ih * 60 + im) - (ph * 60 + pm);
         if (dt < 0) dt += 24 * 60;
         const dm = d - prevD;
-        if (dm > 0 && dt > 0) rops.push({ rowIndex: i, rop: (dm / (dt / 60)), dm, dt });
+        if (dm > 0 && dt > 0) rops.push({ cardIndex: i, rop: (dm / (dt / 60)), dm, dt });
       }
     } else if (ini && ter) {
-      // Normal row: ROP = own depth delta / own time
+      // Normal card: ROP = own depth delta / own time
       const [ih, im] = ini.split(":").map(Number);
       const [th, tm] = ter.split(":").map(Number);
       let dt = (th * 60 + tm) - (ih * 60 + im);
       if (dt < 0) dt += 24 * 60; // midnight crossover
       if (dt > 0 && prevD !== null) {
         const dm = d - prevD;
-        rops.push({ rowIndex: i, rop: dm > 0 ? (dm / (dt / 60)) : 0, dm, dt });
+        rops.push({ cardIndex: i, rop: dm > 0 ? (dm / (dt / 60)) : 0, dm, dt });
       }
     }
   }
@@ -1441,12 +1480,12 @@ function updateStriplogROP() {
   const validRops = rops.filter(r => r.rop > 0);
   const avgRop = validRops.length > 0 ? validRops.reduce((s, r) => s + r.rop, 0) / validRops.length : 0;
 
-  // Update each row's ROP and delta cells
-  for (let i = 1; i < rows.length; i++) {
-    const ropCell = rows[i].querySelector(".slROP");
-    const deltaCell = rows[i].querySelector(".slDelta");
+  // Update each card's ROP and delta cells
+  for (let i = 0; i < cards.length; i++) {
+    const ropCell = cards[i].querySelector(".slROP");
+    const deltaCell = cards[i].querySelector(".slDelta");
     if (!ropCell || !deltaCell) continue;
-    const r = rops.find(p => p.rowIndex === i);
+    const r = rops.find(p => p.cardIndex === i);
     if (r && r.rop > 0 && avgRop > 0) {
       ropCell.textContent = r.rop.toFixed(1);
       const pct = Math.floor(Math.abs((r.rop - avgRop) / avgRop * 100));
@@ -1459,19 +1498,20 @@ function updateStriplogROP() {
       }
     } else {
       ropCell.textContent = r ? "0.0" : "—";
-      deltaCell.textContent = r ? "—" : "—";
+      deltaCell.textContent = "—";
     }
   }
 
   // Summary line
   if (validRops.length > 0) {
-    // Summary: total depth change (all rows) / total elapsed time (excluding stops)
-    let totalDm = 0, firstIni = null, lastTer = null, totalStopDt = 0;
-    for (let i = 1; i < rows.length; i++) {
-      const mode = rows[i].getAttribute("data-mode");
-      const d = parseFloat(rows[i].querySelector(".slDepth")?.value);
-      const ini = rows[i].querySelector(".slInicio")?.value;
-      const ter = rows[i].querySelector(".slTermino")?.value;
+    // Summary: total depth change (all cards) / total elapsed time (excluding stops)
+    let totalDm = 0, firstIni = null, totalStopDt = 0;
+    for (let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      const mode = card.getAttribute("data-mode");
+      const d = parseFloat(card.querySelector(".slDepth")?.value);
+      const ini = card.querySelector(".slInicio")?.value;
+      const ter = card.querySelector(".slTermino")?.value;
       if (!isNaN(d)) totalDm = d; // track last valid depth
       if (mode === "stop" && ini && ter) {
         const [ih, im] = ini.split(":").map(Number);
@@ -1482,17 +1522,16 @@ function updateStriplogROP() {
       }
       if (ini && mode !== "stop") {
         if (!firstIni) firstIni = ini;
-        lastTer = ter || lastTer;
       }
     }
-    // Subtract first row depth to get total meters
-    const firstD = parseFloat(rows[1]?.querySelector(".slDepth")?.value) || 0;
+    // Subtract first card depth to get total meters
+    const firstD = parseFloat(cards[0]?.querySelector(".slDepth")?.value) || 0;
     totalDm = totalDm - firstD;
-    // Use FIRST row's início and LAST row's término (any mode) for elapsed time
-    const firstRowIni = rows[1]?.querySelector(".slInicio")?.value || firstIni || "";
-    const lastRowTer = rows[rows.length - 1]?.querySelector(".slTermino")?.value || "";
-    const [fh, fm] = (firstRowIni || "0:0").split(":").map(Number);
-    const [lh, lm] = (lastRowTer || "0:0").split(":").map(Number);
+    // Use FIRST card's início and LAST card's término (any mode) for elapsed time
+    const firstCardIni = cards[0]?.querySelector(".slInicio")?.value || firstIni || "";
+    const lastCardTer = cards[cards.length - 1]?.querySelector(".slTermino")?.value || "";
+    const [fh, fm] = (firstCardIni || "0:0").split(":").map(Number);
+    const [lh, lm] = (lastCardTer || "0:0").split(":").map(Number);
     let totalDt = ((lh * 60 + lm) - (fh * 60 + fm));
     if (totalDt < 0) totalDt += 24 * 60;
     totalDt -= totalStopDt;
@@ -1511,14 +1550,13 @@ $("#btnShiftStop").addEventListener("click", () => addStriplogRow("stop","","","
 
 function collectStriplog() {
   const items = [];
-  for (let i = 1; i < $("#striplogTable").rows.length; i++) {
-    const row = $("#striplogTable").rows[i];
-    const depth = parseFloat(row.querySelector(".slDepth")?.value);
-    const inicio = row.querySelector(".slInicio")?.value || "";
-    const termino = row.querySelector(".slTermino")?.value || "";
-    const obs = row.querySelector(".slObs")?.value || "";
+  for (const card of getStriplogCards()) {
+    const depth = parseFloat(card.querySelector(".slDepth")?.value);
+    const inicio = card.querySelector(".slInicio")?.value || "";
+    const termino = card.querySelector(".slTermino")?.value || "";
+    const obs = card.querySelector(".slObs")?.value || "";
     if (!isNaN(depth) && (inicio || termino)) {
-      const mode = row.getAttribute("data-mode") || "meter";
+      const mode = card.getAttribute("data-mode") || "meter";
       items.push({ profundidade: depth, inicio, termino, obs: obs || null, mode });
     }
   }
