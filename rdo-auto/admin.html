@@ -139,7 +139,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
       <div class="card-header">Resultados (<span id="rdosCount">0</span>)</div>
       <div style="overflow-x:auto;">
         <table id="rdosTable">
-          <tr><th>Data</th><th>Projeto</th><th>Tipo</th><th>Prof. (m)</th><th>Status</th><th></th></tr>
+          <tr><th>Data</th><th>Projeto</th><th>Tipo</th><th>Prof. (m)</th><th>Status</th><th>Enviado em</th><th></th></tr>
         </table>
       </div>
     </div>
@@ -537,14 +537,14 @@ async function loadRDOFilters() {
 
 async function loadRDOs() {
   const tbody = $("#rdosTable");
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Carregando...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:#9ca3af;">Carregando...</td></tr>';
   try {
   const projetoId = $("#filtroProjeto").value;
   const de = $("#filtroDe").value;
   const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
 
-  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,reopen_requested,projeto_id,version,projetos(cliente,sonda)").eq("deleted", false).order("data", { ascending: false }).limit(200);
+  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,reopen_requested,projeto_id,version,submitted_at,projetos(cliente,sonda)").eq("deleted", false).order("data", { ascending: false }).limit(200);
   if (!$("#filtroAllVersions").checked) query = query.eq("latest", true);
   if (projetoId) query = query.eq("projeto_id", projetoId);
   if (de) query = query.gte("data", de);
@@ -553,21 +553,23 @@ async function loadRDOs() {
 
   const { data, error } = await query;
   if (error || !data) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Erro ao carregar.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:#9ca3af;">Erro ao carregar.</td></tr>';
     return;
   }
   $("#rdosCount").textContent = data.length;
   if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum RDO encontrado.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum RDO encontrado.</td></tr>';
     return;
   }
   tbody.innerHTML = data.map(r => {
     const proj = r.projetos || {};
+    const sentAt = r.submitted_at ? new Date(r.submitted_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" }) : "-";
     return `
     <tr>
       <td>${r.data}${r.version > 1 ? ` <span style="font-size:.65rem;color:#a04000;">v${r.version}</span>` : ''}${r.reopen_requested ? ` <span style="font-size:.65rem;color:#f59e0b;">⟳</span>` : ''}</td><td>${proj.cliente || '-'} (${proj.sonda || '-'})</td><td>${r.tipo_dia || '-'}</td>
       <td>${r.profundidade_final != null ? (r.profundidade_inicial||0) + ' → ' + r.profundidade_final : '-'}</td>
       <td><span class="badge badge-${r.status}">${{rascunho:"Rascunho",em_revisao:"Em Revisão",aprovado:"Aprovado"}[r.status]||r.status}</span></td>
+      <td style="white-space:nowrap;">${sentAt}</td>
       <td class="actions">
         <button class="btn btn-secondary btn-sm" onclick="editRDO('${r.id}')">Editar</button>
         <button class="btn btn-secondary btn-sm" onclick="viewRDO('${r.id}')">Ver</button>
@@ -578,7 +580,7 @@ async function loadRDOs() {
   }).join("");
   } catch (e) {
     console.error("loadRDOs error:", e);
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#ef4444;">Erro ao carregar RDOs: ' + e.message + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:#ef4444;">Erro ao carregar RDOs: ' + e.message + '</td></tr>';
   }
 }
 
@@ -687,13 +689,24 @@ async function viewRDO(id) {
   let desenvHTML = row("Houve limpeza?", yn(r.desenvolvimento_mudou));
   if (r.desenvolvimento_mudou && r.desenvolvimento) {
     const d = r.desenvolvimento;
-    if (d.modelo) desenvHTML += row("Compressor", d.modelo);
-    if (d.pressao_max != null) desenvHTML += row("Pressão máx.", d.pressao_max);
-    if (d.horimetro_inicio != null) desenvHTML += row("Horímetro início", d.horimetro_inicio + " h");
-    if (d.horimetro_fim != null) desenvHTML += row("Horímetro fim", d.horimetro_fim + " h");
-    if (d.uso && d.uso.length > 0) {
-      desenvHTML += `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Uso do compressor</div><table class="ops-table"><tr><th>Hora</th><th>Prof. arr. (m)</th><th>P. arr.</th><th>P. trab.</th></tr>
-        ${d.uso.map(u => `<tr><td>${u.hora||'-'}</td><td>${u.prof_arranque != null ? u.prof_arranque : '-'}</td><td>${u.pressao_arranque != null ? u.pressao_arranque : '-'}</td><td>${u.pressao_trabalho != null ? u.pressao_trabalho : '-'}</td></tr>`).join('')}</table></div>`;
+    if (d.metodo === "bomba") {
+      desenvHTML += row("Método", "Bomba");
+      if (d.nome_bomba) desenvHTML += row("Bomba", d.nome_bomba);
+      if (d.potencia) desenvHTML += row("Potência", d.potencia);
+      if (d.voltagem) desenvHTML += row("Voltagem", d.voltagem);
+      if (d.horas_trabalhadas != null) desenvHTML += row("Horas trabalhadas", d.horas_trabalhadas + " h");
+      if (d.abertura_valvula) desenvHTML += row("Abertura da válvula", d.abertura_valvula === "total" ? "Total" : "Parcial");
+      if (d.profundidade_instalacao != null) desenvHTML += row("Profundidade de instalação", d.profundidade_instalacao + " m");
+      if (d.obs) desenvHTML += row("Observação", d.obs);
+    } else {
+      if (d.modelo) desenvHTML += row("Compressor", d.modelo);
+      if (d.pressao_max != null) desenvHTML += row("Pressão máx.", d.pressao_max);
+      if (d.horimetro_inicio != null) desenvHTML += row("Horímetro início", d.horimetro_inicio + " h");
+      if (d.horimetro_fim != null) desenvHTML += row("Horímetro fim", d.horimetro_fim + " h");
+      if (d.uso && d.uso.length > 0) {
+        desenvHTML += `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Uso do compressor</div><table class="ops-table"><tr><th>Hora</th><th>Prof. arr. (m)</th><th>P. arr.</th><th>P. trab.</th></tr>
+          ${d.uso.map(u => `<tr><td>${u.hora||'-'}</td><td>${u.prof_arranque != null ? u.prof_arranque : '-'}</td><td>${u.pressao_arranque != null ? u.pressao_arranque : '-'}</td><td>${u.pressao_trabalho != null ? u.pressao_trabalho : '-'}</td></tr>`).join('')}</table></div>`;
+      }
     }
   } else {
     desenvHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Não houve limpeza e desenvolvimento neste dia.</div>`;
