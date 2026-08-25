@@ -108,6 +108,32 @@ Foco: reduzir o atrito de preencher RDOs diarios.
   - Visual estilo `O------------O` onde os `O` sao os marcadores de inicio/fim e o traco tem a cor do tipo.
   - Permite ao supervisor visualizar rapidamente a proporcao de horas produtivas vs paradas no dia.
 
+### 1.8 Turno do RDO: dropdown na aba "Equipe & Geral"
+
+- Na aba **Equipe & Geral**, logo **abaixo do campo "Data do RDO"** (`#rdoDate`, card Identificação),
+  adicionar um dropdown "Turno" com as opções: **Turno 1**, **Turno 2**, **Turno 3**.
+- O dropdown é **dinâmico**: exibe apenas a quantidade de opções configurada na criação do projeto
+  (campo `turnos_por_dia` da tabela `projetos`).
+  - Projeto com 1 turno: apenas "Turno 1" (pré-selecionado, campo pode ficar apenas informativo).
+  - Projeto com 2 turnos: "Turno 1" e "Turno 2".
+  - Projeto com 3 turnos: "Turno 1", "Turno 2" e "Turno 3".
+- As opções são recalculadas quando o usuário troca o projeto no dropdown de projeto
+  (mesma lógica de recarga usada hoje pelo pré-preenchimento).
+- Dependência no admin: hoje `#modalTurnosPorDia` (`admin.html`) só oferece "1 turno (24h)" e
+  "2 turnos (12h cada)". Precisa ganhar "3 turnos (8h cada)" e o campo de supervisor do Turno 3
+  (hoje existem só `modalSupervisor1` e `modalSupervisor2`).
+- Persistência: gravar o turno escolhido no RDO (coluna `turno` inteiro em `rdos`, 1 a 3), o que
+  permite distinguir dois RDOs do mesmo projeto na mesma data.
+- Obrigatoriedade: **eventualmente obrigatório**, não agora. Durante o teste beta o campo entra como
+  opcional (sem `required`, sem asterisco, sem bloqueio no envio), para não travar o preenchimento.
+  Quando o fluxo estabilizar, passa a obrigatório junto com a virada geral descrita nas Notas.
+- Efeitos colaterais a revisar quando implementar:
+  - Pré-preenchimento: a busca de "RDO anterior" passa a considerar turno (turno anterior do mesmo dia
+    antes de cair para o dia anterior).
+  - Checagem de RDOs esperados por dia (`migration-scheduled-checks.sql` já usa `turnos_por_dia`):
+    passa a poder comparar por turno, não só por contagem.
+  - Exibição: mostrar o turno no cabeçalho do view do RDO, na lista de RDOs e no PDF exportado.
+
 ---
 
 ## Fase 2: Workflow de Aprovacao
@@ -257,11 +283,29 @@ Fase 1 (MVP+)               Fase 2 (Workflow)      Fase 3 (Notif)      Fase 4 (A
 [BHA dropdown]
 [striplog → auto ROP/depth]
 [completação: revestimento + pré-filtro + limpeza/desenvolvimento]
+[turno do RDO (dropdown 1/2/3)]
 ```
 
 ---
 
 ## Notas
+
+- **Beta: nenhum campo obrigatório (com duas exceções confirmadas).** Enquanto o teste beta com os
+  supervisores estiver rodando, nenhum campo do formulário de RDO deve bloquear o salvamento ou o
+  envio. Sem `required`, sem asterisco vermelho, sem validação que interrompa o fluxo nos demais
+  campos. O objetivo é que o supervisor consiga enviar o RDO mesmo com lacunas, e que as lacunas
+  apareçam como informação (para nós) em vez de virarem atrito (para ele). Novos campos passam a
+  obrigatórios aos poucos, conforme o Igor tiver certeza de cada um (data, turno, projeto,
+  profundidades, etc.), quando o padrão de uso real estiver conhecido.
+  - Obrigatórios confirmados (mantidos):
+    - "Data do RDO" (`#rdoDate` em `index.html`): sem data não há formulário.
+    - Observação de parada do striplog (`main.js`, modo `stop`): se criou uma parada, precisa
+      explicar o motivo.
+- **Autosave e offline**: o autosave periódico (era 30s, depois 2min) foi desativado. Hoje o único
+  salvamento de rascunho é manual, via botão "Salvar Rascunho", que grava direto no Supabase e exige
+  internet. O beta está rodando 100% online (conexão estável), então isso não é problema agora.
+  Offline-first (Fase 5) fica adiado para o live test, quando os geólogos estiverem em campo sem
+  conexão.
 
 - **Supabase Auth** sera introduzido na Fase 2 (necessario para distinguir supervisor de geologo).
 - **RLS** sera reabilitado na Fase 2 com politicas por papel.
@@ -269,7 +313,9 @@ Fase 1 (MVP+)               Fase 2 (Workflow)      Fase 3 (Notif)      Fase 4 (A
 - A transicao de `enviado` para `em_revisao` requer migracao dos dados existentes (script SQL simples).
 - **Aba Completação** (substituir Revestimento): além da descida de revestimento existente, adicionar:
   - "Houve descida de pré-filtro?" — metros, observações. Se sim: registrar pressão de chegada (pressão na linha de fluido quando o pré-filtro cobre todas as seções filtrantes, indicando completação do espaço anular) e quantos sacos (bags) foram necessários até essa pressão.
-  - "Houve limpeza e desenvolvimento do poço?" — toggle com: dados do compressor (modelo, pressão máxima), horímetro do compressor ao final do dia, tabela dinâmica de uso do compressor (hora / prof. de arranque / pressão de arranque / pressão de trabalho, botão +Adicionar profundidade)
+  - "Houve limpeza e desenvolvimento do poço?" — toggle com escolha do método de desenvolvimento (compressor ou bomba):
+    - **Compressor**: dados do compressor (modelo, pressão máxima), horímetro do compressor ao final do dia, tabela dinâmica de uso do compressor (hora / prof. de arranque / pressão de arranque / pressão de trabalho, botão +Adicionar profundidade)
+    - **Bomba**: nome da bomba, potência, voltagem, horas trabalhadas, abertura da válvula (total ou parcial), profundidade de instalação (implementado 2026-08-23)
   - "Houve jateamento?" — toggle com tabela estilo striplog: início, término, início da seção filtrante (m), fim da seção filtrante (m), observação. Botão +Adicionar jateamento.
 - **Aba Inventário + Equipamentos**: aba de consulta (read-only) do estoque atual na obra. Não controla entradas/saídas diretamente. O controle diário fica na aba Insumos: no primeiro dia do projeto, o usuário registra a chegada de todos os itens; nos dias seguintes, registra entradas e saídas. Ao fim do projeto, o inventário digital é confrontado com o físico e as discrepâncias são anotadas no RDO final. Detalhar depois.
 - **Estoque auto-calculado**: o campo Estoque foi removido do formulário. Cada linha de Químicos/Materiais agora tem Tipo (Consumo/Reabastecimento) + Qtd. O estoque será calculado automaticamente como soma de reabastecimentos - consumos, visível na aba Inventário + Equipamentos e no view do RDO.

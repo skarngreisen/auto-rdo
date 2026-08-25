@@ -819,13 +819,24 @@ async function viewRDO(rdo) {
   let desenvHTML = row("Houve limpeza?", yn(rdo.desenvolvimento_mudou));
   if (rdo.desenvolvimento_mudou && rdo.desenvolvimento) {
     const d = rdo.desenvolvimento;
-    if (d.modelo) desenvHTML += row("Compressor", d.modelo);
-    if (d.pressao_max != null) desenvHTML += row("Pressão máx.", d.pressao_max);
-    if (d.horimetro_inicio != null) desenvHTML += row("Horímetro início", d.horimetro_inicio + " h");
-    if (d.horimetro_fim != null) desenvHTML += row("Horímetro fim", d.horimetro_fim + " h");
-    if (d.uso && d.uso.length > 0) {
-      desenvHTML += `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Uso do compressor</div><table class="ops-table"><tr><th>Hora</th><th>Prof. arr. (m)</th><th>P. arr.</th><th>P. trab.</th></tr>
-        ${d.uso.map(u => `<tr><td>${u.hora||'-'}</td><td>${u.prof_arranque != null ? u.prof_arranque : '-'}</td><td>${u.pressao_arranque != null ? u.pressao_arranque : '-'}</td><td>${u.pressao_trabalho != null ? u.pressao_trabalho : '-'}</td></tr>`).join('')}</table></div>`;
+    if (d.metodo === "bomba") {
+      desenvHTML += row("Método", "Bomba");
+      if (d.nome_bomba) desenvHTML += row("Bomba", d.nome_bomba);
+      if (d.potencia) desenvHTML += row("Potência", d.potencia);
+      if (d.voltagem) desenvHTML += row("Voltagem", d.voltagem);
+      if (d.horas_trabalhadas != null) desenvHTML += row("Horas trabalhadas", d.horas_trabalhadas + " h");
+      if (d.abertura_valvula) desenvHTML += row("Abertura da válvula", d.abertura_valvula === "total" ? "Total" : "Parcial");
+      if (d.profundidade_instalacao != null) desenvHTML += row("Profundidade de instalação", d.profundidade_instalacao + " m");
+      if (d.obs) desenvHTML += row("Observação", d.obs);
+    } else {
+      if (d.modelo) desenvHTML += row("Compressor", d.modelo);
+      if (d.pressao_max != null) desenvHTML += row("Pressão máx.", d.pressao_max);
+      if (d.horimetro_inicio != null) desenvHTML += row("Horímetro início", d.horimetro_inicio + " h");
+      if (d.horimetro_fim != null) desenvHTML += row("Horímetro fim", d.horimetro_fim + " h");
+      if (d.uso && d.uso.length > 0) {
+        desenvHTML += `<div style="margin-top:.3rem;"><div style="font-size:.78rem;font-weight:600;">Uso do compressor</div><table class="ops-table"><tr><th>Hora</th><th>Prof. arr. (m)</th><th>P. arr.</th><th>P. trab.</th></tr>
+          ${d.uso.map(u => `<tr><td>${u.hora||'-'}</td><td>${u.prof_arranque != null ? u.prof_arranque : '-'}</td><td>${u.pressao_arranque != null ? u.pressao_arranque : '-'}</td><td>${u.pressao_trabalho != null ? u.pressao_trabalho : '-'}</td></tr>`).join('')}</table></div>`;
+      }
     }
   } else {
     desenvHTML += `<div style="font-size:.82rem;color:#9ca3af;margin-top:.2rem;">Não houve limpeza e desenvolvimento neste dia.</div>`;
@@ -1107,18 +1118,30 @@ function populateForm(rdo) {
   if (rdo.desenvolvimento_mudou && rdo.desenvolvimento) {
     setToggle("#toggleDesenvolvimento", true);
     const d = rdo.desenvolvimento;
-    $("#compressorModelo").value = d.modelo || "";
-    $("#compressorPressaoMax").value = d.pressao_max || "";
-    $("#compressorHorimetroInicio").value = d.horimetro_inicio || "";
-    $("#compressorHorimetroFim").value = d.horimetro_fim || "";
-    clearTable("#compressorTable");
-    if (d.uso && Array.isArray(d.uso)) {
-      d.uso.forEach(u => addCompressorRow(u.hora, u.prof_arranque, u.pressao_arranque, u.pressao_trabalho));
+    setMetodoDesenvolvimento(d.metodo === "bomba" ? "bomba" : "compressor");
+    if (d.metodo === "bomba") {
+      $("#bombaNome").value = d.nome_bomba || "";
+      $("#bombaPotencia").value = d.potencia || "";
+      $("#bombaVoltagem").value = d.voltagem || "";
+      $("#bombaHoras").value = d.horas_trabalhadas || "";
+      $("#bombaAberturaValvula").value = d.abertura_valvula || "";
+      $("#bombaProfundidade").value = d.profundidade_instalacao || "";
+      $("#bombaObs").value = d.obs || "";
     } else {
-      addCompressorRow("","","","");
+      $("#compressorModelo").value = d.modelo || "";
+      $("#compressorPressaoMax").value = d.pressao_max || "";
+      $("#compressorHorimetroInicio").value = d.horimetro_inicio || "";
+      $("#compressorHorimetroFim").value = d.horimetro_fim || "";
+      clearTable("#compressorTable");
+      if (d.uso && Array.isArray(d.uso)) {
+        d.uso.forEach(u => addCompressorRow(u.hora, u.prof_arranque, u.pressao_arranque, u.pressao_trabalho));
+      } else {
+        addCompressorRow("","","","");
+      }
     }
   } else {
     setToggle("#toggleDesenvolvimento", false);
+    setMetodoDesenvolvimento("compressor");
   }
   // Jateamento
   if (rdo.jateamento_mudou && rdo.jateamento && Array.isArray(rdo.jateamento)) {
@@ -1877,7 +1900,26 @@ function collectPreFiltro() {
   return { bags, obs };
 }
 
-// ── Limpeza e Desenvolvimento (compressor) ──────────────────
+// ── Limpeza e Desenvolvimento (método + compressor) ──────────────────
+function getMetodoDesenvolvimento() {
+  const btn = $("#toggleMetodoDesenvolvimento").querySelector(".active-yes");
+  return btn ? btn.dataset.value : "compressor";
+}
+function setMetodoDesenvolvimento(metodo) {
+  const group = $("#toggleMetodoDesenvolvimento");
+  group.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active-yes", "active-no"));
+  const btn = group.querySelector(`[data-value="${metodo}"]`) || group.querySelector('[data-value="compressor"]');
+  if (btn) btn.classList.add("active-yes");
+  const isBomba = metodo === "bomba";
+  $("#sectionMetodoCompressor").classList.toggle("show", !isBomba);
+  $("#sectionMetodoBomba").classList.toggle("show", isBomba);
+}
+$("#toggleMetodoDesenvolvimento").addEventListener("click", (e) => {
+  const btn = e.target.closest(".toggle-btn");
+  if (!btn) return;
+  setMetodoDesenvolvimento(btn.dataset.value);
+});
+
 function addCompressorRow(hora, profArranque, pressaoArranque, pressaoTrabalho) {
   const tbody = $("#compressorTable");
   const row = tbody.insertRow(-1);
@@ -1912,13 +1954,24 @@ function collectCompressorUso() {
 
 function collectDesenvolvimento() {
   if (!getToggleState("#toggleDesenvolvimento")) return null;
+  if (getMetodoDesenvolvimento() === "bomba") {
+    const nome_bomba = $("#bombaNome").value.trim() || null;
+    const potencia = $("#bombaPotencia").value.trim() || null;
+    const voltagem = $("#bombaVoltagem").value.trim() || null;
+    const horas_trabalhadas = parseFloat($("#bombaHoras").value) || null;
+    const abertura_valvula = $("#bombaAberturaValvula").value || null;
+    const profundidade_instalacao = parseFloat($("#bombaProfundidade").value) || null;
+    const obs = $("#bombaObs").value.trim() || null;
+    if (!nome_bomba && !potencia && !voltagem && !horas_trabalhadas && !abertura_valvula && !profundidade_instalacao && !obs) return null;
+    return { metodo: "bomba", nome_bomba, potencia, voltagem, horas_trabalhadas, abertura_valvula, profundidade_instalacao, obs };
+  }
   const modelo = $("#compressorModelo").value.trim() || null;
   const pressao_max = parseFloat($("#compressorPressaoMax").value) || null;
   const horimetro_inicio = parseInt($("#compressorHorimetroInicio").value) || null;
   const horimetro_fim = parseInt($("#compressorHorimetroFim").value) || null;
   const uso = collectCompressorUso();
   if (!modelo && !pressao_max && !horimetro_inicio && !horimetro_fim && !uso) return null;
-  return { modelo, pressao_max, horimetro_inicio, horimetro_fim, uso };
+  return { metodo: "compressor", modelo, pressao_max, horimetro_inicio, horimetro_fim, uso };
 }
 
 // ── Jateamento ──────────────────────────────────────────────
@@ -2127,6 +2180,7 @@ $("#btnSubmit").addEventListener("click", async () => {
   try {
     const photoUrls = await uploadPhotos();
     const payload = buildPayload("em_revisao");
+    payload.submitted_at = new Date().toISOString();
     // Merge new photos with existing ones
     const existingUrls = [];
     $$("#existingPhotos img").forEach(img => existingUrls.push(img.src));
@@ -2190,6 +2244,10 @@ function resetForm() {
   $("#fuelTotals").style.display = "block";
   clearTable("#bhaTable"); addBHARow("","","","","","");
   clearTable("#compressorTable"); addCompressorRow("","","","");
+  setMetodoDesenvolvimento("compressor");
+  $("#bombaNome").value = ""; $("#bombaPotencia").value = ""; $("#bombaVoltagem").value = "";
+  $("#bombaHoras").value = ""; $("#bombaAberturaValvula").value = ""; $("#bombaProfundidade").value = "";
+  $("#bombaObs").value = "";
   clearTable("#jateamentoTable"); addJateamentoRow("","","","","");
   clearTable("#teamTable"); DEFAULT_ROLES.forEach(r => addTeamMemberRow(r,""));
   selectedFiles = [];

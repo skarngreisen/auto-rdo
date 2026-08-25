@@ -1,0 +1,1 @@
+ALTER TABLE public.rdos ADD COLUMN IF NOT EXISTS submitted_at TIMESTAMPTZ;

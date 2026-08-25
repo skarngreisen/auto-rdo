@@ -268,6 +268,12 @@
 <button class="toggle-btn active-no" data-value="no" type="button">Não</button>
 </div>
 <div class="conditional" id="sectionDesenvolvimento">
+<div style="font-size:.82rem;color:#6b7280;margin-bottom:.4rem;">Método de desenvolvimento</div>
+<div class="toggle-group" id="toggleMetodoDesenvolvimento">
+<button class="toggle-btn active-yes" data-value="compressor" type="button">Compressor</button>
+<button class="toggle-btn" data-value="bomba" type="button">Bomba</button>
+</div>
+<div class="conditional show" id="sectionMetodoCompressor">
 <div class="row">
 <div><label for="compressorModelo">Compressor (modelo)</label><input id="compressorModelo" type="text"/></div>
 <div><label for="compressorPressaoMax">Pressão máxima</label><input id="compressorPressaoMax" step="0.01" type="number"/></div>
@@ -280,6 +286,22 @@
 <tr><th>Hora</th><th>Prof. arranque (m)</th><th>Pressão arranque</th><th>Pressão trabalho</th><th></th></tr>
 </table>
 <button class="btn btn-secondary btn-sm" id="btnAddCompressor" style="margin-top:.3rem;" type="button">+ Adicionar profundidade</button>
+</div>
+<div class="conditional" id="sectionMetodoBomba">
+<div class="row">
+<div><label for="bombaNome">Nome da bomba</label><input id="bombaNome" type="text"/></div>
+<div><label for="bombaPotencia">Potência</label><input id="bombaPotencia" type="text" placeholder="ex.: 5 HP"/></div>
+</div>
+<div class="row">
+<div><label for="bombaVoltagem">Voltagem</label><input id="bombaVoltagem" type="text" placeholder="ex.: 220V"/></div>
+<div><label for="bombaHoras">Horas trabalhadas</label><input id="bombaHoras" step="0.5" type="number"/></div>
+</div>
+<div class="row">
+<div><label for="bombaAberturaValvula">Abertura da válvula</label><select id="bombaAberturaValvula"><option value="">Selecione</option><option value="total">Total</option><option value="parcial">Parcial</option></select></div>
+<div><label for="bombaProfundidade">Profundidade de instalação (m)</label><input id="bombaProfundidade" step="0.01" type="number"/></div>
+</div>
+<div><label for="bombaObs">Observações</label><textarea id="bombaObs" rows="2"></textarea></div>
+</div>
 </div>
 </div>
 <!-- Jateamento -->
