@@ -12,8 +12,9 @@ Thumbs.db
 # Supabase CLI temp files
 supabase/.temp/
 
-# Override parent _internal/ — allow migrations, roadmap, and edge functions only
+# Override parent _internal/ - allow migrations and edge functions only
 !_internal/
+_internal/roadmap.md
 _internal/usuarios.md
 _internal/prioridades-tecnicas.md
 _internal/email-semana-1-glaucio.md
