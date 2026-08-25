@@ -24,6 +24,7 @@ _internal/check-policies.js
 _internal/check-rls.js
 _internal/get-full-rdo.js
 _internal/run-sql.js
+_internal/*.js
 _internal/enable-cron.sql
 _internal/enable-pgnet.sql
 _internal/verify-migration.sql
