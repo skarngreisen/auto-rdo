@@ -69,7 +69,6 @@ Deno.serve(async (req: Request) => {
           body: JSON.stringify({
             chat_id: profile.telegram_chat_id,
             text: message,
-            parse_mode: "Markdown",
           }),
         }
       );
