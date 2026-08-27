@@ -4,10 +4,17 @@
 //
 // Receives: { to: string[], subject: string, filename: string, pdf_base64: string }
 // Sends the PDF as an email attachment via Resend.
+// Called from the browser (admin.html), so CORS is enabled.
 // Secret: RESEND_API_KEY (set with: npx supabase secrets set RESEND_API_KEY=...)
 // ============================================================================
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
 interface SendPayload {
   to: string[];
@@ -17,24 +24,41 @@ interface SendPayload {
 }
 
 Deno.serve(async (req: Request) => {
+  // Preflight (CORS)
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   let payload: SendPayload;
   try {
     payload = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "Invalid JSON" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   const { to, subject, filename, pdf_base64 } = payload;
 
   if (!to || !Array.isArray(to) || to.length === 0) {
-    return new Response(JSON.stringify({ error: "to[] array required" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "to[] array required" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
   if (!subject || !filename || !pdf_base64) {
-    return new Response(JSON.stringify({ error: "subject, filename and pdf_base64 required" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "subject, filename and pdf_base64 required" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   const res = await fetch("https://api.resend.com/emails", {
@@ -57,12 +81,12 @@ Deno.serve(async (req: Request) => {
   if (!res.ok) {
     return new Response(JSON.stringify({ ok: false, error: data }), {
       status: 502,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
   return new Response(JSON.stringify({ ok: true, id: data.id }), {
     status: 200,
-    headers: { "Content-Type": "application/json" },
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });
