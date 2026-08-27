@@ -63,6 +63,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
 .toast.show { transform: translateY(0); }
 .toast.success { background: #d1fae5; color: #065f46; }
 .toast.error { background: #fee2e2; color: #991b1b; }
+.toast.info { background: #dbeafe; color: #1e40af; }
 
 .tab { display: none; }
 .tab.active { display: block; }
@@ -1066,6 +1067,7 @@ const BETA_AUTO_EMAIL = true;
 const BETA_EMAIL_RECIPIENTS = ["delivered@resend.dev", "igor.mascarenhas@gel-eng.com.br"]; // Resend test mode: no verified domain yet
 
 async function sendRDOEmail({ to, subject, filename, pdf_base64 }) {
+  toast("Enviando e-mail...", "info");
   try {
     const resp = await fetch(EDGE_SEND_EMAIL, {
       method: "POST",
@@ -1078,7 +1080,7 @@ async function sendRDOEmail({ to, subject, filename, pdf_base64 }) {
       toast("Falha ao enviar o e-mail.", "error");
       return false;
     }
-    toast("E-mail enviado!", "success");
+    toast(`E-mail enviado para ${to.join(", ")}.`, "success");
     return true;
   } catch (e) {
     console.error("send-rdo-email error:", e);
