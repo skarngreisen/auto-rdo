@@ -149,6 +149,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
         <span>Detalhes do RDO</span>
         <button class="btn btn-secondary btn-sm" id="btnCloseDetail">Fechar</button>
       <button class="btn btn-primary btn-sm" id="btnPDFDetail" onclick="generatePDF(currentDetailId)" style="display:none;">Exportar PDF</button>
+      <button class="btn btn-primary btn-sm" id="btnEmailClient" onclick="sendToClient(currentDetailId)" style="display:none;">Enviar ao cliente</button>
       <button class="btn btn-primary btn-sm" id="btnApprove" style="display:none;background:#10b981;">Aprovar</button>
       <button class="btn btn-secondary btn-sm" id="btnRevertToDraft" style="display:none;" onclick="revertToDraft(currentDetailId)">Reverter p/ Rascunho</button>
       </div>
@@ -204,6 +205,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <label>Nome do projeto</label><input type="text" id="modalCliente">
     <label>Localidade</label><input type="text" id="modalLocalidade" placeholder="ex: Ribeirão Preto - SP">
     <label>Sonda</label><select id="modalSonda"><option value="">Selecionar sonda...</option><option value="Cardwell">Cardwell</option><option value="R4">R4</option><option value="A10">A10</option><option value="Tornep">Tornep</option></select>
+    <label>E-mail do cliente</label><input type="email" id="modalClienteEmail" placeholder="ex: cliente@empresa.com">
     <div class="row">
       <div><label>Data Início</label><input type="date" id="modalDataInício"></div>
       <div><label>Turno (descrição)</label><input type="text" id="modalTurno" value="07h x 17h"></div>
@@ -352,7 +354,7 @@ async function loadProjetos() {
 $("#btnNewProject").addEventListener("click", () => {
   $("#modalProjectTitle").textContent = "Novo Projeto";
   $("#editProjectId").value = "";
-  $("#modalCliente").value = ""; $("#modalLocalidade").value = "";
+  $("#modalCliente").value = ""; $("#modalLocalidade").value = ""; $("#modalClienteEmail").value = "";
   $("#modalSonda").value = ""; $("#modalDataInício").value = new Date().toISOString().split("T")[0];
   $("#modalTurno").value = "07h x 17h";
   $("#modalTurnosPorDia").value = "1";
@@ -372,6 +374,7 @@ async function editProject(id) {
   $("#modalProjectTitle").textContent = "Editar Projeto";
   $("#editProjectId").value = data.id;
   $("#modalCliente").value = data.cliente; $("#modalLocalidade").value = data.localidade;
+  $("#modalClienteEmail").value = data.cliente_email || "";
   $("#modalSonda").value = data.sonda; $("#modalDataInício").value = data.data_inicio;
   $("#modalTurno").value = data.turno;
   $("#modalTurnosPorDia").value = data.turnos_por_dia || 1;
@@ -408,6 +411,7 @@ $("#btnModalSave").addEventListener("click", async () => {
     data_inicio: $("#modalDataInício").value,
     turno: $("#modalTurno").value.trim() || "07h x 17h",
     turnos_por_dia: turnosPorDia,
+    cliente_email: $("#modalClienteEmail").value.trim() || null,
     supervisor_turno1: $("#modalSupervisor1").value.trim() || null,
     supervisor_turno2: $("#modalSupervisor2").value.trim() || null,
   };
@@ -602,6 +606,7 @@ async function viewRDO(id) {
   const r = data;
 
   $("#btnPDFDetail").style.display = (r.status !== "rascunho") ? "inline-block" : "none";
+  $("#btnEmailClient").style.display = (r.status !== "rascunho") ? "inline-block" : "none";
   $("#btnRevertToDraft").style.display = (r.status !== "rascunho") ? "inline-block" : "none";
   const btnApprove = $("#btnApprove");
   if (r.status === "em_revisao") {
@@ -863,14 +868,37 @@ async function viewRDO(id) {
   $("#rdoDetail").scrollIntoView({ behavior: "smooth" });
 }
 
-  $("#btnCloseDetail").addEventListener("click", () => { $("#rdoDetail").style.display = "none"; $("#btnPDFDetail").style.display = "none"; $("#btnApprove").style.display = "none"; $("#btnRevertToDraft").style.display = "none"; });
+  $("#btnCloseDetail").addEventListener("click", () => { $("#rdoDetail").style.display = "none"; $("#btnPDFDetail").style.display = "none"; $("#btnEmailClient").style.display = "none"; $("#btnApprove").style.display = "none"; $("#btnRevertToDraft").style.display = "none"; });
 
 async function approveRDO(id) {
   const { error } = await sb.from("rdos").update({ status: "aprovado" }).eq("id", id);
   if (error) { toast("Erro: " + error.message, "error"); return; }
   toast("RDO aprovado!", "success");
+  if (BETA_AUTO_EMAIL) sendRDOEmailOnApproval(id); // fire-and-forget
   closeDetail();
   loadRDOs();
+}
+
+async function sendRDOEmailOnApproval(id) {
+  try {
+    const built = await buildPDF(id);
+    if (!built) return;
+    if (built.r.pdf_enviado_em) return; // already sent
+    const proj = built.r.projetos || {};
+    const to = BETA_EMAIL_RECIPIENTS.length > 0 ? BETA_EMAIL_RECIPIENTS : (proj.cliente_email ? [proj.cliente_email] : []);
+    if (to.length === 0) return;
+    const ok = await sendRDOEmail({
+      to,
+      subject: `RDO aprovado - ${proj.cliente || ""} - ${built.r.data}`,
+      filename: built.filename,
+      pdf_base64: built.doc.output("datauristring").split(",")[1],
+    });
+    if (ok) {
+      await sb.from("rdos").update({ pdf_enviado_em: new Date().toISOString() }).eq("id", id);
+    }
+  } catch (e) {
+    console.error("auto email error:", e);
+  }
 }
 
 async function approveReopen(id) {
@@ -884,6 +912,7 @@ async function approveReopen(id) {
 function closeDetail() {
   $("#rdoDetail").style.display = "none";
   $("#btnPDFDetail").style.display = "none";
+  $("#btnEmailClient").style.display = "none";
   $("#btnApprove").style.display = "none";
   $("#btnApprove").style.background = "#10b981";
   $("#btnRevertToDraft").style.display = "none";
@@ -927,9 +956,9 @@ async function editRDO(id) {
 const { jsPDF } = window.jspdf;
 const PDF_LOGO = "logo_DH.png";
 
-async function generatePDF(id) {
-  const { data: r } = await sb.from("rdos").select("*,projetos(cliente,sonda,localidade,data_inicio,turno)").eq("id", id).single();
-  if (!r) { toast("RDO não encontrado.", "error"); return; }
+async function buildPDF(id) {
+  const { data: r } = await sb.from("rdos").select("*,projetos(cliente,sonda,localidade,data_inicio,turno,cliente_email)").eq("id", id).single();
+  if (!r) { toast("RDO não encontrado.", "error"); return null; }
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = 210, M = 15;
@@ -1021,8 +1050,57 @@ async function generatePDF(id) {
   }
 
   const filename = `RDO_${proj.cliente || "projeto"}_${r.data}.pdf`.replace(/\s+/g, "_");
-  doc.save(filename);
+  return { doc, filename, r };
+}
+
+async function generatePDF(id) {
+  const built = await buildPDF(id);
+  if (!built) return;
+  built.doc.save(built.filename);
   toast("PDF exportado!", "success");
+}
+
+// ── Email sending (Resend) ──────────────────────────────────
+const EDGE_SEND_EMAIL = "https://fecskilrtsaeavoznwgi.supabase.co/functions/v1/send-rdo-email";
+const BETA_AUTO_EMAIL = true;
+const BETA_EMAIL_RECIPIENTS = ["delivered@resend.dev"]; // Resend test mode: no verified domain yet
+
+async function sendRDOEmail({ to, subject, filename, pdf_base64 }) {
+  try {
+    const resp = await fetch(EDGE_SEND_EMAIL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to, subject, filename, pdf_base64 }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || data.ok === false) {
+      console.error("send-rdo-email failed:", data);
+      toast("Falha ao enviar o e-mail.", "error");
+      return false;
+    }
+    toast("E-mail enviado!", "success");
+    return true;
+  } catch (e) {
+    console.error("send-rdo-email error:", e);
+    toast("Falha ao enviar o e-mail.", "error");
+    return false;
+  }
+}
+
+async function sendToClient(id) {
+  const built = await buildPDF(id);
+  if (!built) return;
+  const proj = built.r.projetos || {};
+  if (!proj.cliente_email) {
+    toast("Este projeto não tem e-mail de cliente cadastrado.", "error");
+    return;
+  }
+  await sendRDOEmail({
+    to: [proj.cliente_email],
+    subject: `RDO ${proj.cliente || ""} - ${built.r.data}`,
+    filename: built.filename,
+    pdf_base64: built.doc.output("datauristring").split(",")[1],
+  });
 }
 
 //// DELETE
