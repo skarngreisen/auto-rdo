@@ -955,7 +955,7 @@ async function editRDO(id) {
 // ============================================================
 // PDF GENERATION (jsPDF + autotable)
 const { jsPDF } = window.jspdf;
-const PDF_LOGO = "logo_DH.png";
+const PDF_LOGO = "logo_small.png";
 
 async function buildPDF(id) {
   const { data: r } = await sb.from("rdos").select("*,projetos(cliente,sonda,localidade,data_inicio,turno,cliente_email)").eq("id", id).single();
