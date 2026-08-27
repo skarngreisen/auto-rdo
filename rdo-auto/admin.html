@@ -1063,7 +1063,7 @@ async function generatePDF(id) {
 // ── Email sending (Resend) ──────────────────────────────────
 const EDGE_SEND_EMAIL = "https://fecskilrtsaeavoznwgi.supabase.co/functions/v1/send-rdo-email";
 const BETA_AUTO_EMAIL = true;
-const BETA_EMAIL_RECIPIENTS = ["delivered@resend.dev"]; // Resend test mode: no verified domain yet
+const BETA_EMAIL_RECIPIENTS = ["delivered@resend.dev", "igor.mascarenhas@gel-eng.com.br"]; // Resend test mode: no verified domain yet
 
 async function sendRDOEmail({ to, subject, filename, pdf_base64 }) {
   try {
