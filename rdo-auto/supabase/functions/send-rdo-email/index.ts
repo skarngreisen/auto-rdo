@@ -72,7 +72,7 @@ Deno.serve(async (req: Request) => {
       to,
       subject,
       text: "Segue em anexo o Boletim Diário de Obras (RDO).",
-      attachments: [{ filename, content: pdf_base64 }],
+      attachments: [{ filename, content: pdf_base64, content_type: "application/pdf" }],
     }),
   });
 
