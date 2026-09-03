@@ -94,6 +94,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <button class="active" data-tab="projetos">Projetos</button>
     <button data-tab="rdos">RDOs</button>
     <button data-tab="usuarios">Usuários</button>
+    <button data-tab="notificacoes" id="navNotificacoes" style="display:none;">Notificações</button>
   </nav>
   <div style="flex:1;"></div>
   <div style="position:relative;">
@@ -168,6 +169,29 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
       <table id="usuariosTable">
         <tr><th>Nome</th><th>Email</th><th>Celular</th><th>Função</th><th></th></tr>
       </table>
+    </div>
+  </div>
+
+  <!-- ============ TAB: NOTIFICACOES ============ -->
+  <div class="tab" id="tabNotificacoes">
+    <div class="card">
+      <div class="card-header">Notificações Telegram</div>
+      <p style="font-size:.8rem;color:#6b7280;margin:.2rem 0 1rem;">
+        Marque quais eventos cada usuário recebe no Telegram. "Pendente" significa que a pessoa ainda não ativou o bot. A coluna "Resumo diário" só passa a valer quando a Fase 6 (IA) existir.
+      </p>
+      <div style="overflow-x:auto;">
+        <table id="notificacoesTable">
+          <tr>
+            <th>Usuário</th>
+            <th>Telegram</th>
+            <th>Novo RDO</th>
+            <th>RDO aprovado</th>
+            <th>RDO alterado</th>
+            <th>Resumo diário</th>
+            <th></th>
+          </tr>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -274,6 +298,9 @@ let currentUser = null, currentProfile = null;
     return;
   }
   currentProfile = profile;
+  if (profile.role === "admin") {
+    $("#navNotificacoes").style.display = "";
+  }
   $("#headerUserName").textContent = profile.name || profile.phone || currentUser.email;
   $("#userMenuPhone").textContent = profile.phone || "-";
 })();
@@ -313,8 +340,71 @@ $$("header nav button").forEach(btn => {
     if (btn.dataset.tab === "projetos") loadProjetos();
     else if (btn.dataset.tab === "rdos") { loadRDOFilters(); loadRDOs(); }
     else if (btn.dataset.tab === "usuarios") loadUsuários();
+    else if (btn.dataset.tab === "notificacoes") loadNotificacoes();
   });
 });
+
+// ============================================================
+// NOTIFICATIONS (Telegram preferences)
+// ============================================================
+const NOTIF_EVENTS = [
+  { id: "rdo_enviado",  label: "Novo RDO" },
+  { id: "rdo_aprovado", label: "RDO aprovado" },
+  { id: "rdo_alterado", label: "RDO alterado" },
+  { id: "resumo_diario", label: "Resumo diário" },
+];
+
+async function loadNotificacoes() {
+  const [profilesRes, prefsRes] = await Promise.all([
+    sb.from("profiles").select("user_id,name,email,role,telegram_chat_id").order("name"),
+    sb.from("notificacao_preferencias").select("user_id,evento,ativo"),
+  ]);
+  const profiles = (profilesRes && profilesRes.data) || [];
+  const prefs = (prefsRes && prefsRes.data) || [];
+  if (prefsRes && prefsRes.error) toast("Aviso: execute a migration de preferências no SQL Editor.", "error");
+
+  const prefMap = {};
+  prefs.forEach(p => { prefMap[p.user_id + "|" + p.evento] = p.ativo; });
+
+  const tbody = $("#notificacoesTable");
+  if (profiles.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum usuário.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = profiles.map(p => {
+    const linked = !!p.telegram_chat_id;
+    const statusCell = linked
+      ? '<span style="color:#10b981;font-weight:600;">Ativado</span>'
+      : '<span style="color:#f59e0b;font-weight:600;">Pendente</span>';
+    const checks = NOTIF_EVENTS.map(ev => {
+      const checked = prefMap[p.user_id + "|" + ev.id] ? "checked" : "";
+      return `<td style="text-align:center;"><input type="checkbox" ${checked} onchange="toggleNotif('${p.user_id}','${ev.id}',this.checked)"></td>`;
+    }).join("");
+    const actionCell = linked
+      ? ""
+      : `<button class="btn btn-secondary btn-sm" onclick="copyActivationLink('${p.user_id}')">📋 Link</button>`;
+    return `<tr>
+      <td>${p.name || '-'}<br><span style="font-size:.72rem;color:#9ca3af;">${p.role}</span></td>
+      <td>${statusCell}</td>
+      ${checks}
+      <td>${actionCell}</td>
+    </tr>`;
+  }).join("");
+}
+
+async function toggleNotif(userId, evento, ativo) {
+  const { error } = await sb.from("notificacao_preferencias").upsert(
+    { user_id: userId, evento, ativo, updated_at: new Date().toISOString() },
+    { onConflict: "user_id,evento" }
+  );
+  if (error) toast("Erro ao salvar preferência: " + error.message, "error");
+}
+
+async function copyActivationLink(userId) {
+  await navigator.clipboard.writeText(`https://t.me/rdoauto_bot?start=${userId}`);
+  toast("Link de ativação copiado!", "success");
+}
 
 // ============================================================
 // PROJECTS
