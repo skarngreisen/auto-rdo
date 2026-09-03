@@ -181,15 +181,18 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
       </p>
       <div style="overflow-x:auto;">
         <table id="notificacoesTable">
-          <tr>
-            <th>Usuário</th>
-            <th>Telegram</th>
-            <th>Novo RDO</th>
-            <th>RDO aprovado</th>
-            <th>RDO alterado</th>
-            <th>Resumo diário</th>
-            <th></th>
-          </tr>
+          <thead>
+            <tr>
+              <th>Usuário</th>
+              <th>Telegram</th>
+              <th>Novo RDO</th>
+              <th>RDO aprovado</th>
+              <th>RDO alterado</th>
+              <th>Resumo diário</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="notificacoesBody"></tbody>
         </table>
       </div>
     </div>
@@ -366,7 +369,7 @@ async function loadNotificacoes() {
   const prefMap = {};
   prefs.forEach(p => { prefMap[p.user_id + "|" + p.evento] = p.ativo; });
 
-  const tbody = $("#notificacoesTable");
+  const tbody = $("#notificacoesBody");
   if (profiles.length === 0) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum usuário.</td></tr>';
     return;
