@@ -94,7 +94,6 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <button class="active" data-tab="projetos">Projetos</button>
     <button data-tab="rdos">RDOs</button>
     <button data-tab="usuarios">Usuários</button>
-    <button data-tab="notificacoes" id="navNotificacoes" style="display:none;">Notificações</button>
   </nav>
   <div style="flex:1;"></div>
   <div style="position:relative;">
@@ -167,34 +166,11 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
         <button class="btn btn-primary btn-sm" id="btnNewUser">+ Novo</button>
       </div>
       <table id="usuariosTable">
-        <tr><th>Nome</th><th>Email</th><th>Celular</th><th>Função</th><th></th></tr>
+        <thead>
+          <tr><th>Nome</th><th>Email</th><th>Celular</th><th>Função</th><th>Telegram</th><th></th></tr>
+        </thead>
+        <tbody id="usuariosBody"></tbody>
       </table>
-    </div>
-  </div>
-
-  <!-- ============ TAB: NOTIFICACOES ============ -->
-  <div class="tab" id="tabNotificacoes">
-    <div class="card">
-      <div class="card-header">Notificações Telegram</div>
-      <p style="font-size:.8rem;color:#6b7280;margin:.2rem 0 1rem;">
-        Marque quais eventos cada usuário recebe no Telegram. "Pendente" significa que a pessoa ainda não ativou o bot. A coluna "Resumo diário" só passa a valer quando a Fase 6 (IA) existir.
-      </p>
-      <div style="overflow-x:auto;">
-        <table id="notificacoesTable">
-          <thead>
-            <tr>
-              <th>Usuário</th>
-              <th>Telegram</th>
-              <th>Novo RDO</th>
-              <th>RDO aprovado</th>
-              <th>RDO alterado</th>
-              <th>Resumo diário</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="notificacoesBody"></tbody>
-        </table>
-      </div>
     </div>
   </div>
 
@@ -256,6 +232,11 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
       <div><label>Turno 1 (nome)</label><input type="text" id="modalSupervisor1" placeholder="Nome do supervisor"></div>
       <div id="supervisor2Group" style="display:none;"><label>Turno 2 (nome)</label><input type="text" id="modalSupervisor2" placeholder="Nome do supervisor"></div>
     </div>
+    <hr style="margin:1rem 0;border:none;border-top:2px solid #e8ecf1;">
+    <div class="card-header">Notificações Telegram</div>
+    <p style="font-size:.75rem;color:#6b7280;margin:.2rem 0 .5rem;">Quem recebe notificação deste projeto, e de quais eventos.</p>
+    <div id="notifRecipients"></div>
+    <button type="button" class="btn btn-secondary btn-sm" id="btnAddNotif" style="margin-top:.5rem;">+ Adicionar pessoa</button>
     <div style="display:flex;gap:.5rem;margin-top:1rem;">
       <button class="btn btn-secondary" id="btnModalCancel" style="flex:1;">Cancelar</button>
       <button class="btn btn-primary" id="btnModalSave" style="flex:1;">Salvar</button>
@@ -301,9 +282,6 @@ let currentUser = null, currentProfile = null;
     return;
   }
   currentProfile = profile;
-  if (profile.role === "admin") {
-    $("#navNotificacoes").style.display = "";
-  }
   $("#headerUserName").textContent = profile.name || profile.phone || currentUser.email;
   $("#userMenuPhone").textContent = profile.phone || "-";
 })();
@@ -343,12 +321,11 @@ $$("header nav button").forEach(btn => {
     if (btn.dataset.tab === "projetos") loadProjetos();
     else if (btn.dataset.tab === "rdos") { loadRDOFilters(); loadRDOs(); }
     else if (btn.dataset.tab === "usuarios") loadUsuários();
-    else if (btn.dataset.tab === "notificacoes") loadNotificacoes();
   });
 });
 
 // ============================================================
-// NOTIFICATIONS (Telegram preferences)
+// NOTIFICATIONS (Telegram, per project)
 // ============================================================
 const NOTIF_EVENTS = [
   { id: "rdo_enviado",  label: "Novo RDO" },
@@ -357,57 +334,86 @@ const NOTIF_EVENTS = [
   { id: "resumo_diario", label: "Resumo diário" },
 ];
 
-async function loadNotificacoes() {
-  const [profilesRes, prefsRes] = await Promise.all([
-    sb.from("profiles").select("user_id,name,email,role,telegram_chat_id").order("name"),
-    sb.from("notificacao_preferencias").select("user_id,evento,ativo"),
-  ]);
-  const profiles = (profilesRes && profilesRes.data) || [];
-  const prefs = (prefsRes && prefsRes.data) || [];
-  if (prefsRes && prefsRes.error) toast("Aviso: execute a migration de preferências no SQL Editor.", "error");
+let allProfilesCache = [];
 
-  const prefMap = {};
-  prefs.forEach(p => { prefMap[p.user_id + "|" + p.evento] = p.ativo; });
-
-  const tbody = $("#notificacoesBody");
-  if (profiles.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum usuário.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = profiles.map(p => {
-    const linked = !!p.telegram_chat_id;
-    const statusCell = linked
-      ? '<span style="color:#10b981;font-weight:600;">Ativado</span>'
-      : '<span style="color:#f59e0b;font-weight:600;">Pendente</span>';
-    const checks = NOTIF_EVENTS.map(ev => {
-      const checked = prefMap[p.user_id + "|" + ev.id] ? "checked" : "";
-      return `<td style="text-align:center;"><input type="checkbox" ${checked} onchange="toggleNotif('${p.user_id}','${ev.id}',this.checked)"></td>`;
-    }).join("");
-    const actionCell = linked
-      ? ""
-      : `<button class="btn btn-secondary btn-sm" onclick="copyActivationLink('${p.user_id}')">📋 Link</button>`;
-    return `<tr>
-      <td>${p.name || '-'}<br><span style="font-size:.72rem;color:#9ca3af;">${p.role}</span></td>
-      <td>${statusCell}</td>
-      ${checks}
-      <td>${actionCell}</td>
-    </tr>`;
-  }).join("");
+async function ensureProfilesLoaded() {
+  if (allProfilesCache.length) return allProfilesCache;
+  const { data } = await sb.from("profiles").select("user_id,name,role").order("name");
+  allProfilesCache = data || [];
+  return allProfilesCache;
 }
 
-async function toggleNotif(userId, evento, ativo) {
-  const { error } = await sb.from("notificacao_preferencias").upsert(
-    { user_id: userId, evento, ativo, updated_at: new Date().toISOString() },
-    { onConflict: "user_id,evento" }
-  );
-  if (error) toast("Erro ao salvar preferência: " + error.message, "error");
+function notifPersonOptions(selectedId) {
+  return '<option value="">Selecionar pessoa...</option>' + allProfilesCache.map(p =>
+    `<option value="${p.user_id}" ${p.user_id === selectedId ? 'selected' : ''}>${p.name || p.user_id} (${p.role})</option>`
+  ).join("");
+}
+
+function addNotifRow(userId, eventos) {
+  eventos = eventos || {};
+  const row = document.createElement("div");
+  row.className = "notif-row";
+  row.style.cssText = "border:1px solid #e5e7eb;border-radius:6px;padding:.5rem;margin-bottom:.5rem;";
+  row.innerHTML = `
+    <div style="display:flex;gap:.5rem;align-items:center;">
+      <select class="notif-person" style="flex:1;">${notifPersonOptions(userId)}</select>
+      <button type="button" class="notif-remove btn btn-secondary btn-sm" style="padding:.1rem .55rem;">✕</button>
+    </div>
+    <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.4rem;font-size:.78rem;">
+      ${NOTIF_EVENTS.map(ev => `<label><input type="checkbox" class="notif-ev" data-evento="${ev.id}" ${eventos[ev.id] ? 'checked' : ''}> ${ev.label}</label>`).join("")}
+    </div>`;
+  row.querySelector(".notif-remove").addEventListener("click", () => row.remove());
+  $("#notifRecipients").appendChild(row);
+}
+
+async function loadNotifRecipients(projetoId) {
+  await ensureProfilesLoaded();
+  const container = $("#notifRecipients");
+  container.innerHTML = "";
+  let prefs = [];
+  if (projetoId) {
+    const { data } = await sb.from("notificacao_preferencias").select("user_id,evento,ativo").eq("projeto_id", projetoId);
+    prefs = (data || []).filter(p => p.ativo);
+  }
+  const byUser = {};
+  prefs.forEach(p => { (byUser[p.user_id] = byUser[p.user_id] || {})[p.evento] = true; });
+  const userIds = Object.keys(byUser);
+  if (userIds.length === 0) {
+    addNotifRow();
+  } else {
+    userIds.forEach(uid => addNotifRow(uid, byUser[uid]));
+  }
+}
+
+function collectNotifRows() {
+  const rows = [];
+  document.querySelectorAll("#notifRecipients .notif-row").forEach(row => {
+    const userId = row.querySelector(".notif-person").value;
+    const eventos = [...row.querySelectorAll(".notif-ev:checked")].map(cb => cb.dataset.evento);
+    if (userId && eventos.length) rows.push({ userId, eventos });
+  });
+  return rows;
+}
+
+async function saveNotifRecipients(projetoId) {
+  await sb.from("notificacao_preferencias").delete().eq("projeto_id", projetoId);
+  const rows = collectNotifRows();
+  if (!rows.length) return;
+  const inserts = [];
+  rows.forEach(r => r.eventos.forEach(ev => inserts.push({
+    projeto_id: projetoId, user_id: r.userId, evento: ev, ativo: true,
+    updated_at: new Date().toISOString()
+  })));
+  const { error } = await sb.from("notificacao_preferencias").upsert(inserts, { onConflict: "projeto_id,user_id,evento" });
+  if (error) toast("Erro ao salvar notificações: " + error.message, "error");
 }
 
 async function copyActivationLink(userId) {
   await navigator.clipboard.writeText(`https://t.me/rdoauto_bot?start=${userId}`);
   toast("Link de ativação copiado!", "success");
 }
+
+$("#btnAddNotif").addEventListener("click", async () => { await ensureProfilesLoaded(); addNotifRow(); });
 
 // ============================================================
 // PROJECTS
@@ -459,6 +465,7 @@ $("#btnNewProject").addEventListener("click", () => {
   $("#supervisorHistory").innerHTML = "";
   toggleSupervisor2();
   loadCrewDropdowns();
+  loadNotifRecipients(null);
   $("#modalProject").classList.add("show");
 });
 
@@ -489,6 +496,7 @@ async function editProject(id) {
   // Load geologist dropdown and assignment state
   await loadCrewDropdowns();
   await loadAssignmentState(id);
+  await loadNotifRecipients(id);
   $("#modalProject").classList.add("show");
 }
 
@@ -524,6 +532,9 @@ $("#btnModalSave").addEventListener("click", async () => {
 
   // Save geologist assignment
   await saveAssignment("geologo", projetoId);
+
+  // Save notification recipients
+  await saveNotifRecipients(projetoId);
 
   toast(id ? "Projeto atualizado!" : "Projeto criado!", "success");
   $("#modalProject").classList.remove("show");
@@ -1262,20 +1273,27 @@ $("#btnExportCSV").addEventListener("click", async () => {
 // USERS
 // ============================================================
 async function loadUsuários() {
-  const { data: profiles } = await sb.from("profiles").select("user_id,name,email,role,phone").order("name");
-  const tbody = $("#usuariosTable");
+  const { data: profiles } = await sb.from("profiles").select("user_id,name,email,role,phone,telegram_chat_id").order("name");
+  const tbody = $("#usuariosBody");
   if (!profiles || profiles.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum usuario.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum usuario.</td></tr>';
     return;
   }
-  tbody.innerHTML = profiles.map(p => `
+  tbody.innerHTML = profiles.map(p => {
+    const linked = !!p.telegram_chat_id;
+    const tgCell = linked
+      ? '<span style="color:#10b981;font-weight:600;">Ativado</span>'
+      : '<span style="color:#f59e0b;font-weight:600;">Pendente</span>' +
+        `<button class="btn btn-secondary btn-sm" style="margin-left:.4rem;" onclick="copyActivationLink('${p.user_id}')">📋 Link</button>`;
+    return `
     <tr>
       <td>${p.name || '-'}</td><td>${p.email || '-'}</td><td>${p.phone || '-'}</td><td>${p.role}</td>
+      <td>${tgCell}</td>
       <td class="actions">
         <button class="btn btn-secondary btn-sm" onclick="editUser('${p.user_id}')">Editar</button>
         <button class="btn btn-secondary btn-sm" onclick="copyOnboarding('${p.user_id}')">📋 Onboard</button>
       </td>
-    </tr>`).join("");
+    </tr>`;}).join("");
 }
 
 async function copyOnboarding(userId) {
