@@ -107,7 +107,7 @@ rdo-auto/
 - Abas independentes: **Operacoes**, **Revestimento**, **Combustivel**, **Equipe**
 - Pre-preenchimento automatico a partir do RDO anterior (mesmo dia, turno oposto, ou dia anterior)
 - Heranca de dados de estratigrafia quando nao ha mudanca
-- Auto-save de rascunho a cada 30 segundos
+- Salvamento de rascunho manual (botao "Salvar Rascunho"), gravando direto no Supabase
 
 ### Striplog com ROP automatico
 - Tabela de operacoes metro a metro com profundidade, inicio, termino, tipo e observacao
@@ -128,7 +128,7 @@ rdo-auto/
 - Fotos enviadas apenas na submissao final (nao no rascunho)
 
 ### Fluxo de Aprovacao
-- **Rascunho**: salvo localmente, editavel pelo autor
+- **Rascunho**: salvo no Supabase, editavel pelo autor
 - **Em Revisao**: submetido, visivel para supervisores/administradores
 - **Aprovado**: bloqueado para edicao, disponivel para exportacao PDF
 - Reabertura: supervisor pode solicitar reabertura de RDO aprovado
@@ -190,4 +190,4 @@ rdo-auto/
 - A **publishable key** e segura para uso no frontend. A **secret key** (usada em `.env.local`) nunca deve aparecer no codigo do cliente.
 - O bucket `fotos` e publico: qualquer um com a URL pode acessar as imagens. Em producao, considere restringir o acesso.
 - Soft-delete: RDOs excluidos recebem `deleted = true` em vez de serem removidos do banco.
-- O app funciona offline para preenchimento, mas requer conexao para salvar/enviar (os dados ficam no form ate o envio).
+- O app e 100% online: requer conexao para carregar dados, salvar rascunho e enviar RDO. Nao ha modo offline.
