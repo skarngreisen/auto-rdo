@@ -1148,11 +1148,14 @@ async function buildPDF(id) {
   };
   const paragraph = (label, text) => {
     ensureSpace(8);
-    doc.setFont(undefined, "bold"); doc.text(label + ":", M, y); y += 4;
+    if (label) {
+      doc.setFont(undefined, "bold"); doc.text(label + ":", M, y); y += 4;
+    }
     doc.setFont(undefined, "normal"); doc.setFontSize(8);
-    doc.text(String(text), M, y, { maxWidth: W - 2 * M });
+    const lines = doc.splitTextToSize(String(text), W - 2 * M);
+    doc.text(lines, M, y);
     doc.setFontSize(9);
-    y += 5;
+    y += lines.length * 4.2;
   };
   const table = (head, body, colWidths) => {
     ensureSpace(14);
@@ -1191,7 +1194,7 @@ async function buildPDF(id) {
   section("Perfuração");
   kv("Houve avanço", yn(r.profundidade_final != null));
   if (r.profundidade_final != null) {
-    kv("Profundidade", (r.profundidade_inicial || 0) + " → " + r.profundidade_final + " m");
+    kv("Profundidade", (r.profundidade_inicial || 0) + " a " + r.profundidade_final + " m");
   } else {
     kv("Profundidade", "Não houve avanço na perfuração neste dia.");
   }
@@ -1217,15 +1220,15 @@ async function buildPDF(id) {
     const b = r.brocas;
     if (b.atual && Object.values(b.atual).some(v => v)) {
       doc.setFont(undefined, "bold"); doc.text("Broca Atual", M, y); doc.setFont(undefined, "normal"); y += 3;
-      table(["Fab.", "Série", "Ø", "IADC", "Jatos", "Perf.(m)", "Op.(h)", "ROP"],
+      table(["Fab.", "Série", "Diam.", "IADC", "Jatos", "Perf.(m)", "Op.(h)", "ROP"],
         [[fmt(b.atual.fabricante), fmt(b.atual.serie), fmt(b.atual.diametro), fmt(b.atual.modelo), fmt(b.atual.jatos), fmt(b.atual.perfurado), fmt(b.atual.oper_hs), fmt(b.atual.rop)]],
-        [22, 24, 14, 22, 18, 20, 18, 18]);
+        [20, 22, 14, 22, 16, 20, 18, 16]);
     }
     if (b.anterior && Object.values(b.anterior).some(v => v)) {
       doc.setFont(undefined, "bold"); doc.text("Broca Anterior", M, y); doc.setFont(undefined, "normal"); y += 3;
-      table(["Fab.", "Série", "Ø", "IADC", "Jatos"],
+      table(["Fab.", "Série", "Diam.", "IADC", "Jatos"],
         [[fmt(b.anterior.fabricante), fmt(b.anterior.serie), fmt(b.anterior.diametro), fmt(b.anterior.modelo), fmt(b.anterior.jatos)]],
-        [24, 26, 16, 24, 20]);
+        [24, 26, 18, 26, 20]);
     }
   }
 
@@ -1365,7 +1368,7 @@ async function buildPDF(id) {
   if (r.operacoes && r.operacoes.length > 0) {
     table(["Início", "Término", "Tipo", "Descritivo"],
       r.operacoes.map(o => [fmt(o.inicio), fmt(o.termino), fmt(o.tipo || "Normal"), fmt(o.descritivo)]),
-      [26, 26, 30, 90]);
+      [22, 22, 26, 110]);
   } else {
     kv("", "Nenhuma operação registrada.");
   }
