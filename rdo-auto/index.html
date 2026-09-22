@@ -94,7 +94,9 @@
 <input id="rdoId" type="hidden"/>
 <div class="card formTabContent active" id="tabIdentificacao">
 <div class="card-header">Identificação</div>
+<div id="reopenBanner" style="display:none;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:.6rem .75rem;margin-bottom:.6rem;font-size:.85rem;color:#92400e;"></div>
 <div><label for="rdoDate">Data do RDO <span style="color:#ef4444;">*</span></label><input id="rdoDate" required="" type="date"/></div>
+<div><label for="rdoTurno">Turno <span style="font-size:.7rem;color:#6b7280;">(opcional)</span></label><select id="rdoTurno"><option value="">Selecionar turno...</option></select></div>
 </div><div id="formBody">
 <!-- tabAtividades -->
 <!-- #formBody -->
@@ -402,10 +404,6 @@
 <tr><th>Início</th><th>Término</th><th>Tipo</th><th>Descritivo</th><th></th></tr>
 </table>
 <button class="btn btn-secondary btn-sm" id="btnAddOp" style="margin-top:.3rem;" type="button">+ Adicionar atividade</button>
-<!-- Timeline -->
-<div class="timeline-bar" id="timelineBar" style="margin-top:.6rem;">
-<div class="timeline-track" id="timelineTrack"></div>
-</div>
 </div>
 </div></div><!-- tabEquipe -->
 <!-- Tab 2: Perfuração -->

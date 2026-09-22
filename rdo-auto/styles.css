@@ -232,25 +232,6 @@ input.inherited, textarea.inherited {
 .sl-remove:hover { background: #fecaca; }
 
 /* ============================================================
-   TIMELINE
-   ============================================================ */
-.timeline-bar { position: relative; }
-.timeline-track {
-  position: relative; height: 22px; background: #e5e7eb;
-  border-radius: 4px; overflow: hidden; width: 100%;
-}
-.timeline-segment {
-  position: absolute; top: 0; height: 100%;
-  border-radius: 2px; cursor: default;
-  transition: opacity .15s;
-}
-.timeline-segment:hover { opacity: .85; }
-.timeline-seg-normal { background: #10b981; }
-.timeline-seg-nao-produtiva { background: #f59e0b; }
-.timeline-seg-parada { background: #ef4444; }
-.timeline-seg-parada-climatica { background: #8b5cf6; }
-
-/* ============================================================
    PHOTO PREVIEW
    ============================================================ */
 .photo-grid { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }

@@ -184,8 +184,10 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <label>Nome</label><input type="text" id="modalUserName">
     <label>Email</label><input type="email" id="modalUserEmail" placeholder="ex: nome@gel-eng.com.br">
     <label>Celular (com DDD)</label><input type="tel" id="modalUserPhone">
-    <label>Nova senha</label><input type="password" id="modalUserPassword" placeholder="Min. 8 caracteres">
-    <label>Confirmar senha</label><input type="password" id="modalUserPassword2" placeholder="Repita a senha">
+    <div id="userPasswordGroup">
+      <label>Nova senha</label><input type="password" id="modalUserPassword" placeholder="Min. 8 caracteres">
+      <label>Confirmar senha</label><input type="password" id="modalUserPassword2" placeholder="Repita a senha">
+    </div>
     <label>Função</label><select id="modalUserRole">
       <option value="colaborador">Colaborador</option>
       <option value="supervisor">Supervisor</option>
@@ -216,9 +218,10 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     </div>
     <div class="row" style="margin-top:.5rem;">
       <div><label>Turnos por dia</label>
-        <select id="modalTurnosPorDia" onchange="toggleSupervisor2()">
+        <select id="modalTurnosPorDia" onchange="toggleSupervisorFields()">
           <option value="1">1 turno (24h)</option>
           <option value="2">2 turnos (12h cada)</option>
+          <option value="3">3 turnos (8h cada)</option>
         </select>
       </div>
     </div>
@@ -231,6 +234,7 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <div class="row" id="supervisorFields">
       <div><label>Turno 1 (nome)</label><input type="text" id="modalSupervisor1" placeholder="Nome do supervisor"></div>
       <div id="supervisor2Group" style="display:none;"><label>Turno 2 (nome)</label><input type="text" id="modalSupervisor2" placeholder="Nome do supervisor"></div>
+      <div id="supervisor3Group" style="display:none;"><label>Turno 3 (nome)</label><input type="text" id="modalSupervisor3" placeholder="Nome do supervisor"></div>
     </div>
     <hr style="margin:1rem 0;border:none;border-top:2px solid #e8ecf1;">
     <div class="card-header">Notificações Telegram</div>
@@ -461,9 +465,10 @@ $("#btnNewProject").addEventListener("click", () => {
   $("#modalGeologo").value = "";
   $("#modalSupervisor1").value = "";
   $("#modalSupervisor2").value = "";
+  $("#modalSupervisor3").value = "";
   $("#geologoHistory").innerHTML = "";
   $("#supervisorHistory").innerHTML = "";
-  toggleSupervisor2();
+  toggleSupervisorFields();
   loadCrewDropdowns();
   loadNotifRecipients(null);
   $("#modalProject").classList.add("show");
@@ -479,18 +484,21 @@ async function editProject(id) {
   $("#modalSonda").value = data.sonda; $("#modalDataInício").value = data.data_inicio;
   $("#modalTurno").value = data.turno;
   $("#modalTurnosPorDia").value = data.turnos_por_dia || 1;
-  toggleSupervisor2();
+  toggleSupervisorFields();
 
   // Supervisor free-text fields
   $("#modalSupervisor1").value = data.supervisor_turno1 || "";
   $("#modalSupervisor2").value = data.supervisor_turno2 || "";
+  $("#modalSupervisor3").value = data.supervisor_turno3 || "";
   // Supervisor history display
   const sup1 = data.supervisor_turno1 || "";
   const sup2 = data.supervisor_turno2 || "";
+  const sup3 = data.supervisor_turno3 || "";
   $("#supervisorHistory").innerHTML = [
     sup1 ? "Turno 1: <strong>" + sup1 + "</strong>" : "",
     sup2 ? "Turno 2: <strong>" + sup2 + "</strong>" : "",
-    (!sup1 && !sup2) ? "Nenhum supervisor definido." : ""
+    sup3 ? "Turno 3: <strong>" + sup3 + "</strong>" : "",
+    (!sup1 && !sup2 && !sup3) ? "Nenhum supervisor definido." : ""
   ].filter(Boolean).join("<br>");
 
   // Load geologist dropdown and assignment state
@@ -516,6 +524,7 @@ $("#btnModalSave").addEventListener("click", async () => {
     cliente_email: $("#modalClienteEmail").value.trim() || null,
     supervisor_turno1: $("#modalSupervisor1").value.trim() || null,
     supervisor_turno2: $("#modalSupervisor2").value.trim() || null,
+    supervisor_turno3: $("#modalSupervisor3").value.trim() || null,
   };
   if (!payload.cliente || !payload.localidade || !payload.sonda || !payload.data_inicio) {
     toast("Preencha todos os campos obrigatórios.", "error"); return;
@@ -553,9 +562,10 @@ function confirmDeleteProject(id, name) {
 // ============================================================
 // CREW ASSIGNMENT HELPERS
 // ============================================================
-function toggleSupervisor2() {
-  const sg = $("#supervisor2Group");
-  sg.style.display = $("#modalTurnosPorDia").value === "2" ? "block" : "none";
+function toggleSupervisorFields() {
+  const turnos = parseInt($("#modalTurnosPorDia").value) || 1;
+  $("#supervisor2Group").style.display = turnos >= 2 ? "block" : "none";
+  $("#supervisor3Group").style.display = turnos >= 3 ? "block" : "none";
 }
 
 async function loadCrewDropdowns() {
@@ -572,6 +582,7 @@ async function loadCrewDropdowns() {
   $("#modalGeologo").innerHTML = geologoOpts;
   $("#modalSupervisor1").innerHTML = supOpts;
   $("#modalSupervisor2").innerHTML = supOpts;
+  $("#modalSupervisor3").innerHTML = supOpts;
 }
 
 async function loadAssignmentState(projetoId) {
@@ -653,7 +664,7 @@ async function loadRDOs() {
   const ate = $("#filtroAté").value;
   const status = $("#filtroStatus").value;
 
-  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,reopen_requested,projeto_id,version,submitted_at,projetos(cliente,sonda)").eq("deleted", false).order("data", { ascending: false }).limit(200);
+  let query = sb.from("rdos").select("id,data,tipo_dia,profundidade_inicial,profundidade_final,status,reopen_requested,projeto_id,version,submitted_at,turno,projetos(cliente,sonda)").eq("deleted", false).order("data", { ascending: false }).limit(200);
   if (!$("#filtroAllVersions").checked) query = query.eq("latest", true);
   if (projetoId) query = query.eq("projeto_id", projetoId);
   if (de) query = query.gte("data", de);
@@ -675,7 +686,7 @@ async function loadRDOs() {
     const sentAt = r.submitted_at ? new Date(r.submitted_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" }) : "-";
     return `
     <tr>
-      <td>${r.data}${r.version > 1 ? ` <span style="font-size:.65rem;color:#a04000;">v${r.version}</span>` : ''}${r.reopen_requested ? ` <span style="font-size:.65rem;color:#f59e0b;">⟳</span>` : ''}</td><td>${proj.cliente || '-'} (${proj.sonda || '-'})</td><td>${r.tipo_dia || '-'}</td>
+      <td>${r.data}${r.turno ? ` <span style="font-size:.65rem;color:#3b82f6;">T${r.turno}</span>` : ''}${r.version > 1 ? ` <span style="font-size:.65rem;color:#a04000;">v${r.version}</span>` : ''}${r.reopen_requested ? ` <span style="font-size:.65rem;color:#f59e0b;">⟳</span>` : ''}</td><td>${proj.cliente || '-'} (${proj.sonda || '-'})</td><td>${r.tipo_dia || '-'}</td>
       <td>${r.profundidade_final != null ? (r.profundidade_inicial||0) + ' → ' + r.profundidade_final : '-'}</td>
       <td><span class="badge badge-${r.status}">${{rascunho:"Rascunho",em_revisao:"Em Revisão",aprovado:"Aprovado"}[r.status]||r.status}</span></td>
       <td style="white-space:nowrap;">${sentAt}</td>
@@ -904,7 +915,8 @@ async function viewRDO(id) {
     ${section("Identificacao",
       row("Projeto", (r.projetos?.cliente || '-') + " (" + (r.projetos?.sonda || '-') + ")") +
       row("Autor", authorName) +
-      row("Data", r.data || '-')
+      row("Data", r.data || '-') +
+      row("Turno", r.turno ? "Turno " + r.turno : '-')
     )}
 
     ${section("Perfuracao",
@@ -968,6 +980,8 @@ async function viewRDO(id) {
     )}
 
     ${section("Fotos", fotosHTML)}
+
+    ${section("Histórico de revisão", renderRevisaoLog(r))}
   `;
   $("#rdoDetail").style.display = "block";
   $("#rdoDetail").scrollIntoView({ behavior: "smooth" });
@@ -975,9 +989,36 @@ async function viewRDO(id) {
 
   $("#btnCloseDetail").addEventListener("click", () => { $("#rdoDetail").style.display = "none"; $("#btnPDFDetail").style.display = "none"; $("#btnEmailClient").style.display = "none"; $("#btnApprove").style.display = "none"; $("#btnRevertToDraft").style.display = "none"; });
 
+// ============================================================
+// REVIEW LOG (B-02)
+// ============================================================
+const REVISAO_LABELS = { enviado: "Enviado para revisão", aprovado: "Aprovado", reaberto: "Reaberto para edição", solicitou_reabertura: "Solicitou reabertura" };
+
+// Append an entry to the RDO's review trail (rdos.revisao_log JSONB array).
+async function appendRevisaoLog(rdoId, acao, comentario) {
+  const quem = (currentProfile && currentProfile.name) || (currentUser && currentUser.email) || "-";
+  const { data } = await sb.from("rdos").select("revisao_log").eq("id", rdoId).maybeSingle();
+  const log = (data && Array.isArray(data.revisao_log)) ? data.revisao_log.slice() : [];
+  log.push({ acao, quem, user_id: (currentUser && currentUser.id) || null, quando: new Date().toISOString(), comentario: comentario || null });
+  return sb.from("rdos").update({ revisao_log: log }).eq("id", rdoId);
+}
+
+// Render the review trail as a table (most recent first).
+function renderRevisaoLog(rdo) {
+  const log = Array.isArray(rdo.revisao_log) ? rdo.revisao_log : [];
+  if (log.length === 0) return '<span style="color:#9ca3af;font-size:.82rem;">Nenhuma ação de revisão registrada.</span>';
+  const rows = log.slice().reverse().map(e => {
+    const quando = e.quando ? new Date(e.quando).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" }) : "-";
+    const coment = e.comentario ? String(e.comentario).replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+    return `<tr><td style="white-space:nowrap;">${quando}</td><td>${e.quem || "-"}</td><td>${REVISAO_LABELS[e.acao] || e.acao}</td><td>${coment}</td></tr>`;
+  }).join("");
+  return `<table class="ops-table"><tr><th>Quando</th><th>Quem</th><th>Ação</th><th>Comentário</th></tr>${rows}</table>`;
+}
+
 async function approveRDO(id) {
   const { error } = await sb.from("rdos").update({ status: "aprovado" }).eq("id", id);
   if (error) { toast("Erro: " + error.message, "error"); return; }
+  await appendRevisaoLog(id, "aprovado");
   toast("RDO aprovado!", "success");
   if (BETA_AUTO_EMAIL) sendRDOEmailOnApproval(id); // fire-and-forget
   closeDetail();
@@ -1007,8 +1048,10 @@ async function sendRDOEmailOnApproval(id) {
 }
 
 async function approveReopen(id) {
+  const comentario = prompt("Comentário para quem vai corrigir (opcional):");
   const { error } = await sb.from("rdos").update({ reopen_requested: false, status: "rascunho" }).eq("id", id);
   if (error) { toast("Erro: " + error.message, "error"); return; }
+  await appendRevisaoLog(id, "reaberto", comentario);
   toast("RDO reaberto para edição!", "success");
   closeDetail();
   loadRDOs();
@@ -1024,8 +1067,10 @@ function closeDetail() {
 }
 
 async function revertToDraft(id) {
+  const comentario = prompt("Comentário para quem vai corrigir (por que está revertendo?):");
   const { error } = await sb.from("rdos").update({ status: "rascunho" }).eq("id", id);
   if (error) { toast("Erro: " + error.message, "error"); return; }
+  await appendRevisaoLog(id, "reaberto", comentario);
   toast("RDO revertido para rascunho!", "success");
   closeDetail();
   loadRDOs();
@@ -1065,93 +1110,369 @@ async function buildPDF(id) {
   const { data: r } = await sb.from("rdos").select("*,projetos(cliente,sonda,localidade,data_inicio,turno,cliente_email)").eq("id", id).single();
   if (!r) { toast("RDO não encontrado.", "error"); return null; }
 
+  // Autor (nome do perfil), igual ao viewRDO
+  let authorName = "-";
+  if (r.user_id) {
+    const { data: profile } = await sb.from("profiles").select("name").eq("user_id", r.user_id).maybeSingle();
+    if (profile && profile.name) authorName = profile.name;
+  }
+
   const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const W = 210, M = 15;
+  const W = 210, M = 15, BOTTOM = 280;
   let y = 10;
 
+  // ── helpers ──────────────────────────────────────────────
+  const yn = v => v ? "Sim" : "Não";
+  const fmt = v => (v == null || v === "") ? "-" : String(v);
+  const ensureSpace = (needed) => { if (y + needed > BOTTOM) { doc.addPage(); y = 15; } };
+  const section = (title) => {
+    ensureSpace(12);
+    y += 2;
+    doc.setFontSize(10); doc.setFont(undefined, "bold"); doc.setTextColor(120, 50, 10);
+    doc.text(title, M, y);
+    doc.setFont(undefined, "normal"); doc.setTextColor(0); doc.setFontSize(9);
+    y += 4;
+    doc.setDrawColor(210, 190, 180); doc.line(M, y, W - M, y);
+    y += 3;
+  };
+  const kv = (label, value, valIndent) => {
+    ensureSpace(6);
+    const indent = valIndent || 40;
+    doc.setFont(undefined, "bold");
+    doc.text(label + ":", M, y);
+    doc.setFont(undefined, "normal");
+    const valText = String(value);
+    const lines = doc.splitTextToSize(valText, W - M - indent - M);
+    doc.text(lines, M + indent, y);
+    y += lines.length * 4.2;
+  };
+  const paragraph = (label, text) => {
+    ensureSpace(8);
+    doc.setFont(undefined, "bold"); doc.text(label + ":", M, y); y += 4;
+    doc.setFont(undefined, "normal"); doc.setFontSize(8);
+    doc.text(String(text), M, y, { maxWidth: W - 2 * M });
+    doc.setFontSize(9);
+    y += 5;
+  };
+  const table = (head, body, colWidths) => {
+    ensureSpace(14);
+    doc.autoTable({ startY: y, head: [head], body: body, theme: "grid",
+      styles: { fontSize: 7, cellPadding: 2, valign: "top" },
+      headStyles: { fillColor: [245, 240, 235], textColor: [0], fontStyle: "bold" },
+      columnStyles: colWidths ? Object.fromEntries(colWidths.map((w, i) => [i, { cellWidth: w }])) : undefined,
+      margin: { left: M, right: M } });
+    y = doc.lastAutoTable.finalY + 3;
+  };
+
+  // ── Cabeçalho ────────────────────────────────────────────
   try { doc.addImage(PDF_LOGO, "PNG", W - M - 35, y, 35, 17.5); } catch(_) {}
   y += 2;
   doc.setFontSize(11); doc.setTextColor(160, 64, 0);
-  doc.text("BOLETIM DIARIO DE OBRAS", W / 2, y + 5, { align: "center" });
+  doc.text("RELATÓRIO DIÁRIO DE OBRAS", W / 2, y + 5, { align: "center" });
   y += 10; doc.setDrawColor(192, 160, 160); doc.line(M, y, W - M, y);
 
   y += 6; doc.setFontSize(9); doc.setTextColor(0);
   const proj = r.projetos || {};
+  const turnoLabel = r.turno ? ("Turno " + r.turno) : (proj.turno || "-");
+  // Localidade pode ser longa (endereço completo); reserva linha inteira para ela.
+  const localidade = proj.localidade || "-";
   const info = [
     ["Cliente:", proj.cliente || "-", "Data:", r.data || "-"],
-    ["Sonda:", proj.sonda || "-", "Turno:", proj.turno || "-"],
-    ["Localidade:", proj.localidade || "-"],
+    ["Sonda:", proj.sonda || "-", "Turno:", turnoLabel],
+    ["Autor:", authorName, "Localidade:", localidade],
   ];
-  doc.autoTable({ startY: y, body: info, theme: "plain", styles: { fontSize: 8, cellPadding: 2 },
-    columnStyles: { 0: { fontStyle: "bold", cellWidth: 25 }, 1: { cellWidth: 55 }, 2: { fontStyle: "bold", cellWidth: 18 }, 3: { cellWidth: 55 } },
+  doc.autoTable({ startY: y, body: info, theme: "plain", styles: { fontSize: 8, cellPadding: 2, valign: "top" },
+    columnStyles: { 0: { fontStyle: "bold", cellWidth: 22 }, 1: { cellWidth: 46 }, 2: { fontStyle: "bold", cellWidth: 22 }, 3: { cellWidth: 90 } },
     margin: { left: M } });
   y = doc.lastAutoTable.finalY + 2;
   doc.setDrawColor(192, 160, 160); doc.line(M, y, W - M, y);
 
-  y += 5;
+  // ── Perfuração ───────────────────────────────────────────
+  section("Perfuração");
+  kv("Houve avanço", yn(r.profundidade_final != null));
   if (r.profundidade_final != null) {
-    doc.setFontSize(9); doc.setFont(undefined, "bold");
-    doc.text("Perfuração:", M, y); doc.setFont(undefined, "normal");
-    doc.text(`${r.profundidade_inicial || 0} a ${r.profundidade_final} m`, M + 30, y);
-    y += 5;
-  }
-  // Stratigraphy (array)
-  const stratEntries = r.estratigrafia_mudancas || (r.estratigrafia_descricao ? [{ profundidade: r.estratigrafia_profundidade, descricao: r.estratigrafia_descricao }] : []);
-  if (stratEntries.length > 0) {
-    doc.setFont(undefined, "bold"); doc.text("Estratigrafia:", M, y); y += 4;
-    doc.setFont(undefined, "normal");
-    stratEntries.forEach(s => {
-      doc.text(`${s.descricao || "-"} (${s.profundidade || "?"} m)`, M + 5, y);
-      y += 4;
-    });
+    kv("Profundidade", (r.profundidade_inicial || 0) + " → " + r.profundidade_final + " m");
+  } else {
+    kv("Profundidade", "Não houve avanço na perfuração neste dia.");
   }
 
-  // Striplog summary
+  // Estratigrafia
+  const stratEntries = r.estratigrafia_mudancas || (r.estratigrafia_descricao ? [{ profundidade: r.estratigrafia_profundidade, descricao: r.estratigrafia_descricao }] : []);
+  if (stratEntries.length > 0) {
+    stratEntries.forEach(s => kv("Estratigrafia", (s.profundidade != null ? s.profundidade + "m: " : "") + (s.descricao || "-")));
+  } else {
+    kv("Estratigrafia", "Nenhuma mudança de formação registrada.");
+  }
+
+  // Striplog (tabela completa)
   if (r.striplog && r.striplog.length > 0) {
-    const depths = r.striplog.map(s => s.profundidade).filter(d => !isNaN(d));
-    if (depths.length > 0) {
-      const firstD = depths[0], lastD = depths[depths.length - 1];
-      const firstT = r.striplog[0].inicio || r.striplog[0].horario || "";
-      const meters = lastD - firstD;
-      if (meters > 0 && firstT) {
-        y += 2; doc.setFontSize(9); doc.setFont(undefined, "bold");
-        doc.text("Striplog:", M, y); doc.setFont(undefined, "normal");
-        doc.text(`${meters.toFixed(1)} m perfurados | Início: ${firstT}`, M + 25, y);
-        y += 5;
-      }
+    doc.setFont(undefined, "bold"); doc.text("Striplog", M, y); doc.setFont(undefined, "normal"); y += 3;
+    table(["Prof. (m)", "Início", "Término", "Obs"],
+      r.striplog.map(s => [fmt(s.profundidade), fmt(s.inicio || s.horario), fmt(s.termino), fmt(s.obs)]),
+      [22, 28, 28, 90]);
+  }
+
+  // Brocas
+  if (r.brocas) {
+    const b = r.brocas;
+    if (b.atual && Object.values(b.atual).some(v => v)) {
+      doc.setFont(undefined, "bold"); doc.text("Broca Atual", M, y); doc.setFont(undefined, "normal"); y += 3;
+      table(["Fab.", "Série", "Ø", "IADC", "Jatos", "Perf.(m)", "Op.(h)", "ROP"],
+        [[fmt(b.atual.fabricante), fmt(b.atual.serie), fmt(b.atual.diametro), fmt(b.atual.modelo), fmt(b.atual.jatos), fmt(b.atual.perfurado), fmt(b.atual.oper_hs), fmt(b.atual.rop)]],
+        [22, 24, 14, 22, 18, 20, 18, 18]);
+    }
+    if (b.anterior && Object.values(b.anterior).some(v => v)) {
+      doc.setFont(undefined, "bold"); doc.text("Broca Anterior", M, y); doc.setFont(undefined, "normal"); y += 3;
+      table(["Fab.", "Série", "Ø", "IADC", "Jatos"],
+        [[fmt(b.anterior.fabricante), fmt(b.anterior.serie), fmt(b.anterior.diametro), fmt(b.anterior.modelo), fmt(b.anterior.jatos)]],
+        [24, 26, 16, 24, 20]);
     }
   }
 
+  // BHA
+  if (r.coluna && r.coluna.length > 0) {
+    doc.setFont(undefined, "bold"); doc.text("BHA (coluna)", M, y); doc.setFont(undefined, "normal"); y += 3;
+    table(["Item", "Qty", "ID", "OD", "L(m)", "Tot(m)"],
+      r.coluna.map(i => [fmt(i.item), fmt(i.qty), fmt(i.id_pol), fmt(i.od_pol), fmt(i.length_m), fmt(i.total_m)]),
+      [50, 16, 20, 20, 20, 24]);
+  }
+
+  // Anomalias
+  if (r.parametros_anomalias && r.parametros_anomalias.length > 0) {
+    r.parametros_anomalias.forEach(a => kv(a.parametro || "Parâmetro", a.descricao || "-"));
+  } else {
+    kv("Anomalias", "Nenhuma anomalia registrada.");
+  }
+
+  // ── Revestimento ─────────────────────────────────────────
+  section("Revestimento");
+  kv("Houve descida", yn(r.revestimento_mudou));
+  if (r.revestimento_mudou) {
+    kv("Metros", (r.revestimento_metros != null ? r.revestimento_metros + " m" : "-"));
+    if (r.revestimento_obs) kv("Observação", r.revestimento_obs);
+  } else {
+    kv("", "Não houve descida de revestimento neste dia.");
+  }
+
+  // ── Pré-filtro ───────────────────────────────────────────
+  section("Pré-filtro");
+  kv("Houve descida", yn(r.pre_filtro_mudou));
+  if (r.pre_filtro_mudou && r.pre_filtro) {
+    const pf = r.pre_filtro;
+    if (pf.bags != null) kv("Bags (aumento de pressão)", pf.bags);
+    if (pf.obs) kv("Observação", pf.obs);
+  } else {
+    kv("", "Não houve descida de pré-filtro neste dia.");
+  }
+
+  // ── Limpeza e desenvolvimento ────────────────────────────
+  section("Limpeza e Desenvolvimento");
+  kv("Houve limpeza", yn(r.desenvolvimento_mudou));
+  if (r.desenvolvimento_mudou && r.desenvolvimento) {
+    const d = r.desenvolvimento;
+    if (d.metodo === "bomba") {
+      kv("Método", "Bomba");
+      if (d.nome_bomba) kv("Bomba", d.nome_bomba);
+      if (d.potencia) kv("Potência", d.potencia);
+      if (d.voltagem) kv("Voltagem", d.voltagem);
+      if (d.horas_trabalhadas != null) kv("Horas trabalhadas", d.horas_trabalhadas + " h");
+      if (d.abertura_valvula) kv("Abertura da válvula", d.abertura_valvula === "total" ? "Total" : "Parcial");
+      if (d.profundidade_instalacao != null) kv("Profundidade de instalação", d.profundidade_instalacao + " m");
+      if (d.obs) kv("Observação", d.obs);
+    } else {
+      if (d.modelo) kv("Compressor", d.modelo);
+      if (d.pressao_max != null) kv("Pressão máx.", d.pressao_max);
+      if (d.horimetro_inicio != null) kv("Horímetro início", d.horimetro_inicio + " h");
+      if (d.horimetro_fim != null) kv("Horímetro fim", d.horimetro_fim + " h");
+      if (d.uso && d.uso.length > 0) {
+        doc.setFont(undefined, "bold"); doc.text("Uso do compressor", M, y); doc.setFont(undefined, "normal"); y += 3;
+        table(["Hora", "Prof. arr. (m)", "P. arr.", "P. trab."],
+          d.uso.map(u => [fmt(u.hora), fmt(u.prof_arranque), fmt(u.pressao_arranque), fmt(u.pressao_trabalho)]),
+          [30, 40, 35, 35]);
+      }
+    }
+  } else {
+    kv("", "Não houve limpeza e desenvolvimento neste dia.");
+  }
+
+  // ── Jateamento ───────────────────────────────────────────
+  section("Jateamento");
+  kv("Houve jateamento", yn(r.jateamento_mudou));
+  if (r.jateamento_mudou && r.jateamento && r.jateamento.length > 0) {
+    table(["Início", "Término", "Seção ini. (m)", "Seção fim (m)", "Obs"],
+      r.jateamento.map(j => [fmt(j.inicio), fmt(j.termino), fmt(j.secao_inicio), fmt(j.secao_fim), fmt(j.obs)]),
+      [28, 28, 34, 34, 48]);
+  } else {
+    kv("", "Não houve jateamento neste dia.");
+  }
+
+  // ── Fluido ───────────────────────────────────────────────
+  section("Fluido");
+  if (r.fluido) {
+    const entries = Object.entries(r.fluido).filter(([k, v]) => v != null);
+    if (entries.length > 0) entries.forEach(([k, v]) => kv(k, v));
+    else kv("", "Nenhum parâmetro de fluido preenchido.");
+  } else {
+    kv("", "Nenhum parâmetro de fluido preenchido.");
+  }
+
+  // ── Químicos ─────────────────────────────────────────────
+  section("Químicos");
+  const quimFilled = (r.quimicos || []).filter(q => (q.qtd != null && q.qtd !== "") || (q.consumo != null && q.consumo !== ""));
+  if (quimFilled.length > 0) {
+    table(["Produto", "Tipo", "Qtd"],
+      quimFilled.map(q => {
+        const qtd = q.qtd ?? q.consumo;
+        const tipo = (q.tipo || "consumo") === "reabastecimento" ? "Reabastecimento" : "Consumo";
+        return [fmt(q.name), tipo, qtd != null ? String(qtd) : "-"];
+      }),
+      [90, 50, 30]);
+  } else {
+    kv("", "Nenhum produto químico utilizado.");
+  }
+
+  // ── Combustível ──────────────────────────────────────────
+  section("Combustível");
+  if (r.combustivel && r.combustivel.consumos && r.combustivel.consumos.length > 0) {
+    table(["Equip.", "Tipo", "Litros"],
+      r.combustivel.consumos.map(f => [fmt(f.equipamento), fmt(f.tipo), fmt(f.litros)]),
+      [70, 40, 40]);
+    const s10 = r.combustivel.consumos.filter(c => c.tipo === "S10").reduce((s, c) => s + (c.litros || 0), 0);
+    const s500 = r.combustivel.consumos.filter(c => c.tipo === "S500").reduce((s, c) => s + (c.litros || 0), 0);
+    kv("Totais", "S10: " + s10.toFixed(1) + " L | S500: " + s500.toFixed(1) + " L");
+  }
+  const s10stock = r.combustivel?.estoque_s10;
+  const s500stock = r.combustivel?.estoque_s500;
+  kv("Estoque", "S10 " + (s10stock != null ? s10stock + " L" : "0 L") + " | S500 " + (s500stock != null ? s500stock + " L" : "0 L"));
+
+  // ── Materiais ────────────────────────────────────────────
+  section("Materiais");
+  const matFilled = (r.outros_materiais || []).filter(m => (m.qtd != null && m.qtd !== "") || (m.consumo != null && m.consumo !== ""));
+  if (matFilled.length > 0) {
+    table(["Item", "Tipo", "Qtd"],
+      matFilled.map(m => {
+        const qtd = m.qtd ?? m.consumo;
+        const tipo = (m.tipo || "consumo") === "reabastecimento" ? "Reabastecimento" : "Consumo";
+        return [fmt(m.name), tipo, qtd != null ? String(qtd) : "-"];
+      }),
+      [90, 50, 30]);
+  } else {
+    kv("", "Nenhum material adicional utilizado.");
+  }
+
+  // ── Operações ────────────────────────────────────────────
+  section("Operações");
   if (r.operacoes && r.operacoes.length > 0) {
-    y += 2;
-    doc.setFontSize(9); doc.setFont(undefined, "bold"); doc.text("Registro de Atividades:", M, y); y += 4;
-    const ops = r.operacoes.map(o => [o.inicio + "-" + o.termino, o.descritivo || ""]);
-    doc.autoTable({ startY: y, head: [["Horario", "Descritivo"]], body: ops, theme: "grid",
-      styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [245, 240, 235], textColor: [0] },
-      columnStyles: { 0: { cellWidth: 30 } }, margin: { left: M } });
-    y = doc.lastAutoTable.finalY + 3;
+    table(["Início", "Término", "Tipo", "Descritivo"],
+      r.operacoes.map(o => [fmt(o.inicio), fmt(o.termino), fmt(o.tipo || "Normal"), fmt(o.descritivo)]),
+      [26, 26, 30, 90]);
+  } else {
+    kv("", "Nenhuma operação registrada.");
   }
 
-  y += 2; doc.setFontSize(9); doc.setFont(undefined, "bold"); doc.text("HSE:", M, y); y += 4;
-  doc.setFont(undefined, "normal");
-  doc.text(`DDS: ${r.hse_dds ? "Sim" : "Não"}  |  EPIs: ${r.hse_epis_vistoriados ? "Sim" : "Não"}  |  HH Expostas: ${r.hse_hh_expostas || "-"}`, M, y);
-  y += 5;
-  if (r.hse_incidentes) { doc.text(`Incidentes: ${r.hse_incidentes}`, M, y); y += 4; }
+  // ── Equipe ───────────────────────────────────────────────
+  section("Equipe");
+  if (r.equipe && r.equipe.length > 0) {
+    table(["Função", "Nome"],
+      r.equipe.map(e => [fmt(e.funcao), fmt(e.nome)]),
+      [70, 100]);
+  } else {
+    kv("", "Nenhum membro de equipe registrado.");
+  }
 
+  // ── Sonda ────────────────────────────────────────────────
+  section("Sonda");
+  kv("Horímetro", r.sonda_horimetro != null ? r.sonda_horimetro + " h" : "Não preenchido");
+  if (r.troca_oleo) {
+    const t = r.troca_oleo;
+    doc.setFont(undefined, "bold"); doc.text("Troca de Óleo", M, y); doc.setFont(undefined, "normal"); y += 4;
+    kv("Tipo / Marca", t.tipo || "-");
+    kv("Litros", (t.litros || "-") + " L");
+    kv("Horímetro", (t.horimetro || "-") + " h");
+    kv("Filtro trocado", t.filtro_trocado ? "Sim" : "Não");
+  } else {
+    kv("Troca de óleo", "Não houve troca de óleo neste dia.");
+  }
+
+  // ── HSE ──────────────────────────────────────────────────
+  section("HSE");
+  kv("DDS", yn(r.hse_dds));
+  kv("EPIs vistoriados", yn(r.hse_epis_vistoriados));
+  kv("HH Expostas", r.hse_hh_expostas || "-");
+  kv("Incidentes", r.hse_incidentes || "Nenhum incidente registrado.");
+  kv("Quase-acidentes", r.hse_quase_acidentes || "Nenhum quase-acidente registrado.");
+
+  // ── Observações ──────────────────────────────────────────
   if (r.observacoes) {
-    y += 2; doc.setFont(undefined, "bold"); doc.text("Observações:", M, y); y += 4;
-    doc.setFont(undefined, "normal"); doc.setFontSize(8);
-    doc.text(r.observacoes, M, y, { maxWidth: W - 2 * M });
+    section("Observações");
+    paragraph("", r.observacoes);
   }
 
-  y += 10; doc.setFontSize(9);
-  doc.text(`Supervisor: ${r.aprovacao_geólogo || "-"}`, M, y);
+  // ── Planejamento ─────────────────────────────────────────
+  if (r.planejamento_proximo_turno) {
+    section("Planejamento");
+    paragraph("", r.planejamento_proximo_turno);
+  }
 
+  // ── Fotos ────────────────────────────────────────────────
+  async function loadImageDataURL(url) {
+    try {
+      const resp = await fetch(url, { mode: "cors" });
+      if (!resp.ok) return null;
+      const blob = await resp.blob();
+      return await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+    } catch (_) { return null; }
+  }
+  if (r.fotos && r.fotos.length > 0) {
+    section("Fotos");
+    const cols = 2, thumbW = 60, thumbH = 45, gap = 8;
+    for (let i = 0; i < r.fotos.length; i++) {
+      const col = i % cols, x = M + col * (thumbW + gap);
+      ensureSpace(thumbH + 10);
+      const dataURL = await loadImageDataURL(r.fotos[i]);
+      if (dataURL) {
+        const ext = (r.fotos[i].split(".").pop().split("?")[0] || "jpeg").toLowerCase();
+        const fmtImg = ext === "png" ? "PNG" : (ext === "webp" ? "WEBP" : "JPEG");
+        try {
+          doc.addImage(dataURL, fmtImg, x, y, thumbW, thumbH, undefined, "FAST");
+        } catch (_) {
+          doc.setFontSize(7); doc.setTextColor(120);
+          doc.text("Foto " + (i + 1) + " (erro ao carregar)", x, y + 4);
+          doc.setTextColor(0); doc.setFontSize(9);
+        }
+      } else {
+        doc.setFontSize(7); doc.setTextColor(120);
+        doc.text("Foto " + (i + 1) + " indisponível: " + r.fotos[i], x, y + 4);
+        doc.setTextColor(0); doc.setFontSize(9);
+      }
+      if (col === cols - 1 || i === r.fotos.length - 1) y += thumbH + 6;
+    }
+  }
+
+  // ── Histórico de revisão ────────────────────────────────
+  const log = Array.isArray(r.revisao_log) ? r.revisao_log : [];
+  if (log.length > 0) {
+    section("Histórico de revisão");
+    table(["Quando", "Quem", "Ação", "Comentário"],
+      log.slice().reverse().map(e => {
+        const quando = e.quando ? new Date(e.quando).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" }) : "-";
+        const acao = REVISAO_LABELS[e.acao] || e.acao || "-";
+        return [quando, fmt(e.quem), acao, fmt(e.comentario)];
+      }),
+      [32, 40, 40, 58]);
+  }
+
+  // ── Rodapé / paginação ───────────────────────────────────
   const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(7); doc.setTextColor(156, 163, 175);
-    doc.text(`RDO Auto | Pagina ${i}`, W / 2, 290, { align: "center" });
+    doc.text(`RDO Auto | Página ${i}`, W / 2, 290, { align: "center" });
   }
 
   const filename = `RDO_${proj.cliente || "projeto"}_${r.data}.pdf`.replace(/\s+/g, "_");
@@ -1314,6 +1635,7 @@ $("#btnNewUser").addEventListener("click", () => {
   $("#editUserId").value = "";
    $("#modalUserName").value = ""; $("#modalUserEmail").value = ""; $("#modalUserPhone").value = "";
   $("#modalUserPassword").value = ""; $("#modalUserPassword2").value = ""; $("#modalUserRole").value = "colaborador";
+  $("#userPasswordGroup").style.display = "block";
   $("#modalUser").classList.add("show");
 });
 
@@ -1326,6 +1648,7 @@ async function editUser(userId) {
    $("#modalUserEmail").value = data.email || "";
    $("#modalUserPhone").value = data.phone || "";
   $("#modalUserPassword").value = ""; $("#modalUserPassword2").value = "";
+  $("#userPasswordGroup").style.display = "none";
   $("#modalUserRole").value = data.role;
   $("#modalUser").classList.add("show");
 }
@@ -1365,12 +1688,6 @@ $("#btnUserModalSave").addEventListener("click", async () => {
     toast("Mensagem de onboarding copiada! Envie para o usuário.", "success");
   } else {
     await sb.from("profiles").update({ name, email, phone, role }).eq("user_id", id);
-    if (password) {
-      // Show SQL snippet for password reset
-      const sql = `UPDATE auth.users SET encrypted_password = crypt('${password}', gen_salt('bf')) WHERE email = '${email}';`;
-      await navigator.clipboard.writeText(sql);
-      toast("SQL copiado! Execute no SQL Editor do Supabase para alterar a senha.", "success");
-    }
   }
   toast(id ? "Perfil atualizado!" : "Usuário criado!", "success");
   $("#modalUser").classList.remove("show");

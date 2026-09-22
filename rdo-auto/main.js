@@ -108,6 +108,7 @@ async function loadProfile() {
 // ============================================================
 let currentProjectId = null;
 let currentProjectName = "";
+let allProjects = [];
 
 function showView(viewId) {
   $$(".view").forEach(v => v.classList.remove("active"));
@@ -329,6 +330,7 @@ function showToast(msg, type) {
 // ============================================================
 async function loadProjects() {
   const { data, error } = await sb.from("projetos").select("*").order("created_at", { ascending: false });
+  allProjects = data || [];
   const sel = $("#projectSelect");
   if (error || !data || data.length === 0) {
     sel.innerHTML = '<option value="">Nenhum projeto disponivel.</option>';
@@ -352,8 +354,25 @@ $("#projectSelect").addEventListener("change", () => {
   $("#headerProjectName").textContent = currentProjectName;
   $("#rdosList").style.display = "block";
   $("#homeFooter").style.display = "block";
+  updateTurnoOptions();
   loadRDOs();
 });
+
+// Populate the "Turno" dropdown options based on the current project's turnos_por_dia (B-01).
+function updateTurnoOptions() {
+  const sel = $("#rdoTurno");
+  if (!sel) return;
+  const proj = allProjects.find(p => p.id === currentProjectId);
+  const n = (proj && proj.turnos_por_dia) ? parseInt(proj.turnos_por_dia, 10) : 1;
+  const clamped = Math.min(Math.max(n, 1), 3);
+  const current = sel.value;
+  let html = '<option value="">Selecionar turno...</option>';
+  for (let i = 1; i <= clamped; i++) {
+    html += `<option value="${i}">Turno ${i}</option>`;
+  }
+  sel.innerHTML = html;
+  if (current && Array.from(sel.options).some(o => o.value === current)) sel.value = current;
+}
 
 // ============================================================
 // NEW PROJECT MODAL (admin-only, element may not exist in field app)
@@ -411,7 +430,7 @@ async function loadRDOs() {
   container.innerHTML = '<div style="text-align:center;padding:1rem;color:#9ca3af;">Carregando...</div>';
 
   const { data, error } = await sb.from("rdos")
-    .select("id,data,tipo_dia,profundidade_inicial,profundidade_final,formacao,status,version")
+    .select("id,data,tipo_dia,profundidade_inicial,profundidade_final,formacao,status,version,turno")
     .eq("deleted", false)
     .eq("latest", true)
     .eq("projeto_id", currentProjectId)
@@ -438,7 +457,7 @@ async function loadRDOs() {
     return `
       <div class="rdo-card" data-id="${r.id}" data-status="${r.status}">
         <div class="rdo-info">
-          <div class="rdo-date">${r.data} — ${r.tipo_dia || 'N/D'}${r.version > 1 ? ` <span style="font-size:.7rem;color:#a04000;">v${r.version}</span>` : ''}</div>
+          <div class="rdo-date">${r.data}${r.turno ? ` <span style="font-size:.7rem;color:#3b82f6;">T${r.turno}</span>` : ''} — ${r.tipo_dia || 'N/D'}${r.version > 1 ? ` <span style="font-size:.7rem;color:#a04000;">v${r.version}</span>` : ''}</div>
           <div class="rdo-meta">${depthInfo}${r.formacao ? ' | ' + r.formacao : ''}</div>
         </div>
         <div class="rdo-badge ${badgeClass}">${badgeText}</div>
@@ -558,6 +577,7 @@ async function loadLastStratigraphy() {
 $("#btnNewRDO").addEventListener("click", async () => {
   $("#rdoId").value = "";
   resetForm();
+  updateTurnoOptions();
   showView("formView");
   // Hide form body until date is set
   $("#formBody").style.display = "none";
@@ -734,7 +754,20 @@ function prefillApproval() {
 function openDraft(rdo) {
   resetForm();
   $("#rdoId").value = rdo.id;
+  updateTurnoOptions();
   populateForm(rdo);
+  // Warn the colaborador if this draft was reopened with a comment (B-02).
+  const reopen = latestReopenComment(rdo);
+  const banner = $("#reopenBanner");
+  if (reopen) {
+    banner.innerHTML = '<strong>RDO reaberto para edição.</strong><br>' +
+      '<span style="font-size:.8rem;">' + (reopen.quem || "-") + ' · ' +
+      new Date(reopen.quando).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" }) + '</span><br>' +
+      (reopen.comentario ? '<em>' + String(reopen.comentario).replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</em>' : "");
+    banner.style.display = "block";
+  } else {
+    banner.style.display = "none";
+  }
   $("#formBody").style.display = "block";
   startAutoDraft();
   renderPhotoPreview();
@@ -925,7 +958,8 @@ async function viewRDO(rdo) {
 
     ${section("Identificacao",
       row("Autor", authorName) +
-      row("Data", rdo.data || '-')
+      row("Data", rdo.data || '-') +
+      row("Turno", rdo.turno ? "Turno " + rdo.turno : '-')
     )}
 
     ${section("Perfuracao",
@@ -990,6 +1024,8 @@ async function viewRDO(rdo) {
 
     ${section("Fotos", fotosHTML)}
 
+    ${section("Histórico de revisão", renderRevisaoLog(rdo))}
+
     ${rdo.status === 'aprovado' && !rdo.reopen_requested && currentProfile && currentProfile.role === 'colaborador'
       ? `<button class="btn btn-secondary" onclick="requestReopen('${rdo.id}')" style="margin-top:.5rem;">Solicitar Reabertura</button>`
       : (rdo.reopen_requested ? `<p style="color:#f59e0b;font-size:.78rem;margin-top:.5rem;">Reabertura solicitada — aguardando supervisor</p>` : '')}
@@ -997,9 +1033,46 @@ async function viewRDO(rdo) {
   showView("readonlyView");
 }
 
+// ============================================================
+// REVIEW LOG (B-02)
+// ============================================================
+const REVISAO_LABELS = { enviado: "Enviado para revisão", aprovado: "Aprovado", reaberto: "Reaberto para edição", solicitou_reabertura: "Solicitou reabertura" };
+
+// Append an entry to the RDO's review trail (rdos.revisao_log JSONB array).
+async function appendRevisaoLog(rdoId, acao, comentario) {
+  const quem = (currentProfile && currentProfile.name) || (currentUser && currentUser.email) || "-";
+  const { data } = await sb.from("rdos").select("revisao_log").eq("id", rdoId).maybeSingle();
+  const log = (data && Array.isArray(data.revisao_log)) ? data.revisao_log.slice() : [];
+  log.push({ acao, quem, user_id: (currentUser && currentUser.id) || null, quando: new Date().toISOString(), comentario: comentario || null });
+  return sb.from("rdos").update({ revisao_log: log }).eq("id", rdoId);
+}
+
+// Render the review trail as a table (most recent first).
+function renderRevisaoLog(rdo) {
+  const log = Array.isArray(rdo.revisao_log) ? rdo.revisao_log : [];
+  if (log.length === 0) return '<span style="color:#9ca3af;font-size:.82rem;">Nenhuma ação de revisão registrada.</span>';
+  const rows = log.slice().reverse().map(e => {
+    const quando = e.quando ? new Date(e.quando).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" }) : "-";
+    const coment = e.comentario ? String(e.comentario).replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+    return `<tr><td style="white-space:nowrap;">${quando}</td><td>${e.quem || "-"}</td><td>${REVISAO_LABELS[e.acao] || e.acao}</td><td>${coment}</td></tr>`;
+  }).join("");
+  return `<table class="ops-table"><tr><th>Quando</th><th>Quem</th><th>Ação</th><th>Comentário</th></tr>${rows}</table>`;
+}
+
+// Latest "reaberto" comment, used to warn the colaborador editing a reverted draft.
+function latestReopenComment(rdo) {
+  const log = Array.isArray(rdo.revisao_log) ? rdo.revisao_log : [];
+  for (let i = log.length - 1; i >= 0; i--) {
+    if (log[i].acao === "reaberto" && log[i].comentario) return log[i];
+  }
+  return null;
+}
+
 async function requestReopen(id) {
+  const comentario = prompt("Por que você precisa reabrir este RDO? (opcional)");
   const { error } = await sb.from("rdos").update({ reopen_requested: true }).eq("id", id);
   if (error) { showToast("Erro: " + error.message, "error"); return; }
+  await appendRevisaoLog(id, "solicitou_reabertura", comentario);
   showToast("Reabertura solicitada!", "success");
   showView("homeView");
   loadRDOs();
@@ -1010,6 +1083,7 @@ async function requestReopen(id) {
 // ============================================================
 function populateForm(rdo) {
   $("#rdoDate").value = rdo.data;
+  $("#rdoTurno").value = rdo.turno || "";
   if (rdo.profundidade_final != null) {
     setToggle("#toggleDrilling", true);
     // Depth is computed from striplog, not manual fields
@@ -1290,45 +1364,10 @@ function addOpRow(inicio, termino, tipo, descritivo) {
     <td><select class="opType" style="min-width:100px;font-size:.82rem;padding:.3rem;">${opts}</select></td>
     <td><input type="text" value="${descritivo || ''}" class="opDescription" placeholder="Descreva..."></td>
     <td><button class="btn btn-danger btn-sm opRemove" type="button">&times;</button></td>`;
-  row.querySelector(".opRemove").addEventListener("click", () => { row.remove(); updateTimeline(); });
-  // Update timeline on input
-  row.querySelectorAll("input, select").forEach(el => el.addEventListener("input", updateTimeline));
-  row.querySelectorAll("input, select").forEach(el => el.addEventListener("change", updateTimeline));
-  updateTimeline();
+  row.querySelector(".opRemove").addEventListener("click", () => { row.remove(); });
 }
 $("#btnAddOp").addEventListener("click", () => addOpRow("","","Normal",""));
 addOpRow("","","Normal","");
-
-function updateTimeline() {
-  const track = $("#timelineTrack");
-  const turnoH = parseFloat($("#shiftHours").value) || 12;
-  track.innerHTML = "";
-  for (let i = 1; i < $("#opsTable").rows.length; i++) {
-    const row = $("#opsTable").rows[i];
-    const inicio = row.querySelector(".opStart")?.value;
-    const termino = row.querySelector(".opEnd")?.value;
-    const tipo = row.querySelector(".opType")?.value || "Normal";
-    const desc = row.querySelector(".opDescription")?.value || "";
-    if (!inicio || !termino) continue;
-    const [ih, im] = inicio.split(":").map(Number);
-    const [th, tm] = termino.split(":").map(Number);
-    const startMin = ih * 60 + im;
-    const endMin = th * 60 + tm;
-    if (endMin <= startMin) continue;
-    const totalMin = turnoH * 60;
-    const leftPct = (startMin / totalMin) * 100;
-    const widthPct = ((endMin - startMin) / totalMin) * 100;
-    const cls = tipo === "Parada Climatica" ? "timeline-seg-parada-climatica" : tipo === "Parada" ? "timeline-seg-parada" : tipo === "Nao Produtiva" ? "timeline-seg-nao-produtiva" : "timeline-seg-normal";
-    const seg = document.createElement("div");
-    seg.className = "timeline-segment " + cls;
-    seg.style.left = leftPct + "%";
-    seg.style.width = widthPct + "%";
-    seg.title = `${inicio}-${termino}: ${desc}`;
-    track.appendChild(seg);
-  }
-}
-// Update timeline when turno changes
-$("#shiftHours").addEventListener("input", updateTimeline);
 
 // ============================================================
 // COLUNA TABLE
@@ -2081,6 +2120,7 @@ function buildPayload(status) {
     user_id: (currentUser && currentUser.id) || null,
     projeto_id: currentProjectId,
     data: $("#rdoDate").value || new Date().toISOString().split("T")[0],
+    turno: $("#rdoTurno").value ? parseInt($("#rdoTurno").value, 10) : null,
       hse_dds: $("#hseDds").checked,
     hse_incidentes: $("#hseIncidents").value || null,
     hse_quase_acidentes: $("#hseNearMiss").value || null,
@@ -2195,6 +2235,7 @@ $("#btnSubmit").addEventListener("click", async () => {
       result = await sb.from("rdos").insert(payload).select().single();
     }
     if (result.error) { showToast("Erro: "+result.error.message,"error"); return; }
+    await appendRevisaoLog(result.data.id, "enviado");
     showToast("RDO enviado com sucesso!","success");
     stopAutoDraft();
     resetForm();
@@ -2217,7 +2258,9 @@ function resetForm() {
   const today = new Date().toISOString().split("T")[0];
   $("#rdoDate").value = "";
   $("#rdoDate").max = today;
+  $("#rdoTurno").value = "";
   $("#formBody").style.display = "none";
+  $("#reopenBanner").style.display = "none";
   setToggle("#toggleDrilling", false);
   setToggle("#toggleFluid", false);
   setToggle("#toggleMateriais", false);
