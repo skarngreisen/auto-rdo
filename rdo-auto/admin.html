@@ -1168,13 +1168,32 @@ async function buildPDF(id) {
   };
 
   // ── Cabeçalho ────────────────────────────────────────────
-  try { doc.addImage(PDF_LOGO, "PNG", W - M - 35, y, 35, 17.5); } catch(_) {}
-  y += 2;
-  doc.setFontSize(11); doc.setTextColor(160, 64, 0);
-  doc.text("RELATÓRIO DIÁRIO DE OBRAS", W / 2, y + 5, { align: "center" });
-  y += 10; doc.setDrawColor(192, 160, 160); doc.line(M, y, W - M, y);
+  // A linha divisória precisa ficar ABAIXO do logo e do título.
+  // Calculamos a posição dinamicamente a partir da altura real do logo,
+  // em vez de usar coordenadas fixas que sobrepõem os elementos.
+  const logoX = W - M - 35;
+  const logoY = y;             // topo do logo = topo atual da página
+  const logoW = 35;
+  const logoH = 17.5;          // altura conhecida da imagem logo_small.png (35 x 17.5 mm)
+  let logoBottom = logoY;      // se o logo não carregar, não influencia
+  try {
+    doc.addImage(PDF_LOGO, "PNG", logoX, logoY, logoW, logoH);
+    logoBottom = logoY + logoH;
+  } catch (_) {}
 
-  y += 6; doc.setFontSize(9); doc.setTextColor(0);
+  // Título centralizado verticalmente na faixa do logo.
+  const titleSize = 11;
+  doc.setFontSize(titleSize); doc.setTextColor(160, 64, 0);
+  const titleBaseline = logoY + logoH / 2 + titleSize / 3; // centro óptico da faixa do logo
+  doc.text("RELATÓRIO DIÁRIO DE OBRAS", W / 2, titleBaseline, { align: "center" });
+
+  // Linha divisória: abaixo de quem estiver mais baixo (logo ou título) + margem de segurança.
+  const titleBottom = titleBaseline + titleSize * 0.35;
+  const LINE_SAFETY = 3;       // margem de segurança em mm
+  y = Math.max(logoBottom, titleBottom) + LINE_SAFETY;
+  doc.setDrawColor(192, 160, 160); doc.line(M, y, W - M, y);
+
+  y += 5; doc.setFontSize(9); doc.setTextColor(0);
   const proj = r.projetos || {};
   const turnoLabel = r.turno ? ("Turno " + r.turno) : (proj.turno || "-");
   // Localidade pode ser longa (endereço completo); reserva linha inteira para ela.
