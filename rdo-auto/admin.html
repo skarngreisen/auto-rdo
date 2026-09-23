@@ -1165,7 +1165,12 @@ async function buildPDF(id) {
     y += lines.length * 4.2 + KV_GAP;
   };
   const table = (head, body, colWidths) => {
-    ensureSpace(16);
+    // Estima a altura da tabela (cabeçalho + N linhas * altura~5mm) e,
+    // se não couber na página atual, inicia numa página nova para evitar
+    // cabeçalho repetido e linhas "órfãs" no fim da página.
+    const ROW_H = 5.5;
+    const estHeight = ROW_H * (body.length + 1) + 6;
+    if (y + estHeight > BOTTOM) { doc.addPage(); y = 15; }
     doc.autoTable({ startY: y, head: [head], body: body, theme: "grid",
       styles: { fontSize: 7, cellPadding: CELL_PAD, valign: "top" },
       headStyles: { fillColor: [245, 240, 235], textColor: [0], fontStyle: "bold" },
