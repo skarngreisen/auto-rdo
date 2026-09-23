@@ -1166,6 +1166,35 @@ async function buildPDF(id) {
       margin: { left: M, right: M } });
     y = doc.lastAutoTable.finalY + 3;
   };
+  // Resumo da perfuração a partir do striplog (metros, tempo, ROP médio).
+  const computeStriplogSummary = (striplog) => {
+    if (!striplog || striplog.length === 0) return null;
+    const depths = striplog.map(s => parseFloat(s.profundidade)).filter(d => !isNaN(d)).sort((a, b) => a - b);
+    if (depths.length === 0) return null;
+    const depthStart = depths[0];
+    const depthEnd = depths[depths.length - 1];
+    const meters = depthEnd - depthStart;
+    const toMin = (t) => { const [h, m] = String(t || "").split(":").map(Number); return (h || 0) * 60 + (m || 0); };
+    const firstIni = striplog.find(s => s.inicio)?.inicio || "";
+    const lastTer = [...striplog].reverse().find(s => s.termino)?.termino || "";
+    let minutes = null;
+    if (firstIni && lastTer) {
+      let totalDt = toMin(lastTer) - toMin(firstIni);
+      if (totalDt < 0) totalDt += 24 * 60; // virada de meia-noite
+      let stopDt = 0;
+      for (const s of striplog) {
+        if (s.mode === "stop" && s.inicio && s.termino) {
+          let sd = toMin(s.termino) - toMin(s.inicio);
+          if (sd < 0) sd += 24 * 60;
+          stopDt += sd;
+        }
+      }
+      totalDt -= stopDt;
+      if (totalDt > 0) minutes = totalDt;
+    }
+    const ropAvg = (meters > 0 && minutes) ? (meters / (minutes / 60)) : null;
+    return { depthStart, depthEnd, meters, minutes, ropAvg };
+  };
 
   // ── Cabeçalho ────────────────────────────────────────────
   // A linha divisória precisa ficar ABAIXO do logo e do título.
@@ -1211,8 +1240,17 @@ async function buildPDF(id) {
 
   // ── Perfuração ───────────────────────────────────────────
   section("Perfuração");
+  const perfSummary = computeStriplogSummary(r.striplog);
   kv("Houve avanço", yn(r.profundidade_final != null));
-  if (r.profundidade_final != null) {
+  if (r.profundidade_final != null && perfSummary) {
+    // Resumo da perfuração (profundidade + metros + tempo + ROP médio)
+    const s = perfSummary;
+    const profTxt = s.depthStart.toFixed(2) + " a " + s.depthEnd.toFixed(2) + " m";
+    kv("Resumo da perfuração", profTxt + "  |  " +
+      (s.meters > 0 ? s.meters.toFixed(1) + " m " : "") +
+      (s.minutes != null ? "em " + s.minutes + " min" : "") +
+      (s.ropAvg != null ? "  |  ROP médio " + s.ropAvg.toFixed(1) + " m/h" : ""));
+  } else if (r.profundidade_final != null) {
     kv("Profundidade", (r.profundidade_inicial || 0) + " a " + r.profundidade_final + " m");
   } else {
     kv("Profundidade", "Não houve avanço na perfuração neste dia.");
@@ -1224,14 +1262,6 @@ async function buildPDF(id) {
     stratEntries.forEach(s => kv("Estratigrafia", (s.profundidade != null ? s.profundidade + "m: " : "") + (s.descricao || "-")));
   } else {
     kv("Estratigrafia", "Nenhuma mudança de formação registrada.");
-  }
-
-  // Striplog (tabela completa)
-  if (r.striplog && r.striplog.length > 0) {
-    doc.setFont(undefined, "bold"); doc.text("Striplog", M, y); doc.setFont(undefined, "normal"); y += 3;
-    table(["Prof. (m)", "Início", "Término", "Obs"],
-      r.striplog.map(s => [fmt(s.profundidade), fmt(s.inicio || s.horario), fmt(s.termino), fmt(s.obs)]),
-      [22, 28, 28, 90]);
   }
 
   // Brocas
@@ -1487,6 +1517,21 @@ async function buildPDF(id) {
         return [quando, fmt(e.quem), acao, fmt(e.comentario)];
       }),
       [32, 40, 40, 58]);
+  }
+
+  // ── Anexo: Striplog (última página) ──────────────────────
+  if (r.striplog && r.striplog.length > 0) {
+    doc.addPage();
+    y = 15;
+    doc.setFontSize(11); doc.setFont(undefined, "bold"); doc.setTextColor(120, 50, 10);
+    doc.text("ANEXO — STRIPLOG", W / 2, y, { align: "center" });
+    doc.setFont(undefined, "normal"); doc.setTextColor(0); doc.setFontSize(9);
+    y += 4;
+    doc.setDrawColor(210, 190, 180); doc.line(M, y, W - M, y);
+    y += 4;
+    table(["Prof. (m)", "Início", "Término", "Obs"],
+      r.striplog.map(s => [fmt(s.profundidade), fmt(s.inicio || s.horario), fmt(s.termino), fmt(s.obs)]),
+      [26, 32, 32, 90]);
   }
 
   // ── Rodapé / paginação ───────────────────────────────────
