@@ -9,6 +9,23 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
+// Escape free text before injecting into innerHTML (textareas render raw content).
+function escapeHtml(str) {
+  return String(str == null ? "" : str)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const AUTO_GROW_MAX_PX = 160; // ~10 lines; beyond this the textarea scrolls
+
+// Auto-grow a textarea vertically to fit its content, capped by max height.
+// Resetting height to "auto" first lets scrollHeight shrink when text is removed.
+function autoGrow(el) {
+  if (!el) return;
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, AUTO_GROW_MAX_PX) + "px";
+  el.style.overflowY = el.scrollHeight > AUTO_GROW_MAX_PX ? "auto" : "hidden";
+}
+
 // ============================================================
 // AUTH
 // ============================================================
@@ -1362,9 +1379,12 @@ function addOpRow(inicio, termino, tipo, descritivo) {
     <td><input type="time" value="${inicio || ''}" class="opStart"></td>
     <td><input type="time" value="${termino || ''}" class="opEnd"></td>
     <td><select class="opType" style="min-width:100px;font-size:.82rem;padding:.3rem;">${opts}</select></td>
-    <td><input type="text" value="${descritivo || ''}" class="opDescription" placeholder="Descreva..."></td>
+    <td><textarea rows="1" class="opDescription auto-grow" placeholder="Descreva...">${escapeHtml(descritivo)}</textarea></td>
     <td><button class="btn btn-danger btn-sm opRemove" type="button">&times;</button></td>`;
   row.querySelector(".opRemove").addEventListener("click", () => { row.remove(); });
+  const desc = row.querySelector(".opDescription");
+  autoGrow(desc);
+  desc.addEventListener("input", () => autoGrow(desc));
 }
 $("#btnAddOp").addEventListener("click", () => addOpRow("","","Normal",""));
 addOpRow("","","Normal","");
@@ -1464,7 +1484,7 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
         </div>
         <div class="sl-field sl-field-obs">
           <span class="sl-label">Observação</span>
-          <input type="text" value="${obs || ''}" class="slObs" placeholder="${mode === 'stop' ? 'Motivo da parada (obrigatório)' : 'Ex.: parada para manutencao'}" ${mode === "stop" ? "required" : ""}>
+          <textarea rows="1" class="slObs auto-grow" placeholder="${mode === 'stop' ? 'Motivo da parada (obrigatório)' : 'Ex.: parada para manutencao'}" ${mode === "stop" ? "required" : ""}>${escapeHtml(obs)}</textarea>
         </div>
         <span class="sl-type"><span style="color:${borderColor};">●</span> ${modeLabel}</span>
       </div>
@@ -1474,6 +1494,9 @@ function addStriplogRow(mode, depth, inicio, termino, obs) {
   $("#striplogTable").appendChild(card);
   card.querySelector(".sl-remove").addEventListener("click", () => { card.remove(); updateStriplogROP(); });
   card.querySelectorAll("input").forEach(el => el.addEventListener("input", updateStriplogROP));
+  const obsEl = card.querySelector(".slObs");
+  autoGrow(obsEl);
+  obsEl.addEventListener("input", () => autoGrow(obsEl));
   updateStriplogROP();
 }
 
@@ -1755,9 +1778,12 @@ function addAnomalyRow(parametro, descricao) {
   const opts = PARAM_OPTIONS.map(p => `<option value="${p}" ${p === parametro ? "selected" : ""}>${p}</option>`).join("");
   row.innerHTML = `
     <td><select class="anomalyParam" style="min-width:110px;">${opts}</select></td>
-    <td><input type="text" value="${descricao || ''}" class="anomalyDesc" placeholder="Descreva a anomalia observada..."></td>
+    <td><textarea rows="1" class="anomalyDesc auto-grow" placeholder="Descreva a anomalia observada...">${escapeHtml(descricao)}</textarea></td>
     <td><button class="btn btn-danger btn-sm anomalyRemove" type="button">&times;</button></td>`;
   row.querySelector(".anomalyRemove").addEventListener("click", () => row.remove());
+  const desc = row.querySelector(".anomalyDesc");
+  autoGrow(desc);
+  desc.addEventListener("input", () => autoGrow(desc));
 }
 $("#btnAddAnomaly").addEventListener("click", () => addAnomalyRow("",""));
 
@@ -1767,9 +1793,12 @@ function addStratRow(depth, desc) {
   const row = tbody.insertRow(-1);
   row.innerHTML = `
     <td><input type="number" step="0.01" value="${depth || ''}" class="stratDepth" style="min-width:70px;"></td>
-    <td><input type="text" value="${desc || ''}" class="stratDesc" placeholder="Ex.: Fm. Botucatu, arenito fino"></td>
+    <td><textarea rows="1" class="stratDesc auto-grow" placeholder="Ex.: Fm. Botucatu, arenito fino">${escapeHtml(desc)}</textarea></td>
     <td><button class="btn btn-danger btn-sm stratRemove" type="button">&times;</button></td>`;
   row.querySelector(".stratRemove").addEventListener("click", () => row.remove());
+  const descEl = row.querySelector(".stratDesc");
+  autoGrow(descEl);
+  descEl.addEventListener("input", () => autoGrow(descEl));
 }
 $("#btnAddStrat").addEventListener("click", () => addStratRow("",""));
 
@@ -2022,9 +2051,12 @@ function addJateamentoRow(inicio, termino, secaoInicio, secaoFim, obs) {
     <td><input type="time" value="${termino || ''}" class="jatTermino" style="min-width:72px;width:72px;"></td>
     <td><input type="number" step="0.01" value="${secaoInicio || ''}" class="jatSecIni" style="min-width:60px;width:70px;"></td>
     <td><input type="number" step="0.01" value="${secaoFim || ''}" class="jatSecFim" style="min-width:60px;width:70px;"></td>
-    <td><input type="text" value="${obs || ''}" class="jatObs" placeholder="Obs" style="min-width:90px;"></td>
+    <td><textarea rows="1" class="jatObs auto-grow" placeholder="Obs" style="min-width:90px;">${escapeHtml(obs)}</textarea></td>
     <td><button class="btn btn-danger btn-sm jatRemove" type="button">&times;</button></td>`;
   row.querySelector(".jatRemove").addEventListener("click", () => row.remove());
+  const obsEl = row.querySelector(".jatObs");
+  autoGrow(obsEl);
+  obsEl.addEventListener("input", () => autoGrow(obsEl));
 }
 $("#btnAddJateamento").addEventListener("click", () => addJateamentoRow("","","","",""));
 
