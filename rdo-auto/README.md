@@ -1,6 +1,6 @@
 # RDO Auto — PWA para Preenchimento de Relatorio Diario de Obras
 
-Aplicativo web progressivo (PWA) para supervisores de campo preencherem o RDO diretamente no celular, eliminando papel e digitacao manual. Hospedado via **GitHub Pages**.
+Aplicativo web progressivo (PWA) para supervisores de campo preencherem o RDO diretamente no celular, eliminando papel e digitacao manual. Hospedado via **GitHub Pages** (veja `AZURE-DEPLOY.md` para instrucoes de hospedagem alternativa no **Azure Static Web Apps**).
 
 ---
 

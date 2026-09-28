@@ -32,3 +32,20 @@ _internal/enable-cron.sql
 _internal/enable-pgnet.sql
 _internal/verify-migration.sql
 _internal/visita-campo-*.md
+
+# _internal/ — keep migrations (.sql) and edge-functions tracked, ignore the rest
+_internal/*.md
+_internal/*.py
+_internal/*.pdf
+_internal/email-*.md
+_internal/migration-revisao-log.sql
+_internal/migration-turno.sql
+
+# references/ — large binary asset dump (inputs for manual review, not for the repo)
+references/*
+!references/RDOs Artesano.xlsx
+
+# Stray artifacts from broken shell redirects / unexpanded env vars
+%TEMP%/
+{await
+*.tmp
