@@ -38,8 +38,6 @@ _internal/*.md
 _internal/*.py
 _internal/*.pdf
 _internal/email-*.md
-_internal/migration-revisao-log.sql
-_internal/migration-turno.sql
 
 # references/ — large binary asset dump (inputs for manual review, not for the repo)
 references/*

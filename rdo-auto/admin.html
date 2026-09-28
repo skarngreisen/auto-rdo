@@ -423,7 +423,7 @@ $("#btnAddNotif").addEventListener("click", async () => { await ensureProfilesLo
 // PROJECTS
 // ============================================================
 async function loadProjetos() {
-  const { data } = await sb.from("projetos").select("*").order("created_at", { ascending: false });
+  const { data } = await sb.from("projetos").select("*").eq("deleted", false).order("created_at", { ascending: false });
   const tbody = $("#projetosTable");
   if (!data || data.length === 0) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:#9ca3af;">Nenhum projeto.</td></tr>';
@@ -450,7 +450,7 @@ async function loadProjetos() {
       <td style="font-size:.78rem;">${geoMap[p.id] || '-'}</td>
       <td class="actions">
         <button class="btn btn-secondary btn-sm" onclick="editProject('${p.id}')">Editar</button>
-        <button class="btn btn-danger btn-sm" onclick="confirmDeleteProject('${p.id}','${p.cliente}')">Excluir</button>
+        ${currentProfile && currentProfile.role === "admin" ? `<button class="btn btn-danger btn-sm" onclick="confirmDeleteProject('${p.id}','${p.cliente}')">Excluir</button>` : ""}
       </td>
     </tr>`).join("");
 }
@@ -555,7 +555,7 @@ let deleteTarget = null;
 function confirmDeleteProject(id, name) {
   deleteTarget = { type: "project", id, name };
   $("#confirmTitle").textContent = "Excluir projeto?";
-  $("#confirmMsg").textContent = `Tem certeza que deseja excluir "${name}"? Todos os RDOs deste projeto serão excluídos.`;
+  $("#confirmMsg").textContent = `Tem certeza que deseja excluir "${name}"? O projeto será ocultado (recuperável por um administrador), mas os RDOs permanecem no banco.`;
   $("#modalConfirm").classList.add("show");
 }
 
@@ -648,7 +648,7 @@ async function saveAssignment(type, projetoId, turno) {
 // RDO FILTERS & LIST
 // ============================================================
 async function loadRDOFilters() {
-  const { data } = await sb.from("projetos").select("id,cliente,sonda").order("cliente");
+  const { data } = await sb.from("projetos").select("id,cliente,sonda").eq("deleted", false).order("cliente");
   const sel = $("#filtroProjeto");
   if (data) {
     sel.innerHTML = '<option value="">Todos</option>' + data.map(p => `<option value="${p.id}">${p.cliente} (${p.sonda})</option>`).join("");
@@ -1653,16 +1653,22 @@ $("#modalConfirm").addEventListener("click", e => { if (e.target === $("#modalCo
 $("#btnConfirmOk").addEventListener("click", async () => {
   if (!deleteTarget) return;
   let error;
-  if (deleteTarget.type === "project") {
-    ({ error } = await sb.from("projetos").delete().eq("id", deleteTarget.id));
+  const wasProject = deleteTarget.type === "project";
+  if (wasProject) {
+    // Soft delete: marca como apagado, não remove a linha (recuperável + auditado).
+    ({ error } = await sb.from("projetos").update({
+      deleted: true,
+      deleted_at: new Date().toISOString(),
+      deleted_by: currentUser ? currentUser.id : null,
+    }).eq("id", deleteTarget.id));
   } else {
     ({ error } = await sb.from("rdos").update({ deleted: true }).eq("id", deleteTarget.id));
   }
   if (error) { toast("Erro: " + error.message, "error"); }
-  else { toast(deleteTarget.type === "project" ? "Projeto excluído!" : "RDO excluído!", "success"); }
+  else { toast(wasProject ? "Projeto excluído!" : "RDO excluído!", "success"); }
   deleteTarget = null;
   $("#modalConfirm").classList.remove("show");
-  if (deleteTarget?.type === "project") { loadProjetos(); loadRDOFilters(); }
+  if (wasProject) { loadProjetos(); loadRDOFilters(); }
   else loadRDOs();
 });
 
