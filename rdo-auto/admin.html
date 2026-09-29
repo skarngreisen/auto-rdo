@@ -1510,18 +1510,65 @@ async function buildPDF(id) {
       });
     } catch (_) { return null; }
   }
+  // Load an image element to read its natural pixel dimensions.
+  function loadImageElement(dataURL) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.naturalWidth || img.width, h: img.naturalHeight || img.height });
+      img.onerror = () => resolve(null);
+      img.src = dataURL;
+    });
+  }
+
+  // Draw an image "cover"-fitted in a cell: keeps the aspect ratio, fills the
+  // whole cell and crops the overflow (centered). Never stretches.
+  async function addImageCover(dataURL, fmtImg, x, y, cellW, cellH) {
+    const dims = await loadImageElement(dataURL);
+    let drawW = cellW, drawH = cellH, dx = x, dy = y;
+    if (dims && dims.w > 0 && dims.h > 0) {
+      const scale = Math.max(cellW / dims.w, cellH / dims.h); // cover
+      drawW = dims.w * scale;
+      drawH = dims.h * scale;
+      dx = x - (drawW - cellW) / 2; // center horizontally
+      dy = y - (drawH - cellH) / 2; // center vertically
+    }
+    const canClip = typeof doc.saveGraphicsState === "function" &&
+                    typeof doc.clip === "function" &&
+                    typeof doc.advancedAPI === "function";
+    if (canClip) {
+      // Clipping requires the advanced graphics API in jsPDF.
+      doc.advancedAPI(function (d) {
+        d.saveGraphicsState();
+        d.rect(x, y, cellW, cellH);
+        d.clip();
+        d.discardPath();
+        d.addImage(dataURL, fmtImg, dx, dy, drawW, drawH, undefined, "FAST");
+        d.restoreGraphicsState();
+      });
+    } else {
+      // Fallback (no clipping API): keep aspect ratio, fit inside cell (contain).
+      let fw = cellW, fh = cellH;
+      if (dims && dims.w > 0 && dims.h > 0) {
+        const s = Math.min(cellW / dims.w, cellH / dims.h);
+        fw = dims.w * s; fh = dims.h * s;
+      }
+      doc.addImage(dataURL, fmtImg, x + (cellW - fw) / 2, y + (cellH - fh) / 2, fw, fh, undefined, "FAST");
+    }
+  }
+
   if (r.fotos && r.fotos.length > 0) {
     section("Fotos");
-    const cols = 2, thumbW = 60, thumbH = 45, gap = 8;
+    const cols = 2, cellW = 85, cellH = 64, gap = 8, rowGap = 8;
     for (let i = 0; i < r.fotos.length; i++) {
-      const col = i % cols, x = M + col * (thumbW + gap);
-      ensureSpace(thumbH + 10);
+      const col = i % cols;
+      const x = M + col * (cellW + gap);
+      if (col === 0) ensureSpace(cellH + 12); // new row: ensure it fits before drawing
       const dataURL = await loadImageDataURL(r.fotos[i]);
       if (dataURL) {
         const ext = (r.fotos[i].split(".").pop().split("?")[0] || "jpeg").toLowerCase();
         const fmtImg = ext === "png" ? "PNG" : (ext === "webp" ? "WEBP" : "JPEG");
         try {
-          doc.addImage(dataURL, fmtImg, x, y, thumbW, thumbH, undefined, "FAST");
+          await addImageCover(dataURL, fmtImg, x, y, cellW, cellH);
         } catch (_) {
           doc.setFontSize(7); doc.setTextColor(120);
           doc.text("Foto " + (i + 1) + " (erro ao carregar)", x, y + 4);
@@ -1532,7 +1579,7 @@ async function buildPDF(id) {
         doc.text("Foto " + (i + 1) + " indisponível: " + r.fotos[i], x, y + 4);
         doc.setTextColor(0); doc.setFontSize(9);
       }
-      if (col === cols - 1 || i === r.fotos.length - 1) y += thumbH + 6;
+      if (col === cols - 1 || i === r.fotos.length - 1) y += cellH + rowGap;
     }
   }
 
