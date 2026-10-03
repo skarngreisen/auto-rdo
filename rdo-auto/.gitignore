@@ -39,6 +39,15 @@ _internal/*.py
 _internal/*.pdf
 _internal/email-*.md
 
+# _internal/ subfolders (rules above use single * = direct children only)
+_internal/resumos/
+_internal/**/*.md
+_internal/**/*.py
+_internal/**/*.pdf
+# ...but keep security migrations versioned
+!_internal/seguranca/
+!_internal/seguranca/*.sql
+
 # references/ — large binary asset dump (inputs for manual review, not for the repo)
 references/*
 !references/RDOs Artesano.xlsx
