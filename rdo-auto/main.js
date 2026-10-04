@@ -966,8 +966,13 @@ async function viewRDO(rdo) {
 
   // Fotos
   let fotosHTML = empty("Nenhuma foto anexada.");
-  if (rdo.fotos && rdo.fotos.length > 0) {
-    fotosHTML = `<div class="photo-grid">${rdo.fotos.map(url => `<img src="${url}" class="photo-thumb" style="cursor:pointer;max-width:120px;border-radius:6px;" onclick="window.open('${url}')">`).join('')}</div>`;
+  const viewFotos = normalizePhotos(rdo.fotos);
+  if (viewFotos.length > 0) {
+    fotosHTML = `<div class="photo-grid">${viewFotos.map(f => {
+      const url = escapeHtml(f.url);
+      const cap = f.caption ? `<figcaption class="photo-caption-text">${escapeHtml(f.caption)}</figcaption>` : "";
+      return `<figure class="photo-figure"><img src="${url}" class="photo-thumb" style="cursor:pointer;max-width:120px;border-radius:6px;" onclick="window.open('${url}')">${cap}</figure>`;
+    }).join('')}</div>`;
   }
 
   c.innerHTML = `
@@ -1300,14 +1305,12 @@ function populateForm(rdo) {
   $("#planNextShift").value = rdo.planejamento_proximo_turno || "";
 
 
-  // Existing photos
-  selectedFiles = [];
+  // Existing photos (normalized: old string URLs and new {url, caption} both work)
+  selectedPhotos = [];
+  existingPhotos = normalizePhotos(rdo.fotos);
+  removedPhotoUrls = [];
   photoInput.value = "";
-  if (rdo.fotos && rdo.fotos.length > 0) {
-    $("#existingPhotos").innerHTML = `<p style="font-size:.78rem;color:#6b7280;margin-top:.5rem;">Fotos existentes (serao mantidas):</p><div class="photo-grid">${rdo.fotos.map(url => `<img src="${url}" class="photo-thumb">`).join("")}</div>`;
-  } else {
-    $("#existingPhotos").innerHTML = "";
-  }
+  renderExistingPhotos();
   renderPhotoPreview();
 }
 
@@ -1681,39 +1684,173 @@ DEFAULT_ROLES.forEach(r => addTeamMemberRow(r,""));
 // ============================================================
 // PHOTOS
 // ============================================================
-let selectedFiles = [];
+const MAX_PHOTOS = 6;
+const MAX_CAPTION_LEN = 120;
+// New photos pending upload: [{ file, caption }]
+let selectedPhotos = [];
+// Photos already saved on the RDO: [{ url, caption }]
+let existingPhotos = [];
+// Photo URLs the user removed. Deleted from Storage on submit.
+let removedPhotoUrls = [];
+
+// Old RDOs store fotos as ["url", ...]; new ones as [{url, caption}].
+// Normalize either shape into [{url, caption}] so both keep working.
+function normalizePhotos(fotos) {
+  if (!Array.isArray(fotos)) return [];
+  return fotos.map(f => {
+    if (typeof f === "string") return { url: f, caption: "" };
+    if (f && typeof f === "object" && f.url) {
+      return { url: String(f.url), caption: f.caption == null ? "" : String(f.caption) };
+    }
+    return null;
+  }).filter(Boolean);
+}
+
 $("#photoInput").addEventListener("change", () => {
-  selectedFiles = Array.from($("#photoInput").files).slice(0, 3);
+  const picked = Array.from($("#photoInput").files).filter(f => f.type.startsWith("image/"));
+  const room = MAX_PHOTOS - existingPhotos.length - selectedPhotos.length;
+  if (room <= 0) {
+    showToast("Limite de " + MAX_PHOTOS + " fotos atingido.", "error");
+    $("#photoInput").value = "";
+    return;
+  }
+  if (picked.length > room) showToast("Só cabem mais " + room + " foto(s).", "error");
+  picked.slice(0, room).forEach(file => selectedPhotos.push({ file, caption: "" }));
+  // Reset the native input: files live in selectedPhotos from here on.
+  $("#photoInput").value = "";
   renderPhotoPreview();
 });
+
+// Wrap a thumbnail + remove button so a wrongly attached photo can be dropped.
+function photoThumbEl(src, onRemove) {
+  const wrap = document.createElement("div");
+  wrap.className = "photo-item";
+  const img = document.createElement("img");
+  img.src = src;
+  img.className = "photo-thumb";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "photo-remove";
+  btn.setAttribute("aria-label", "Remover foto");
+  btn.textContent = "\u00d7";
+  btn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); onRemove(); });
+  wrap.appendChild(img);
+  wrap.appendChild(btn);
+  return wrap;
+}
+
+// Caption field for one photo, wired to the given {caption} holder.
+function photoCaptionEl(holder, index, total, onChange) {
+  const field = document.createElement("div");
+  field.className = "photo-caption";
+  const label = document.createElement("label");
+  label.textContent = (index + 1) + "/" + total;
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Legenda da foto (opcional)";
+  input.value = holder.caption || "";
+  input.maxLength = MAX_CAPTION_LEN;
+  // Live counter so the limit is explicit before the user hits it.
+  const counter = document.createElement("span");
+  counter.className = "photo-caption-count";
+  const updateCounter = () => {
+    counter.textContent = input.value.length + "/" + MAX_CAPTION_LEN;
+  };
+  updateCounter();
+  input.addEventListener("input", () => {
+    holder.caption = input.value;
+    updateCounter();
+    if (onChange) onChange();
+  });
+  field.appendChild(label);
+  field.appendChild(input);
+  field.appendChild(counter);
+  return field;
+}
+
 function renderPhotoPreview() {
   const pg = $("#photoPreview");
   pg.innerHTML = "";
-  selectedFiles.forEach((file) => {
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
-    img.className = "photo-thumb";
-    pg.appendChild(img);
+  selectedPhotos.forEach((entry, index) => {
+    const url = URL.createObjectURL(entry.file);
+    pg.appendChild(photoThumbEl(url, () => {
+      selectedPhotos.splice(index, 1);
+      renderPhotoPreview();
+    }));
   });
-  for (let i = selectedFiles.length; i < 3; i++) {
+  for (let i = existingPhotos.length + selectedPhotos.length; i < MAX_PHOTOS; i++) {
     const div = document.createElement("div");
     div.className = "photo-placeholder";
     div.textContent = "+";
     pg.appendChild(div);
   }
+  renderPhotoCaptions();
 }
 
+function renderPhotoCaptions() {
+  const holder = $("#photoCaptions");
+  if (!holder) return;
+  holder.innerHTML = "";
+  selectedPhotos.forEach((entry, index) => {
+    holder.appendChild(photoCaptionEl(entry, index, selectedPhotos.length));
+  });
+}
+
+function renderExistingPhotos() {
+  const holder = $("#existingPhotos");
+  holder.innerHTML = "";
+  if (existingPhotos.length === 0) return;
+  const label = document.createElement("p");
+  label.className = "photo-existing-label";
+  label.textContent = "Fotos existentes (editaveis):";
+  holder.appendChild(label);
+  const grid = document.createElement("div");
+  grid.className = "photo-grid";
+  existingPhotos.forEach((entry, index) => {
+    grid.appendChild(photoThumbEl(entry.url, () => {
+      existingPhotos.splice(index, 1);
+      if (!removedPhotoUrls.includes(entry.url)) removedPhotoUrls.push(entry.url);
+      renderExistingPhotos();
+      renderPhotoPreview();
+    }));
+  });
+  holder.appendChild(grid);
+  existingPhotos.forEach((entry, index) => {
+    holder.appendChild(photoCaptionEl(entry, index, existingPhotos.length));
+  });
+}
+
+// Extract the storage object path from a public bucket URL (null if foreign).
+function storagePathFromUrl(url) {
+  const marker = `/storage/v1/object/public/${STORAGE_BUCKET}/`;
+  const i = url.indexOf(marker);
+  if (i === -1) return null;
+  return decodeURIComponent(url.slice(i + marker.length).split("?")[0]);
+}
+
+// Best-effort removal of user-dropped photos from Storage. Failure is not
+// fatal: the photo is already gone from the RDO payload either way.
+async function deleteRemovedPhotos() {
+  if (removedPhotoUrls.length === 0) return;
+  const paths = removedPhotoUrls.map(storagePathFromUrl).filter(Boolean);
+  removedPhotoUrls = [];
+  if (paths.length === 0) return;
+  const { error } = await sb.storage.from(STORAGE_BUCKET).remove(paths);
+  if (error) console.warn("Falha ao apagar foto(s) do storage:", error.message);
+}
+
+// Upload pending photos and return [{url, caption}] preserving order.
 async function uploadPhotos() {
-  if (selectedFiles.length === 0) return [];
-  const urls = [];
-  for (const file of selectedFiles) {
+  const out = [];
+  for (const entry of selectedPhotos) {
+    const file = entry.file;
     const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
     const { data, error } = await sb.storage.from(STORAGE_BUCKET).upload(fileName, file, { cacheControl:"3600", upsert:false });
     if (error) { showToast("Erro ao enviar foto: "+error.message,"error"); continue; }
     const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(data.path);
-    urls.push(urlData.publicUrl);
+    out.push({ url: urlData.publicUrl, caption: entry.caption || "" });
   }
-  return urls;
+  return out;
 }
 
 // ============================================================
@@ -2250,13 +2387,13 @@ $("#btnSubmit").addEventListener("click", async () => {
   $("#btnSubmit").disabled = true;
   $("#btnSubmit").innerHTML = '<span class="spinner"></span> Enviando...';
   try {
-    const photoUrls = await uploadPhotos();
+    const uploaded = await uploadPhotos();
+    // Drop photos the user removed from Storage (best-effort, non-blocking).
+    await deleteRemovedPhotos();
     const payload = buildPayload("em_revisao");
     payload.submitted_at = new Date().toISOString();
-    // Merge new photos with existing ones
-    const existingUrls = [];
-    $$("#existingPhotos img").forEach(img => existingUrls.push(img.src));
-    payload.fotos = [...existingUrls, ...photoUrls];
+    // Surviving existing photos + newly uploaded ones, each {url, caption}.
+    payload.fotos = [...existingPhotos, ...uploaded];
     if (payload.fotos.length === 0) delete payload.fotos;
 
     const rdoId = $("#rdoId").value;
@@ -2325,9 +2462,12 @@ function resetForm() {
   $("#bombaObs").value = "";
   clearTable("#jateamentoTable"); addJateamentoRow("","","","","");
   clearTable("#teamTable"); DEFAULT_ROLES.forEach(r => addTeamMemberRow(r,""));
-  selectedFiles = [];
+  selectedPhotos = [];
+  existingPhotos = [];
+  removedPhotoUrls = [];
   $("#photoInput").value = "";
   $("#existingPhotos").innerHTML = "";
+  $("#photoCaptions").innerHTML = "";
   renderPhotoPreview();
 
   // Clear pre-fill notes, inherited markers, and last stratigraphy

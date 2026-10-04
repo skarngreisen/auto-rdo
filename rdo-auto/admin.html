@@ -271,6 +271,29 @@ const sb = window.supabase.createClient(
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
+const STORAGE_BUCKET = "fotos";
+const MAX_PHOTOS = 6;
+
+// Escape text before injecting into innerHTML.
+function escapeHtml(str) {
+  return String(str == null ? "" : str)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+// Old RDOs store fotos as ["url", ...]; new ones as [{url, caption}].
+// Normalize either shape into [{url, caption}] so both keep working.
+function normalizePhotos(fotos) {
+  if (!Array.isArray(fotos)) return [];
+  return fotos.map(f => {
+    if (typeof f === "string") return { url: f, caption: "" };
+    if (f && typeof f === "object" && f.url) {
+      return { url: String(f.url), caption: f.caption == null ? "" : String(f.caption) };
+    }
+    return null;
+  }).filter(Boolean);
+}
+
 // ── Auth guard (admin/geólogo only) ──
 let currentUser = null, currentProfile = null;
 (async function adminAuth() {
@@ -907,8 +930,13 @@ async function viewRDO(id) {
 
   // Fotos
   let fotosHTML = empty("Nenhuma foto anexada.");
-  if (r.fotos && r.fotos.length > 0) {
-    fotosHTML = `<div class="photo-grid">${r.fotos.map(url => `<img src="${url}" class="photo-thumb" style="cursor:pointer;max-width:120px;border-radius:6px;" onclick="window.open('${url}')">`).join('')}</div>`;
+  const viewFotos = normalizePhotos(r.fotos);
+  if (viewFotos.length > 0) {
+    fotosHTML = `<div class="photo-grid">${viewFotos.map(f => {
+      const url = escapeHtml(f.url);
+      const cap = f.caption ? `<figcaption class="photo-caption-text">${escapeHtml(f.caption)}</figcaption>` : "";
+      return `<figure class="photo-figure"><img src="${url}" class="photo-thumb" style="cursor:pointer;max-width:120px;border-radius:6px;" onclick="window.open('${url}')">${cap}</figure>`;
+    }).join('')}</div>`;
   }
 
   c.innerHTML = `
@@ -1556,31 +1584,60 @@ async function buildPDF(id) {
     }
   }
 
-  if (r.fotos && r.fotos.length > 0) {
+  const pdfFotos = normalizePhotos(r.fotos);
+  if (pdfFotos.length > 0) {
+    // 2 columns x 3 rows → 6 photos on a single page.
+    // Usable width = 210 - 2*15 = 180mm → cellW = (180 - gap)/2.
+    const cols = 2, gap = 8, rowGap = 6;
+    const cellW = (W - 2 * M - gap) / 2;   // 86mm
+    const cellH = 72;                      // image box height
+    const capLines = 2, capLineH = 3.5;    // caption area below each image
+    const capBoxH = capLines * capLineH + 2;
+    const rowH = cellH + capBoxH + rowGap;
+    const rows = Math.ceil(pdfFotos.length / cols);
+    const blockH = rows * cellH + (rows - 1) * rowGap + capBoxH * rows;
+
+    // Keep the whole photo block together on one page: if it won't fit in the
+    // remaining space, start a fresh page before drawing anything. A full page
+    // holds one block (blockH ≈ 255mm from y=15), so this never loops twice.
+    ensureSpace(SECTION_GAP + LINE + blockH);
     section("Fotos");
-    const cols = 2, cellW = 85, cellH = 64, gap = 8, rowGap = 8;
-    for (let i = 0; i < r.fotos.length; i++) {
+
+    const startY = y;
+    for (let i = 0; i < pdfFotos.length; i++) {
+      const foto = pdfFotos[i];
       const col = i % cols;
+      const row = Math.floor(i / cols);
       const x = M + col * (cellW + gap);
-      if (col === 0) ensureSpace(cellH + 12); // new row: ensure it fits before drawing
-      const dataURL = await loadImageDataURL(r.fotos[i]);
+      const cellY = startY + row * rowH;
+      const dataURL = await loadImageDataURL(foto.url);
       if (dataURL) {
-        const ext = (r.fotos[i].split(".").pop().split("?")[0] || "jpeg").toLowerCase();
+        const ext = (foto.url.split(".").pop().split("?")[0] || "jpeg").toLowerCase();
         const fmtImg = ext === "png" ? "PNG" : (ext === "webp" ? "WEBP" : "JPEG");
         try {
-          await addImageCover(dataURL, fmtImg, x, y, cellW, cellH);
+          await addImageCover(dataURL, fmtImg, x, cellY, cellW, cellH);
         } catch (_) {
           doc.setFontSize(7); doc.setTextColor(120);
-          doc.text("Foto " + (i + 1) + " (erro ao carregar)", x, y + 4);
+          doc.text("Foto " + (i + 1) + " (erro ao carregar)", x, cellY + 4);
           doc.setTextColor(0); doc.setFontSize(9);
         }
       } else {
         doc.setFontSize(7); doc.setTextColor(120);
-        doc.text("Foto " + (i + 1) + " indisponível: " + r.fotos[i], x, y + 4);
+        doc.text("Foto " + (i + 1) + " indisponível", x, cellY + 4);
         doc.setTextColor(0); doc.setFontSize(9);
       }
-      if (col === cols - 1 || i === r.fotos.length - 1) y += cellH + rowGap;
+      // Caption under the image (wrapped, clamped to capLines).
+      if (foto.caption) {
+        doc.setFontSize(7.5); doc.setTextColor(70);
+        const capW = cellW - 2;
+        let lines = doc.splitTextToSize(foto.caption, capW).slice(0, capLines);
+        if (lines.length === 0) lines = [foto.caption];
+        doc.text(lines, x, cellY + cellH + capLineH);
+        doc.setTextColor(0); doc.setFontSize(9);
+      }
     }
+    // Advance past the whole block (caption box already counted per row).
+    y = startY + rows * rowH + capBoxH - rowGap;
   }
 
   // ── Histórico de revisão ────────────────────────────────

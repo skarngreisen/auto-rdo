@@ -122,10 +122,12 @@ rdo-auto/
 - Calculo automatico do total por linha
 
 ### Fotos
-- Upload multiplo de fotos (JPEG, PNG, WebP) para Supabase Storage
+- Upload multiplo de fotos (JPEG, PNG, WebP) para Supabase Storage, ate 6 por RDO
 - Preview em miniatura antes do envio
-- Remocao de fotas individuais
-- Fotos enviadas apenas na submissao final (nao no rascunho)
+- Legenda por foto (opcional, ate 120 caracteres); RDOs antigos com `[url1, url2, ...]` continuam sendo lidos
+- Remocao de fotos individuais
+- Fotos novas sao enviadas apenas na submissao final (nao no rascunho); ao remover uma foto ja salva, o arquivo e apagado do Storage (best-effort)
+- Edicao de RDO ja enviado gera uma nova versao (V2), preservando o historico
 
 ### Fluxo de Aprovacao
 - **Rascunho**: salvo no Supabase, editavel pelo autor
@@ -176,7 +178,7 @@ rdo-auto/
 | `estratigrafia_mudancas` | `[{ profundidade, descricao }]` |
 | `outros_materiais` | `[{ item, qtd }]` |
 | `insumos` | `[{ item, qtd }]` |
-| `fotos` | `[url1, url2, ...]` |
+| `fotos` | `[{ url, caption }]` (max 6) |
 
 ### RLS (Row-Level Security)
 

@@ -246,14 +246,45 @@ input.inherited, textarea.inherited {
    PHOTO PREVIEW
    ============================================================ */
 .photo-grid { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
+.photo-item { position: relative; width: 72px; height: 72px; }
+.photo-existing-label { font-size: .78rem; color: #6b7280; margin-top: .5rem; }
 .photo-thumb {
   width: 72px; height: 72px; border-radius: 8px; object-fit: cover;
   border: 2px solid #e5e7eb;
+  display: block;
 }
+.photo-remove {
+  position: absolute; top: -6px; right: -6px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #dc2626; color: #fff; border: 2px solid #fff;
+  font-size: 14px; line-height: 1; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+}
+.photo-remove:hover { background: #b91c1c; }
 .photo-placeholder {
   width: 72px; height: 72px; border-radius: 8px; border: 2px dashed #d1d5db;
   display: flex; align-items: center; justify-content: center;
   color: #9ca3af; font-size: 1.5rem;
+}
+/* Caption inputs under the photo preview */
+.photo-caption { display: flex; align-items: center; gap: .5rem; margin-top: .5rem; }
+.photo-caption label {
+  flex: 0 0 auto; font-size: .72rem; font-weight: 600; color: #9ca3af;
+  min-width: 2.2rem; text-align: right;
+}
+.photo-caption input {
+  flex: 1 1 auto; font-size: .82rem; padding: .4rem .55rem;
+}
+.photo-caption-count {
+  flex: 0 0 auto; font-size: .72rem; color: #9ca3af;
+  font-variant-numeric: tabular-nums; min-width: 3.2rem; text-align: right;
+}
+/* View: photo + caption */
+.photo-figure { margin: 0; display: flex; flex-direction: column; align-items: center; max-width: 120px; }
+.photo-caption-text {
+  font-size: .72rem; color: #4b5563; margin-top: .3rem;
+  text-align: center; line-height: 1.25; word-break: break-word;
 }
 
 /* ============================================================

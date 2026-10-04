@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS rdos (
     fluido          JSONB,    -- { densidade, viscosidade, filtrado, ph, agua_livre, areia, api_cake, solidos }
 
     -- Photos
-    fotos           JSONB,    -- [ "url1", "url2", "url3" ]
+    fotos           JSONB,    -- [ { url, caption } ] ; legacy [ "url1", ... ] still read (max 6)
 
     version         INT NOT NULL DEFAULT 1,
     reopen_requested BOOLEAN NOT NULL DEFAULT false,
