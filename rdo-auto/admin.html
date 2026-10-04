@@ -942,6 +942,9 @@ async function viewRDO(id) {
       row("Turno", r.turno ? "Turno " + r.turno : '-')
     )}
 
+    ${section("Operacoes", opsHTML)}
+    ${section("Equipe", eqHTML)}
+
     ${section("Perfuracao",
       row("Houve avanco?", r.profundidade_final != null ? yn(true) : yn(false)) +
       (r.profundidade_final != null
@@ -964,8 +967,6 @@ async function viewRDO(id) {
     ${section("Quimicos", quimicosHTML)}
     ${section("Combustivel", fuelHTML)}
     ${section("Materiais", matHTML)}
-    ${section("Operacoes", opsHTML)}
-    ${section("Equipe", eqHTML)}
 
     ${section("Sonda",
       row("Horímetro", r.sonda_horimetro != null ? r.sonda_horimetro + " h" : empty("Não preenchido")) +
@@ -1267,6 +1268,27 @@ async function buildPDF(id) {
   doc.setDrawColor(192, 160, 160); doc.line(M, y, W - M, y);
   y += LINE;
 
+  // ── Operações ────────────────────────────────────────────
+  // Ordem de leitura do RDO: Operações e Equipe vêm logo após a Identificação.
+  section("Operações");
+  if (r.operacoes && r.operacoes.length > 0) {
+    table(["Início", "Término", "Tipo", "Descritivo"],
+      r.operacoes.map(o => [fmt(o.inicio), fmt(o.termino), fmt(o.tipo || "Normal"), fmt(o.descritivo)]),
+      [22, 22, 26, 110]);
+  } else {
+    kv("", "Nenhuma operação registrada.");
+  }
+
+  // ── Equipe ───────────────────────────────────────────────
+  section("Equipe");
+  if (r.equipe && r.equipe.length > 0) {
+    table(["Função", "Nome"],
+      r.equipe.map(e => [fmt(e.funcao), fmt(e.nome)]),
+      [50, 130]);
+  } else {
+    kv("", "Nenhum membro de equipe registrado.");
+  }
+
   // ── Perfuração ───────────────────────────────────────────
   section("Perfuração");
   const perfSummary = computeStriplogSummary(r.striplog);
@@ -1439,26 +1461,6 @@ async function buildPDF(id) {
       [90, 50, 40]);
   } else {
     kv("", "Nenhum material adicional utilizado.");
-  }
-
-  // ── Operações ────────────────────────────────────────────
-  section("Operações");
-  if (r.operacoes && r.operacoes.length > 0) {
-    table(["Início", "Término", "Tipo", "Descritivo"],
-      r.operacoes.map(o => [fmt(o.inicio), fmt(o.termino), fmt(o.tipo || "Normal"), fmt(o.descritivo)]),
-      [22, 22, 26, 110]);
-  } else {
-    kv("", "Nenhuma operação registrada.");
-  }
-
-  // ── Equipe ───────────────────────────────────────────────
-  section("Equipe");
-  if (r.equipe && r.equipe.length > 0) {
-    table(["Função", "Nome"],
-      r.equipe.map(e => [fmt(e.funcao), fmt(e.nome)]),
-      [50, 130]);
-  } else {
-    kv("", "Nenhum membro de equipe registrado.");
   }
 
   // ── Sonda ────────────────────────────────────────────────
