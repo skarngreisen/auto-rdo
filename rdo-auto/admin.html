@@ -1687,7 +1687,10 @@ async function buildPDF(id) {
     }
   }
 
-  const filename = `RDO_${proj.cliente || "projeto"}_${r.data}.pdf`.replace(/\s+/g, "_");
+  // File name: client, date and turn (turno numeric -> "T1"; otherwise fall back
+  // to the project's shift text, e.g. "07h x 17h").
+  const turnoTag = r.turno ? ("T" + r.turno) : (proj.turno || "");
+  const filename = `RDO_${proj.cliente || "projeto"}_${r.data}${turnoTag ? "_" + turnoTag : ""}.pdf`.replace(/\s+/g, "_");
   return { doc, filename, r };
 }
 
