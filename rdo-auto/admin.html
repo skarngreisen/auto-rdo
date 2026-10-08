@@ -84,6 +84,37 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
   }
   .card { padding: .75rem; }
 }
+
+/* Rendered AI summary. Reading-oriented, not a code block. */
+.resumo-md { background:#f8fafc; border:1px solid #e5e7eb; border-radius:6px;
+  padding:1rem 1.15rem; max-height:45vh; overflow:auto; font-size:.82rem;
+  line-height:1.65; color:#1f2937; }
+.resumo-md h1 { font-size:1.05rem; font-weight:700; margin:0 0 .6rem; color:#1a1a2e;
+  padding-bottom:.4rem; border-bottom:2px solid #e8ecf1; }
+.resumo-md h2 { font-size:.92rem; font-weight:700; margin:1.1rem 0 .45rem; color:#1a1a2e; }
+.resumo-md h2:first-child { margin-top:0; }
+.resumo-md h3 { font-size:.84rem; font-weight:600; margin:.9rem 0 .35rem; color:#374151; }
+.resumo-md p { margin:.45rem 0; }
+.resumo-md ul { margin:.4rem 0 .6rem; padding-left:1.2rem; }
+.resumo-md li { margin:.22rem 0; }
+.resumo-md blockquote { margin:.6rem 0; padding:.5rem .75rem; border-left:3px solid #cbd5e1;
+  background:#f1f5f9; color:#475569; font-size:.78rem; border-radius:0 4px 4px 0; }
+.resumo-md blockquote p { margin:.2rem 0; }
+.resumo-md strong { font-weight:650; color:#111827; }
+.resumo-md code { background:#eef2f7; padding:.05rem .3rem; border-radius:3px;
+  font-family:ui-monospace,Consolas,monospace; font-size:.76rem; }
+/* The opening "Resumo" block is the one most people read, and nothing else. */
+.resumo-md h2.md-resumo { font-size:.86rem; text-transform:uppercase; letter-spacing:.04em;
+  color:#0f766e; margin:0 0 .4rem; }
+.resumo-md .md-resumo-corpo { background:#f0fdfa; border-left:3px solid #14b8a6;
+  border-radius:0 6px 6px 0; padding:.7rem .85rem; margin:.2rem 0 .9rem;
+  font-size:.86rem; line-height:1.7; color:#134e4a; }
+.resumo-md .md-resumo-corpo p { margin:.5rem 0; }
+.resumo-md .md-resumo-corpo p:first-child { margin-top:0; }
+.resumo-md .md-resumo-corpo p:last-child { margin-bottom:0; }
+/* The consultation block sits below the reading block, visually secondary. */
+.resumo-md h2.md-detalhe { font-size:.82rem; color:#6b7280; font-weight:600; }
+.resumo-md .md-divisor { border:none; border-top:2px dashed #e5e7eb; margin:1.2rem 0 1rem; }
 </style>
 </head>
 <body>
@@ -242,6 +273,72 @@ input:focus, select:focus { outline: none; border-color: #3b82f6; }
     <div style="display:flex;gap:.5rem;margin-top:1rem;">
       <button class="btn btn-secondary" id="btnModalCancel" style="flex:1;">Cancelar</button>
       <button class="btn btn-primary" id="btnModalSave" style="flex:1;">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: AI Summary -->
+<div class="modal-overlay" id="modalAiSummary">
+  <div class="modal" style="max-width:760px;">
+    <h2>Resumo AI</h2>
+    <p id="aiProjetoNome" style="font-size:.8rem;color:#6b7280;margin:.2rem 0 .75rem;"></p>
+
+    <!-- key selection -->
+    <div class="row">
+      <div style="flex:1;">
+        <label>Escolha a API key</label>
+        <select id="aiKeySelect"><option value="">Carregando...</option></select>
+      </div>
+      <div style="flex:0 0 auto;display:flex;align-items:flex-end;gap:.4rem;padding-bottom:.1rem;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnAiManageKeys">Gerenciar</button>
+      </div>
+    </div>
+    <p id="aiKeyHint" style="font-size:.72rem;color:#6b7280;margin:.3rem 0 0;"></p>
+
+    <div style="display:flex;gap:.5rem;margin-top:.75rem;">
+      <button type="button" class="btn btn-primary btn-sm" id="btnAiGenerate">Gerar Resumo</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="btnAiForce" style="display:none;">Regerar Completo</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="btnAiReset" style="display:none;">Regerar do Zero</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="btnAiClose" style="margin-left:auto;">Fechar</button>
+    </div>
+
+    <div id="aiStatus" style="display:none;margin-top:.75rem;font-size:.8rem;"></div>
+
+    <div id="aiOutputWrap" style="display:none;margin-top:.75rem;">
+      <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;">
+        <span id="aiOutputMeta" style="font-size:.72rem;color:#6b7280;"></span>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnAiCopy" style="margin-left:auto;">Copiar</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnAiDownload">Exportar .md</button>
+      </div>
+      <div id="aiOutput" class="resumo-md"></div>
+    </div>
+
+    <!-- new key form -->
+    <div id="aiKeyForm" style="display:none;margin-top:.9rem;border-top:2px solid #e8ecf1;padding-top:.75rem;">
+      <div class="card-header">Adicionar uma nova API Key</div>
+      <label>Título</label>
+      <input type="text" id="aiNewTitulo" placeholder="ex: DeepSeek, Claude da DH, Minha chave pessoal">
+      <label>API Key</label>
+      <input type="password" id="aiNewKey" placeholder="cole a chave fornecida pelo provedor" autocomplete="off">
+      <p id="aiDetectHint" style="font-size:.72rem;color:#6b7280;margin:.35rem 0 0;">Ao salvar, identificamos o provedor automaticamente.</p>
+      <details style="margin-top:.5rem;">
+        <summary style="font-size:.75rem;color:#6b7280;cursor:pointer;">Avançado: endpoint da API</summary>
+        <input type="text" id="aiNewBaseUrl" placeholder="deixe em branco para detectar automaticamente" style="margin-top:.4rem;">
+      </details>
+      <div style="display:flex;gap:.5rem;margin-top:.75rem;">
+        <button type="button" class="btn btn-primary btn-sm" id="btnAiSaveKey">Salvar chave</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnAiCancelKey">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- key management -->
+    <div id="aiKeyManager" style="display:none;margin-top:.9rem;border-top:2px solid #e8ecf1;padding-top:.75rem;">
+      <div class="card-header">API keys cadastradas</div>
+      <div id="aiKeyList" style="font-size:.78rem;"></div>
+      <div style="display:flex;gap:.5rem;margin-top:.75rem;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnAiAddFromManager">+ Adicionar chave</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnAiCloseManager">Voltar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -471,6 +568,7 @@ async function loadProjetos() {
       <td style="font-size:.78rem;">${geoMap[p.id] || '-'}</td>
       <td class="actions">
         <button class="btn btn-secondary btn-sm" onclick="editProject('${p.id}')">Editar</button>
+        <button class="btn btn-secondary btn-sm" onclick="openAiSummary('${p.id}', this.dataset.proj)" data-proj="${(p.cliente || "").replace(/"/g, "&quot;")}">Resumo AI</button>
         ${currentProfile && currentProfile.role === "admin" ? `<button class="btn btn-danger btn-sm" onclick="confirmDeleteProject('${p.id}','${p.cliente}')">Excluir</button>` : ""}
       </td>
     </tr>`).join("");
@@ -1694,6 +1792,20 @@ $("#btnConfirmOk").addEventListener("click", async () => {
   if (!deleteTarget) return;
   let error;
   const wasProject = deleteTarget.type === "project";
+
+  // AI key removal goes through the Edge Function: the keys table is not
+  // readable or writable by client roles at all.
+  if (deleteTarget.type === "ai_key") {
+    const res = await aiFetch("delete_key", { key_id: deleteTarget.id });
+    deleteTarget = null;
+    $("#modalConfirm").classList.remove("show");
+    if (res.erro) { toast(res.erro, "error"); return; }
+    toast("API key removida!", "success");
+    await aiLoadKeys();
+    if ($("#aiKeyManager").style.display === "block") aiRenderKeyManager();
+    return;
+  }
+
   if (wasProject) {
     // Soft delete: marca como apagado, não remove a linha (recuperável + auditado).
     ({ error } = await sb.from("projetos").update({
@@ -1710,6 +1822,558 @@ $("#btnConfirmOk").addEventListener("click", async () => {
   $("#modalConfirm").classList.remove("show");
   if (wasProject) { loadProjetos(); loadRDOFilters(); }
   else loadRDOs();
+});
+
+// ============================================================
+// AI SUMMARY
+// ============================================================
+// The user registers an API key (title + key). The provider is derived by the
+// Edge Function from the key prefix or the endpoint host. See
+// supabase/functions/ai-summary/index.ts.
+
+const AI_FN_URL = "https://fecskilrtsaeavoznwgi.supabase.co/functions/v1/ai-summary";
+
+let aiProjetoId = null;
+let aiKeysCache = [];
+let aiLastOutput = "";
+
+function aiErrMsg(detail) {
+  return detail ? " Detalhe técnico: " + detail : "";
+}
+
+// Human-readable duration from a millisecond count.
+function aiFormatarDuracao(ms) {
+  const s = Math.max(0, ms) / 1000;
+  if (s < 60) return s.toFixed(1).replace(".", ",") + "s";
+  const min = Math.floor(s / 60);
+  const resto = Math.round(s % 60);
+  return min + "min " + String(resto).padStart(2, "0") + "s";
+}
+
+function aiShowStatus(text, type) {
+  const el = $("#aiStatus");
+  el.style.display = "block";
+  el.className = type === "error" ? "ai-status ai-status-error" : "ai-status";
+  el.style.background = type === "error" ? "#fef2f2" : "#f0f9ff";
+  el.style.border = "1px solid " + (type === "error" ? "#fecaca" : "#bae6fd");
+  el.style.borderRadius = "6px";
+  el.style.padding = ".5rem .65rem";
+  el.style.color = type === "error" ? "#991b1b" : "#075985";
+  el.innerHTML = text;
+}
+
+function aiClearStatus() {
+  const el = $("#aiStatus");
+  el.style.display = "none";
+  el.innerHTML = "";
+}
+
+async function aiFetch(action, payload) {
+  const { data } = await sb.auth.getSession();
+  const token = data?.session?.access_token;
+  if (!token) {
+    return { erro: "Sessão expirada. Faça login novamente.", code: "no_token" };
+  }
+  let resp;
+  try {
+    resp = await fetch(AI_FN_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token,
+      },
+      body: JSON.stringify(Object.assign({ action: action }, payload || {})),
+    });
+  } catch (e) {
+    return { erro: "Não foi possível conectar ao serviço de resumo.", code: "network", detail: e.message };
+  }
+  let body;
+  try {
+    body = await resp.json();
+  } catch (_) {
+    return { erro: "Resposta inválida do serviço de resumo.", code: "bad_json" };
+  }
+  return body;
+}
+
+// ── markdown rendering ──────────────────────────────────────
+// The summary is model output derived from user-entered fields, so it is
+// untrusted text. Escape FIRST, then apply formatting: never the other way
+// around, or HTML typed into an RDO observation becomes executable markup here.
+
+function renderResumoMd(md) {
+  // 1. Escape everything. After this the string contains no live HTML.
+  const t = escapeHtml(md || "");
+
+  // 2. Format, using only the subset the summary template produces.
+  const linhas = t.split(/\r?\n/);
+  const out = [];
+  let emLista = false;
+  let emQuote = false;
+
+  // The document has two reading layers. Everything from this heading down is
+  // the consultation block, so it gets a divider and a secondary look.
+  const SECOES_DETALHE = [
+    "O que aconteceu, por fase",
+    "Equipe e logística",
+    "Fluido, químicos e insumos",
+    "HSE e intercorrências",
+  ];
+  let detalheAberto = false;
+  let emSecaoResumo = false;
+  let resumoAberto = false;
+
+  const fechaLista = () => { if (emLista) { out.push("</ul>"); emLista = false; } };
+  const fechaQuote = () => { if (emQuote) { out.push("</blockquote>"); emQuote = false; } };
+  const fechaResumo = () => { if (resumoAberto) { out.push("</div>"); resumoAberto = false; } };
+
+  for (const linha of linhas) {
+    const s = linha.trim();
+
+    if (!s) { fechaLista(); fechaQuote(); continue; }
+
+    const h = /^(#{1,3})\s+(.*)$/.exec(s);
+    if (h) {
+      fechaLista(); fechaQuote();
+      const nivel = h[1].length;
+      const titulo = h[2];
+      const soTitulo = titulo.replace(/<[^>]*>/g, "").trim();
+
+      let classe = "";
+      if (nivel === 2) {
+        // Close the opening block as soon as another section starts.
+        fechaResumo();
+        emSecaoResumo = false;
+
+        if (soTitulo === "Resumo") {
+          classe = ' class="md-resumo"';
+          emSecaoResumo = true;
+        } else if (SECOES_DETALHE.includes(soTitulo)) {
+          if (!detalheAberto) {
+            out.push('<hr class="md-divisor">');
+            detalheAberto = true;
+          }
+          classe = ' class="md-detalhe"';
+        }
+      }
+      out.push("<h" + nivel + classe + ">" + inlineMd(titulo) + "</h" + nivel + ">");
+      continue;
+    }
+
+    // After escaping, a literal ">" is "&gt;". Structural markers must be
+    // matched in their escaped form, otherwise blockquotes never match.
+    if (/^&gt;\s?/.test(s)) {
+      fechaLista();
+      if (!emQuote) { out.push("<blockquote>"); emQuote = true; }
+      out.push("<p>" + inlineMd(s.replace(/^&gt;\s?/, "")) + "</p>");
+      continue;
+    }
+    fechaQuote();
+
+    const li = /^[-*]\s+(.*)$/.exec(s);
+    if (li) {
+      if (!emLista) { out.push("<ul>"); emLista = true; }
+      out.push("<li>" + inlineMd(li[1]) + "</li>");
+      continue;
+    }
+    fechaLista();
+
+    // The text under "## Resumo" is the single most-read block, so it gets the
+    // highlighted card instead of plain paragraphs. It may be two paragraphs,
+    // so the wrapper opens on the first and closes at the next section.
+    if (emSecaoResumo) {
+      if (!resumoAberto) { out.push('<div class="md-resumo-corpo">'); resumoAberto = true; }
+      out.push('<p>' + inlineMd(s) + "</p>");
+      continue;
+    }
+
+    out.push("<p>" + inlineMd(s) + "</p>");
+  }
+  fechaLista(); fechaQuote();
+  // Close the opening block if the document ends before another section.
+  if (resumoAberto) out.push("</div>");
+  return out.join("\n");
+}
+
+// Inline formatting, applied to already-escaped text.
+function inlineMd(s) {
+  return s
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+}
+
+function aiMostrarResumo(texto) {
+  aiLastOutput = texto || "";
+  $("#aiOutput").innerHTML = renderResumoMd(aiLastOutput);
+  $("#aiOutputWrap").style.display = "block";
+}
+
+// ── key list ────────────────────────────────────────────────
+
+function aiRenderKeySelect() {
+  const sel = $("#aiKeySelect");
+  // The Edge Function already filters out deleted keys, so this list is active
+  // by construction. Do not re-filter on a `deleted` field the API may omit.
+  const ativos = aiKeysCache;
+
+  if (!ativos.length) {
+    sel.innerHTML = '<option value="">Nenhuma API key cadastrada</option>';
+    sel.value = "";
+    $("#btnAiGenerate").disabled = true;
+    $("#aiKeyHint").textContent = "Cadastre uma API key para poder gerar o resumo.";
+    // With zero keys, open the registration form right away.
+    $("#aiKeyForm").style.display = "block";
+    return;
+  }
+
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">Escolha uma API key...</option>' +
+    ativos.map(k =>
+      '<option value="' + k.id + '">' + escapeHtml(k.titulo) +
+      ' (' + escapeHtml(k.provedor_rotulo || k.provedor) + ')</option>'
+    ).join("") +
+    '<option value="__new__">Adicionar uma nova API Key</option>';
+
+  // Prefer the previously selected key; otherwise select the only key available
+  // so "Gerar Resumo" is immediately usable after registering the first one.
+  if (prev && Array.from(sel.options).some(o => o.value === prev)) {
+    sel.value = prev;
+  } else if (ativos.length === 1) {
+    sel.value = ativos[0].id;
+  }
+
+  $("#btnAiGenerate").disabled = !sel.value || sel.value === "__new__";
+  aiUpdateKeyHint();
+}
+
+function aiUpdateKeyHint() {
+  const val = $("#aiKeySelect").value;
+  const hint = $("#aiKeyHint");
+  const key = aiKeysCache.find(k => k.id === val);
+
+  if (val === "__new__") {
+    hint.textContent = "";
+    $("#aiKeyForm").style.display = "block";
+    $("#btnAiGenerate").disabled = true;
+    return;
+  }
+  $("#aiKeyForm").style.display = "none";
+
+  if (!key) {
+    hint.textContent = "";
+    $("#btnAiGenerate").disabled = true;
+    return;
+  }
+  const partes = [];
+  if (key.last_used_at) {
+    partes.push("Último uso: " + new Date(key.last_used_at).toLocaleString("pt-BR"));
+  } else {
+    partes.push("Ainda não usada.");
+  }
+  if (key.last_error) partes.push("Última tentativa falhou.");
+  hint.textContent = partes.join(" · ");
+}
+
+async function aiLoadKeys() {
+  const res = await aiFetch("list_keys", {});
+  if (res.erro) {
+    aiKeysCache = [];
+    aiRenderKeySelect();
+    aiShowStatus(escapeHtml(res.erro) + escapeHtml(aiErrMsg(res.detail)), "error");
+    return;
+  }
+  aiKeysCache = res.keys || [];
+  aiRenderKeySelect();
+}
+
+// ── key manager ─────────────────────────────────────────────
+
+function aiRenderKeyManager() {
+  const box = $("#aiKeyList");
+  if (!aiKeysCache.length) {
+    box.innerHTML = '<p style="color:#6b7280;">Nenhuma API key cadastrada.</p>';
+    return;
+  }
+  box.innerHTML = aiKeysCache.map(k => {
+    const usada = k.last_used_at
+      ? "usada em " + new Date(k.last_used_at).toLocaleDateString("pt-BR")
+      : "nunca usada";
+    const erro = k.last_error
+      ? '<div style="color:#b91c1c;font-size:.7rem;margin-top:.15rem;">Última tentativa falhou.</div>'
+      : "";
+    return '<div style="display:flex;align-items:flex-start;gap:.5rem;padding:.5rem 0;border-bottom:1px solid #f1f5f9;">' +
+      '<div style="flex:1;">' +
+        '<strong>' + escapeHtml(k.titulo) + '</strong>' +
+        '<div style="color:#6b7280;font-size:.72rem;">' +
+          escapeHtml(k.provedor_rotulo || k.provedor) +
+          " · criada em " + new Date(k.created_at).toLocaleDateString("pt-BR") +
+          " · " + usada +
+        '</div>' + erro +
+      '</div>' +
+      '<button type="button" class="btn btn-danger btn-sm" onclick="aiAskDeleteKey(\'' + k.id + '\')">Remover</button>' +
+    '</div>';
+  }).join("");
+}
+
+function aiAskDeleteKey(keyId) {
+  const key = aiKeysCache.find(k => k.id === keyId);
+  deleteTarget = { type: "ai_key", id: keyId, name: key ? key.titulo : "esta API key" };
+  $("#confirmTitle").textContent = "Remover API key?";
+  $("#confirmMsg").textContent = 'Tem certeza que deseja remover "' + (key ? key.titulo : "") +
+    '"? Os resumos já gerados continuam salvos; só a chave sai da lista.';
+  $("#modalConfirm").classList.add("show");
+}
+
+// ── open / close ────────────────────────────────────────────
+
+function openAiSummary(projetoId, projetoNome) {
+  aiProjetoId = projetoId;
+  aiLastOutput = "";
+  $("#aiProjetoNome").textContent = projetoNome ? "Projeto: " + projetoNome : "";
+  $("#aiOutputWrap").style.display = "none";
+  $("#aiOutput").textContent = "";
+  $("#aiKeyManager").style.display = "none";
+  $("#aiKeyForm").style.display = "none";
+  $("#aiKeySelect").value = "";
+  $("#btnAiForce").style.display = "none";
+  $("#btnAiReset").style.display = "none";
+  aiClearStatus();
+  $("#modalAiSummary").classList.add("show");
+  aiLoadKeys();
+}
+
+function closeAiSummary() {
+  aiProjetoId = null;
+  $("#modalAiSummary").classList.remove("show");
+}
+
+// ── generate ────────────────────────────────────────────────
+
+async function aiGenerate(force, reset) {
+  const keyId = $("#aiKeySelect").value;
+
+  // Never fail silently: a click that does nothing looks like a broken button.
+  if (!aiProjetoId) {
+    aiShowStatus("Projeto não identificado. Feche esta janela e abra o Resumo AI pelo botão do projeto.", "error");
+    return;
+  }
+  if (!keyId) {
+    aiShowStatus("Escolha uma API key no dropdown antes de gerar o resumo.", "error");
+    return;
+  }
+  if (keyId === "__new__") {
+    aiShowStatus("Preencha e salve a nova API key antes de gerar o resumo.", "error");
+    return;
+  }
+
+  $("#btnAiGenerate").disabled = true;
+  $("#btnAiForce").disabled = true;
+  $("#btnAiReset").disabled = true;
+
+  // The provider call can take a minute on a project with many RDOs. Show a
+  // live timer so the screen never looks frozen.
+  const inicio = Date.now();
+  const pintar = () => {
+    const s = Math.round((Date.now() - inicio) / 1000);
+    aiShowStatus('<strong>Gerando resumo… ' + s + 's</strong><br>' +
+      (reset
+        ? "Regerando do zero: o resumo anterior foi descartado. Não feche esta janela."
+        : "A chamada ao provedor pode levar até um minuto em projetos grandes. Não feche esta janela."), "info");
+  };
+  pintar();
+  const ticker = setInterval(pintar, 1000);
+
+  let res;
+  try {
+    res = await aiFetch("generate", {
+      key_id: keyId,
+      projeto_id: aiProjetoId,
+      force: force === true,
+      reset: reset === true,
+    });
+  } finally {
+    clearInterval(ticker);
+  }
+
+  $("#btnAiGenerate").disabled = false;
+  $("#btnAiForce").disabled = false;
+  $("#btnAiReset").disabled = false;
+  if (res.erro) {
+    aiShowStatus("<strong>" + escapeHtml(res.erro) + "</strong>" + escapeHtml(aiErrMsg(res.detail)), "error");
+    if (res.code === "chave_recusada") aiLoadKeys();
+    return;
+  }
+
+  if (res.nada_novo) {
+    aiShowStatus(escapeHtml(res.mensagem || "Nenhuma novidade desde o último resumo.") +
+      " (consultado em " + aiFormatarDuracao(Date.now() - inicio) + ")", "info");
+    if (res.conteudo) {
+      aiMostrarResumo(res.conteudo);
+      $("#aiOutputMeta").textContent = "Resumo anterior" + (res.gerado_em ? " · " + new Date(res.gerado_em).toLocaleDateString("pt-BR") : "");
+    }
+    $("#btnAiForce").style.display = "inline-block";
+    $("#btnAiReset").style.display = "inline-block";
+    return;
+  }
+
+  aiMostrarResumo(res.conteudo);
+  const meta = [];
+  if (res.projeto_nome) meta.push(res.projeto_nome);
+  if (res.key_titulo) meta.push(res.key_titulo);
+  if (res.novos_rdos != null) meta.push(res.novos_rdos + " RDO(s) novo(s)");
+  if (res.rdos_cobertos != null) meta.push(res.rdos_cobertos + " no total");
+  // Elapsed time is measured in the browser, from the click to the response,
+  // so it includes the network round trip and not just the provider call.
+  meta.push("gerado em " + aiFormatarDuracao(Date.now() - inicio));
+  if (res.custo_estimado_usd != null) meta.push("~US$ " + res.custo_estimado_usd.toFixed(4));
+  $("#aiOutputMeta").textContent = meta.join(" · ");
+  $("#aiOutputWrap").style.display = "block";
+  $("#btnAiForce").style.display = "none";
+  $("#btnAiReset").style.display = "inline-block";
+
+  if (res.aviso) {
+    aiShowStatus(escapeHtml(res.aviso) + escapeHtml(aiErrMsg(res.detail)), "error");
+  } else {
+    aiShowStatus(res.incremental
+      ? "Resumo atualizado com as informações novas."
+      : "Resumo gerado a partir de todos os RDOs ativos.", "info");
+  }
+  aiLoadKeys();
+}
+
+// ── wiring ──────────────────────────────────────────────────
+
+$("#aiKeySelect").addEventListener("change", aiUpdateKeyHint);
+$("#btnAiGenerate").addEventListener("click", () => aiGenerate(false));
+$("#btnAiForce").addEventListener("click", () => aiGenerate(true));
+$("#btnAiReset").addEventListener("click", () => {
+  if (!confirm("Regerar do zero descarta o resumo atual e escreve um novo do início.\n\nO histórico anterior fica guardado, mas deixa de ser usado como base. Continuar?")) return;
+  aiGenerate(true, true);
+});
+$("#btnAiClose").addEventListener("click", closeAiSummary);
+$("#modalAiSummary").addEventListener("click", e => { if (e.target === $("#modalAiSummary")) closeAiSummary(); });
+
+$("#btnAiManageKeys").addEventListener("click", () => {
+  $("#aiKeyManager").style.display = "block";
+  $("#aiKeyForm").style.display = "none";
+  aiRenderKeyManager();
+});
+$("#btnAiCloseManager").addEventListener("click", () => { $("#aiKeyManager").style.display = "none"; });
+$("#btnAiAddFromManager").addEventListener("click", () => {
+  $("#aiKeyManager").style.display = "none";
+  $("#aiKeyForm").style.display = "block";
+});
+
+$("#btnAiCancelKey").addEventListener("click", () => {
+  $("#aiNewTitulo").value = "";
+  $("#aiNewKey").value = "";
+  $("#aiNewBaseUrl").value = "";
+  aiUpdateDetectHint();
+  if (aiKeysCache.length) $("#aiKeyForm").style.display = "none";
+  else aiRenderKeySelect();
+});
+
+// Live hint about what will happen on save.
+function aiUpdateDetectHint() {
+  const k = $("#aiNewKey").value.trim();
+  const url = $("#aiNewBaseUrl").value.trim();
+  const hint = $("#aiDetectHint");
+  if (url) {
+    hint.textContent = "Provedor identificado pelo endpoint informado.";
+    return;
+  }
+  if (!k) {
+    hint.textContent = "Ao salvar, identificamos o provedor automaticamente.";
+    return;
+  }
+  // Prefix is only a hint: the real answer comes from probing the providers.
+  if (k.startsWith("sk-ant-")) hint.textContent = "Parece Anthropic. Vamos confirmar ao salvar.";
+  else if (/^AIza/.test(k)) hint.textContent = "Parece Google Gemini. Vamos confirmar ao salvar.";
+  else if (/^gsk_/.test(k)) hint.textContent = "Parece Groq. Vamos confirmar ao salvar.";
+  else if (/^sk-or-/.test(k)) hint.textContent = "Parece OpenRouter. Vamos confirmar ao salvar.";
+  else hint.textContent = "Ao salvar, identificamos o provedor automaticamente.";
+}
+$("#aiNewKey").addEventListener("input", aiUpdateDetectHint);
+$("#aiNewBaseUrl").addEventListener("input", aiUpdateDetectHint);
+
+$("#btnAiSaveKey").addEventListener("click", async () => {
+  const titulo = $("#aiNewTitulo").value.trim();
+  const apiKey = $("#aiNewKey").value.trim();
+  const baseUrl = $("#aiNewBaseUrl").value.trim();
+
+  if (!titulo) { aiShowStatus("Dê um nome para identificar esta API key.", "error"); return; }
+  if (!apiKey) { aiShowStatus("Cole a API key que você quer cadastrar.", "error"); return; }
+
+  $("#btnAiSaveKey").disabled = true;
+  const t0 = Date.now();
+  const tick = () => {
+    const s = Math.round((Date.now() - t0) / 1000);
+    aiShowStatus("Identificando o provedor… " + s + "s<br>" +
+      "Estamos testando a chave nos provedores conhecidos.", "info");
+  };
+  tick();
+  const ticker = setInterval(tick, 1000);
+
+  const payload = { titulo: titulo, api_key: apiKey };
+  if (baseUrl) payload.base_url = baseUrl;
+
+  let res;
+  try {
+    res = await aiFetch("save_key", payload);
+  } finally {
+    clearInterval(ticker);
+  }
+  $("#btnAiSaveKey").disabled = false;
+
+  if (res.erro) {
+    // The "not supported" case gets the full list so the user knows what to ask for.
+    if (res.code === "provedor_nao_suportado") {
+      const lista = (res.suportados || []).map(p => "• " + escapeHtml(p.rotulo)).join("<br>");
+      aiShowStatus(
+        "<strong>Essa API key não foi reconhecida.</strong><br>" +
+        "Atualmente só suportamos as chaves destes provedores:<br><br>" + lista +
+        "<br><br>Se o seu provedor não está na lista, contate o admin.",
+        "error"
+      );
+    } else {
+      aiShowStatus("<strong>" + escapeHtml(res.erro) + "</strong>" + escapeHtml(aiErrMsg(res.detail)), "error");
+    }
+    return;
+  }
+
+  $("#aiNewTitulo").value = "";
+  $("#aiNewKey").value = "";
+  $("#aiNewBaseUrl").value = "";
+  aiUpdateDetectHint();
+  $("#aiKeyForm").style.display = "none";
+
+  await aiLoadKeys();
+  if (res.key && res.key.id) $("#aiKeySelect").value = res.key.id;
+  aiUpdateKeyHint();
+  aiShowStatus("Chave cadastrada e identificada como <strong>" +
+    escapeHtml(res.provedor_rotulo || res.provedor_detectado) + "</strong>.", "info");
+  toast("API key cadastrada!", "success");
+});
+
+$("#btnAiCopy").addEventListener("click", async () => {
+  if (!aiLastOutput) return;
+  try {
+    await navigator.clipboard.writeText(aiLastOutput);
+    toast("Resumo copiado!", "success");
+  } catch (_) {
+    toast("Não foi possível copiar. Selecione o texto manualmente.", "error");
+  }
+});
+
+$("#btnAiDownload").addEventListener("click", () => {
+  if (!aiLastOutput) return;
+  const nome = ($("#aiProjetoNome").textContent || "resumo").replace(/^Projeto:\s*/, "").replace(/[^\w\-]+/g, "-");
+  const blob = new Blob([aiLastOutput], { type: "text/markdown;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "resumo-" + nome + "-" + new Date().toISOString().slice(0, 10) + ".md";
+  a.click();
+  URL.revokeObjectURL(a.href);
 });
 
 // ============================================================

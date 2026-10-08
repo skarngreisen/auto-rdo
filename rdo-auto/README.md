@@ -80,6 +80,11 @@ rdo-auto/
 ├── .gitignore          # Exclui .env.local e node_modules
 ├── .env.local          # Credenciais locais (nao commitado)
 ├── README.md           # Este arquivo
+├── supabase/
+│   └── functions/
+│       ├── notify-telegram/    # Envia mensagem via bot do Telegram
+│       ├── telegram-webhook/   # Onboarding do bot (vincula chat_id)
+│       └── ai-summary/         # Resumo AI: list/save/delete de API keys + geracao incremental
 ├── docs/
 │   ├── estrutura_referencia.md   # Schema extraido da planilha original
 │   └── lacunas-bdo.md            # Analise de lacunas do BDO atual
@@ -129,6 +134,41 @@ rdo-auto/
 - Fotos novas sao enviadas apenas na submissao final (nao no rascunho); ao remover uma foto ja salva, o arquivo e apagado do Storage (best-effort)
 - Edicao de RDO ja enviado gera uma nova versao (V2), preservando o historico
 
+### Resumo AI incremental (aba Projetos)
+
+Na aba **Projetos** do painel admin, cada projeto tem o botao **Resumo AI**. Ele abre uma janela com um dropdown de API keys, um botao **Gerar Resumo** e uma area de resultado com **Copiar** e **Exportar .md**.
+
+- **Cadastro de API key**: o usuario informa apenas um **titulo** (ex.: "DeepSeek", "Claude da DH") e a **API key**. Nao existe escolha de modelo nem de provedor.
+- **Deteccao do provedor e empirica**: uma API key e uma string aleatoria, e prefixo so revela o provedor quando ele escolhe usar um (o `sk-` e compartilhado por varios). Entao o cadastro **sonda os provedores em paralelo** e o primeiro que aceitar a chave vence. Leva 3 segundos e nao depende de adivinhacao.
+- **A sondagem exige prova dupla**: o endpoint precisa aceitar a chave **e** recusar a mesma chamada sem credencial. Sem isso, um catalogo publico de modelos (o da OpenRouter, por exemplo) responderia 200 para uma chave invalida e daria um falso positivo.
+- **Se nenhum provedor aceitar**, o cadastro e recusado com a lista do que e suportado e a orientacao de contatar o admin.
+
+Provedores suportados (em `ai_provedores`, a lista e dado, nao codigo):
+
+| Provedor | Formato | Modelo default |
+|---|---|---|
+| Anthropic (Claude) | anthropic | claude-sonnet-4-5 |
+| OpenAI | openai_compat | gpt-4o |
+| DeepSeek | openai_compat | deepseek-v4-flash |
+| Qwen (Alibaba) | openai_compat | qwen-max |
+| Moonshot (Kimi) | openai_compat | moonshot-v1-8k |
+| Zhipu (GLM) | openai_compat | glm-4-plus |
+| Groq | openai_compat | llama-3.3-70b-versatile |
+| OpenRouter | openai_compat | anthropic/claude-sonnet-4.5 |
+| Mistral | openai_compat | mistral-large-latest |
+| Google Gemini | gemini | gemini-2.0-flash |
+
+**Adicionar um provedor novo** e um `INSERT` em `ai_provedores` (host, formato, endpoint de sondagem), nao codigo novo. Os provedores chineses em geral falam o formato OpenAI, entao entram por essa via. So `anthropic` e `gemini` exigem formato proprio, porque tem API propria.
+- **Gerenciar** lista as chaves com tipo detectado, data de criacao, ultimo uso e um aviso quando a ultima tentativa falhou. O botao **Remover** faz soft delete.
+- **Resumo incremental**: o resumo e acumulativo por projeto. A primeira geracao le todos os RDOs **ativos** (ignorando os soft-deleted, incluindo rascunhos e em revisao). As geracoes seguintes enviam ao provedor o resumo anterior mais apenas os RDOs novos, com instrucao explicita de preservar o texto existente. Se nao houver nada novo, nenhuma chamada e feita e a UI oferece **Regerar Completo**.
+- **Template**: o formato do resumo fica em `ai_config.template_resumo` (secoes Avanco fisico, O que aconteceu por fase, Equipe e logistica, Fluido/quimicos/insumos, HSE e intercorrencias, Planejamento e pendencias, Alertas de dados, Resumo em uma frase).
+
+#### Seguranca das API keys
+
+A tabela `ai_api_keys` tem RLS habilitada **sem nenhuma policy** e todas as permissoes revogadas de `anon` e `authenticated`. Nem um admin consegue ler a chave pelo navegador. O dropdown da UI e populado pela Edge Function `ai-summary`, que devolve apenas id, titulo, provedor e metadados, nunca o valor da chave.
+
+Uma consequencia pratica: o `service_role` nao recebe GRANT automatico em tabelas criadas por SQL, entao a migration concede `SELECT` em `projetos`, `rdos` e `profiles` para ele.
+
 ### Fluxo de Aprovacao
 - **Rascunho**: salvo no Supabase, editavel pelo autor
 - **Em Revisao**: submetido, visivel para supervisores/administradores
@@ -161,6 +201,10 @@ rdo-auto/
 | `profiles` | Extensao de `auth.users` com nome, role e telefone |
 | `projetos` | Projetos de perfuracao (cliente, localidade, sonda, data, turno) |
 | `rdos` | Relatorios diarios com dados estruturados em JSONB |
+| `ai_api_keys` | API keys do resumo AI. Bloqueada: sem policy de RLS e sem GRANT para `anon`/`authenticated` |
+| `ai_provedores` | Registro de provedores (host, formato, endpoint de sondagem, modelo default). Leitura liberada, escrita so pelo service role |
+| `ai_resumos` | Resumo acumulativo por projeto, com os ids dos RDOs ja cobertos |
+| `ai_config` | Configuracao singleton do resumo AI (template do texto). Bloqueada como `ai_api_keys` |
 
 ### Colunas JSONB em `rdos`
 
